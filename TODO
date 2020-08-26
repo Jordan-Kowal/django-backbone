@@ -1,0 +1,54 @@
+# TODO
+
+## API
+
+#### Core API
+- [ ] Make django script to remove migrations
+- [ ] Make django script to remove migrations > deletes db > make migrations > migrate > create super user
+
+#### Users API
+- [x] Move auth services from core to users
+- [ ] Update login/logout services with token auth
+- [ ] Write tests for auth services
+
+#### Contact API
+- [ ] Update Contact model/admin
+- [ ] Write Contact services
+- [ ] Write tests for those services
+- [ ] Ban spammer (either with IP ban from core or something else)
+- [ ] Write tests for ban scenario
+
+#### Emails
+Update the design and content of the following emails:
+- [ ] Users
+    - [ ] Verify
+    - [ ] Welcome
+    - [ ] Password reset
+    - [ ] Password update
+- [ ] Contact
+    - [ ] Admin alert
+    - [ ] User alert
+
+
+
+
+## FRONT
+- [x] Validate structure for modules (store in each?)
+- [ ] Validate a general design and color scheme
+- [x] Install and implement Vuetify
+- [ ] Build 6 pages (design only)
+    - [ ] Home
+    - [ ] Contact
+    - [ ] Charts
+    - [ ] Error
+    - [ ] Login
+    - [ ] User Management
+- [ ] Build a few pages for "design examples"
+- [ ] Components for message displays
+- [ ] Probably make a mixin around Axios
+
+
+
+
+## Others
+- [ ] Update README.md

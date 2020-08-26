@@ -1,0 +1,42 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        {{ css }}
+    </style>
+</head>
+
+
+<body>
+    <div id="container">
+        <div id="header">
+            <img id="logo" src="{{ domain }}/media/core/logo.png" alt="Logo"/>
+        </div>
+        <div id="content">
+            <h1>Validation de votre compte</h1>
+            <h2>Dernière étape pour valider votre compte</h2>
+            <p>
+                Suite à la création de votre compte sur notre site, vous trouverez ci-dessous
+                un lien cliquable nous permettant de vérifier si l'adresse email
+                que vous avez fournie est valide.
+            </p>
+            <p>
+                Une fois votre compte validé, vous aurez accès à l'ensemble de nos fonctionnalités.
+                Il vous suffit simplement de cliquez sur le bouton ci-dessous :
+            </p>
+            <a class="button primary" href="{{ verification_link }}">
+                Vérifier mon email
+            </a>
+            <p class="button-sub-text">
+                ou cliquez sur le lien ci-après : {{ verification_link }}
+            </p>
+            {% include "core/emails/_signature.html" %}
+        </div>
+        {% include "core/emails/_footer.html" %}
+    </div>
+</body>

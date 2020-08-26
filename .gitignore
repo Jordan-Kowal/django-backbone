@@ -1,0 +1,102 @@
+### IDE ###
+.vscode
+.idea
+
+
+### Django ###
+*.log
+*.pot
+*.pyc
+__pycache__/
+*local_settings.py
+*.sqlite3
+**/media/*
+!**/media/core
+
+
+### Virtual Environment ###
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.python-version # Python versioning
+
+
+### Packaging ###
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+
+### PyInstaller ###
+*.manifest
+*.spec
+
+
+### Installer Logs ###
+pip-log.txt
+pip-delete-this-directory.txt
+
+
+### Testing ###
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+
+### MyPy ###
+.mypy_cache
+
+
+### Translation ###
+# *.mo
+
+
+### VueJS ###
+node_modules/
+.DS_Store
+node_modules
+/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*

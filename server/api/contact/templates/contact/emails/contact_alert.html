@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        {{ css }}
+    </style>
+</head>
+
+
+<body>
+    <div id="container">
+        <div id="header">
+            <img id="logo" src="{{ domain }}/media/core/logo.png" alt="Logo"/>
+        </div>
+        <div id="content">
+            <h1>Nouveau message</h1>
+            <h2>Envoyé via le formulaire de contact</h2>
+            <p>
+                Vous avez reçu un nouveau message de la part de
+                <strong>{{ contact.name }}</strong> intitulé <strong>{{ contact.subject }}</strong>.
+                <br/>
+                Pour le consulter, cliquez sur le bouton ci-dessous :
+            </p>
+            <a class="button primary" href="{{ contact_admin_url }}">
+                Voir le message
+            </a>
+            <p class="button-sub-text">
+                ou cliquez sur le lien ci-après : {{ contact_admin_url }}
+            </p>
+            {% include "core/emails/_signature.html" %}
+        </div>
+        {% include "core/emails/_footer.html" %}
+    </div>
+</body>
