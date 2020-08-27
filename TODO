@@ -27,6 +27,7 @@ Update the design and content of the following emails:
 - [ ] Contact
     - [ ] Admin alert
     - [ ] User alert
+    - [ ] Config either in settings or Contact class
 
 #### Others
 - [ ] Update README.md
