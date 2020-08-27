@@ -1,10 +1,9 @@
 # TODO
 
-## API
-
 #### Core API
-- [ ] Make django script to remove migrations
-- [ ] Make django script to remove migrations > deletes db > make migrations > migrate > create super user
+- [ ] Make django script to delete migration files
+- [ ] Make django script to deletes db > remove migrations > make migrations > migrate > create super user
+- [ ] Move it to jklib
 
 #### Users API
 - [x] Move auth services from core to users
@@ -29,26 +28,5 @@ Update the design and content of the following emails:
     - [ ] Admin alert
     - [ ] User alert
 
-
-
-
-## FRONT
-- [x] Validate structure for modules (store in each?)
-- [ ] Validate a general design and color scheme
-- [x] Install and implement Vuetify
-- [ ] Build 6 pages (design only)
-    - [ ] Home
-    - [ ] Contact
-    - [ ] Charts
-    - [ ] Error
-    - [ ] Login
-    - [ ] User Management
-- [ ] Build a few pages for "design examples"
-- [ ] Components for message displays
-- [ ] Probably make a mixin around Axios
-
-
-
-
-## Others
+#### Others
 - [ ] Update README.md
