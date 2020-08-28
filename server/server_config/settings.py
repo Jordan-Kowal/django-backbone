@@ -118,10 +118,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {"min_length": 10,},
+        "OPTIONS": {
+            "min_length": 10,
+        },
     },
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
 
 
@@ -165,20 +171,25 @@ SITE_ID = 1
 #       ALLOWED_HOST
 #       SECURE_SSL_REDIRECT
 #       FRONTEND_ROOT_URL
+#
 #   reCAPTCHA
 #       RECAPTCHA_SITE_KEY
 #       RECAPTCHA_SECRET_KEY
+#
 #   Cookies
 #       CSRF_COOKIE_HTTPONLY
 #       CSRF_COOKIE_SECURE
+#
 #   Session
 #       SESSION_COOKIE_AGE
 #       SESSION_COOKIE_HTTPONLY
 #       SESSION_COOKIE_SECURE
 #       SESSION_ENGINE
 #       SESSION_EXPIRE_AT_BROWSER_CLOSE
+#
 #   Databases:
 #       DATABASES
+#
 #   Emails:
 #       EMAIL_BACKEND
 #       EMAIL_HOST
@@ -186,7 +197,12 @@ SITE_ID = 1
 #       EMAIL_USE_TLS
 #       EMAIL_HOST_USER
 #       EMAIL_HOST_PASSWORD
+#
+#   Custom Django Commands:
+#       SUPER_USER (dict with username, password, email)
+
 try:
+    # Local
     from .local_settings import *
 except ImportError as e:
     print(e)

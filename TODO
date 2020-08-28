@@ -3,6 +3,7 @@
 #### Core API
 - [ ] Make django script to delete migration files
 - [ ] Make django script to deletes db > remove migrations > make migrations > migrate > create super user
+- [ ] Create Operation and Task classes
 - [ ] Move it to jklib
 
 #### Users API
