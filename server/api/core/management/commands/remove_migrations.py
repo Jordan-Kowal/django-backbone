@@ -4,18 +4,20 @@ Native Django models (like User) are not impacted and their migration files will
 """
 
 
-# Django
-from django.core.management.base import BaseCommand
+# Personal
+from jklib.django.commands.commands import ImprovedCommand
 
 # Local
-from ...operations import ask_user_to_proceed, remove_migrations
+from ...operations import RemoveMigrations
 
 
 # --------------------------------------------------------------------------------
 # > Class
 # --------------------------------------------------------------------------------
-class Command(BaseCommand):
-    """Django command to delete all our custom migration files"""
+class Command(ImprovedCommand):
+    """Command to delete all our custom migration files"""
+
+    operation_class = RemoveMigrations
 
     def add_arguments(self, parser):
         """
@@ -35,6 +37,6 @@ class Command(BaseCommand):
         proceed = False
         if not force:
             print("You are about to remove all of your custom apps migration files")
-            proceed = ask_user_to_proceed()
+            proceed = self.ask_user_to_proceed()
         if force or proceed:
-            remove_migrations()
+            self.run_operation()

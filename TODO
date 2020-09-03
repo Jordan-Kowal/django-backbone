@@ -4,10 +4,13 @@
 - [ ] Make django script to delete migration files
 - [ ] Make django script to deletes db > remove migrations > make migrations > migrate > create super user
 - [ ] Create Operation and Task classes
-- [ ] Move it to jklib
+- [ ] Extend Command class to provide "proceed" function
+- [ ] Move those classes to jklib
 
 #### Users API
 - [x] Move auth services from core to users
+- [ ] (JKLIB) Handle "staff vs users" serializers
+- [ ] Add "Staff" versions for services
 - [ ] Update login/logout services with token auth
 - [ ] Write tests for auth services
 

@@ -8,18 +8,20 @@ Django command to completely reset the application database. It will:
 Only works for sqlite3 databases
 """
 
-# Django
-from django.core.management.base import BaseCommand
+# Personal
+from jklib.django.commands.commands import ImprovedCommand
 
 # Local
-from ...operations import ask_user_to_proceed, reset_sqlite3_database
+from ...operations import DeleteSqlite3Database
 
 
 # --------------------------------------------------------------------------------
 # > Class
 # --------------------------------------------------------------------------------
-class Command(BaseCommand):
+class Command(ImprovedCommand):
     """Django command to reset the sqlite3 database"""
+
+    operation_class = DeleteSqlite3Database
 
     # ----------------------------------------
     # Behavior
@@ -56,9 +58,9 @@ class Command(BaseCommand):
         proceed = False
         if not force:
             self._show_proceed_warning(remake_migrations, create_user)
-            proceed = ask_user_to_proceed()
+            proceed = self.ask_user_to_proceed()
         if force or proceed:
-            reset_sqlite3_database(remake_migrations, create_user)
+            self.run_operation(remake_migrations, create_user)
 
     # ----------------------------------------
     # Private
@@ -77,8 +79,10 @@ class Command(BaseCommand):
         :param bool remake_migrations: Whether we will delete and remake the migration files
         :param bool create_user: Whether we will create a new super user
         """
-        messages = ["The following actions will be run"]
-        messages.append("  > Delete the sqlite3 database file")
+        messages = [
+            "The following actions will be run",
+            "  > Delete the sqlite3 database file",
+        ]
         if remake_migrations:
             messages.append("  > Delete and remake the migration files")
         messages.append("  > Create a brand new sqlite3 database file")
