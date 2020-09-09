@@ -8,7 +8,7 @@ Native Django models (like User) are not impacted and their migration files will
 from jklib.django.commands.commands import ImprovedCommand
 
 # Local
-from ...operations import RemoveMigrations
+from ...operations import OperationRemoveMigrations
 
 
 # --------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ from ...operations import RemoveMigrations
 class Command(ImprovedCommand):
     """Command to delete all our custom migration files"""
 
-    operation_class = RemoveMigrations
+    operation_class = OperationRemoveMigrations
 
     def add_arguments(self, parser):
         """

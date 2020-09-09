@@ -22,7 +22,7 @@ from jklib.django.commands.operations import Operation, OperationTask
 # --------------------------------------------------------------------------------
 # > Tasks
 # --------------------------------------------------------------------------------
-class CreateSuperUser(OperationTask):
+class TaskCreateSuperUser(OperationTask):
     """Creates a new super user based on the settings values"""
 
     name = "Superuser creation"
@@ -39,7 +39,7 @@ class CreateSuperUser(OperationTask):
         self.print_success(f"Super user '{username}' was created")
 
 
-class DeleteMigrationFiles(OperationTask):
+class TaskDeleteMigrationFiles(OperationTask):
     """
     Searches the 'migrations' folders and remove the migration files
     It does not remove the __init__.py file
@@ -60,11 +60,11 @@ class DeleteMigrationFiles(OperationTask):
                     if re.search(regex, filename) is not None:
                         filepath = os.path.join(dirpath, filename)
                         os.remove(filepath)
-                        self.print_success(f"Removing {filepath}")
+                        self.print_success(f"Removed {filepath}")
                         delete_count += 1
 
 
-class DeleteSqlite3Database(OperationTask):
+class TaskDeleteSqlite3Database(OperationTask):
     """Finds and removes the sqlite3 database file"""
 
     name = "Sqlite3 removal"
@@ -76,13 +76,13 @@ class DeleteSqlite3Database(OperationTask):
         _, file_ext = os.path.splitext(db_filepath)
         if file_ext == ".sqlite3":
             self.print_info("Removing sqlite3 database...")
-            print(db_filepath)
-            self.print_info("Database successfully removed")
+            os.remove(db_filepath)
+            self.print_success("Database successfully removed")
         else:
             raise Exception("Error: Database must be a sqlite3 file")
 
 
-class MakeAndDoMigrations(OperationTask):
+class TaskMakeAndDoMigrations(OperationTask):
     """Make and apply migrations using the classic Django commands"""
 
     name = "Migration update"
@@ -100,13 +100,14 @@ class MakeAndDoMigrations(OperationTask):
 # --------------------------------------------------------------------------------
 # > Operations
 # --------------------------------------------------------------------------------
-class RemoveMigrations(Operation):
+class OperationRemoveMigrations(Operation):
     """Operation to remove migration files"""
 
-    tasks = [DeleteMigrationFiles]
+    name = "Migration files removal"
+    tasks = [TaskDeleteMigrationFiles]
 
 
-class ResetSqlite3Database(Operation):
+class OperationResetSqlite3Database(Operation):
     """
     Operation that will perform the following tasks:
         Delete the sqlite3 database
@@ -116,16 +117,18 @@ class ResetSqlite3Database(Operation):
         (Optional) Create super user
     """
 
+    name = "Sqlite3 Database Reset"
+
     def __init__(self, remake_migrations, create_user):
         """
         Adds additional tasks to delete migration files and create superuser based on the args
         :param bool remake_migrations: Whether to delete and remake the migration files
         :param bool create_user: Whether to automatically create a super user
         """
-        tasks = [DeleteSqlite3Database]
+        tasks = [TaskDeleteSqlite3Database]
         if remake_migrations:
-            tasks.append(DeleteMigrationFiles)
-        tasks.append(MakeAndDoMigrations)
+            tasks.append(TaskDeleteMigrationFiles)
+        tasks.append(TaskMakeAndDoMigrations)
         if create_user:
-            tasks.append(CreateSuperUser)
+            tasks.append(TaskCreateSuperUser)
         self.tasks = tasks

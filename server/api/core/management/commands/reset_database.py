@@ -12,7 +12,7 @@ Only works for sqlite3 databases
 from jklib.django.commands.commands import ImprovedCommand
 
 # Local
-from ...operations import DeleteSqlite3Database
+from ...operations import OperationResetSqlite3Database
 
 
 # --------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ from ...operations import DeleteSqlite3Database
 class Command(ImprovedCommand):
     """Django command to reset the sqlite3 database"""
 
-    operation_class = DeleteSqlite3Database
+    operation_class = OperationResetSqlite3Database
 
     # ----------------------------------------
     # Behavior

@@ -1,11 +1,11 @@
 # TODO
 
 #### Core API
-- [ ] Make django script to delete migration files
-- [ ] Make django script to deletes db > remove migrations > make migrations > migrate > create super user
-- [ ] Create Operation and Task classes
-- [ ] Extend Command class to provide "proceed" function
-- [ ] Move those classes to jklib
+- [x] Make django script to delete migration files
+- [x] Make django script to deletes db > remove migrations > make migrations > migrate > create super user
+- [x] Create Operation and Task classes
+- [x] Extend Command class to provide "proceed" function
+- [x] Move those classes to jklib
 
 #### Users API
 - [x] Move auth services from core to users
