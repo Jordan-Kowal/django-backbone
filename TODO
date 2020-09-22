@@ -9,8 +9,21 @@
 
 #### Users API
 - [x] Move auth services from core to users
-- [ ] (JKLIB) Handle "staff vs users" serializers
-- [ ] Add "Staff" versions for services
+- [x] (JKLIB) Handle "staff vs users" serializers
+- [ ] Add "Staff" versions for services and tests
+    - [x] create
+    - [ ] destroy
+    - [x] list
+    - [ ] perform_password_reset
+    - [ ] request_password_reset
+    - [x] retrieve
+    - [ ] self
+    - [ ] send_verification_email
+    - [x] update
+    - [ ] update_password
+    - [ ] verify
+    - [ ] login
+    - [ ] logout
 - [ ] Update login/logout services with token auth
 - [ ] Write tests for auth services
 

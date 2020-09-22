@@ -13,6 +13,7 @@ from ._shared import RetrieveUserSerializer
 class RetrieveUserHandler(ModelActionHandler):
     """Fetches a user's data"""
 
+    serializer_mode = "normal"
     serializer = RetrieveUserSerializer
 
     def main(self):

@@ -39,6 +39,7 @@ class ListUserSerializer(ModelSerializer):
 class ListUserHandler(ModelActionHandler):
     """Fetches the list of existing users"""
 
+    serializer_mode = "normal"
     serializer = ListUserSerializer
 
     def main(self):

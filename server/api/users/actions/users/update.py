@@ -5,7 +5,7 @@
 from jklib.django.drf.actions import ModelActionHandler
 
 # Local
-from ._shared import UpdateUserSerializer
+from ._shared import UpdateAdminSerializer, UpdateUserSerializer
 
 
 # --------------------------------------------------------------------------------
@@ -14,7 +14,8 @@ from ._shared import UpdateUserSerializer
 class UpdateUserHandler(ModelActionHandler):
     """Updates a user data"""
 
-    serializer = UpdateUserSerializer
+    serializer_mode = "user"
+    serializer = {"user": UpdateUserSerializer, "admin": UpdateAdminSerializer}
 
     def main(self):
         """

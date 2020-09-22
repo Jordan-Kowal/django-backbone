@@ -34,6 +34,78 @@ class RetrieveUserSerializer(ModelSerializer):
         return user_representation(user)
 
 
+class UpdateAdminSerializer(NotEmptyModelSerializer):
+    """
+    Model serializer to update a user's data, destined to ADMIN users
+    Can update more fields than the basic UpdateUserSerializer
+    Because the email is also the username, it is required and must be unique
+    """
+
+    is_verified = BooleanField(required=False)
+
+    # ----------------------------------------
+    # Behavior
+    # ----------------------------------------
+    class Meta:
+        """Meta class to setup the serializer"""
+
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "is_active",
+            "is_staff",
+            "is_verified",
+        ]
+        extra_kwargs = {
+            "email": {**required()},
+        }
+
+    def update(self, user, validated_data):
+        """
+        Behavior when saving the serializer associated to an existing user
+        Will update both the User and its Profile instance
+        :param User user: The User instance to update
+        :param dict validated_data: Validated data of the serializer
+        :return: The updated user instance
+        :rtype: User
+        """
+        # Updating the models
+        user.email = validated_data.get("email", user.email)
+        user.first_name = validated_data.get("first_name", user.first_name)
+        user.last_name = validated_data.get("last_name", user.last_name)
+        user.is_active = validated_data.get("is_active", user.is_active)
+        user.is_staff = validated_data.get("is_staff", user.is_staff)
+        profile = user.profile
+        profile.is_verified = validated_data.get("is_verified", profile.is_verified)
+        # Saving the models (starting with deepest)
+        profile.save()
+        user.save()
+        return user
+
+    def to_representation(self, user):
+        """
+        Returns the formatted user data
+        :param User user: The targeted user instance
+        :return: Dict containing our user data
+        :rtype: dict
+        """
+        return user_representation(user)
+
+    # ----------------------------------------
+    # Validation
+    # ----------------------------------------
+    def validate_email(self, email):
+        """
+        Checks that the new email is still unique
+        :param str email: The provided email
+        :return: The email initial data
+        :rtype: str
+        """
+        return validate_email_is_still_unique(self.instance.email, email)
+
+
 class UpdateUserSerializer(NotEmptyModelSerializer):
     """
     Model serializer to update a user data
@@ -60,7 +132,6 @@ class UpdateUserSerializer(NotEmptyModelSerializer):
     def update(self, user, validated_data):
         """
         Behavior when saving the serializer associated to an existing user
-        Will update both the User and its Profile instance
         :param User user: The User instance to update
         :param dict validated_data: Validated data of the serializer
         :return: The updated user instance
@@ -86,16 +157,12 @@ class UpdateUserSerializer(NotEmptyModelSerializer):
     # ----------------------------------------
     def validate_email(self, email):
         """
-        If the email changes, checks that it is still unique
+        Checks that the new email is still unique
         :param str email: The provided email
         :return: The email initial data
         :rtype: str
         """
-        if email != self.instance.email:
-            users = User.objects.filter(email=email)
-            if len(users) > 0:
-                raise ValidationError("This email is already taken")
-        return email
+        return validate_email_is_still_unique(self.instance.email, email)
 
 
 # --------------------------------------------------------------------------------
@@ -115,9 +182,25 @@ def user_representation(user):
         "last_name": user.last_name,
         "email": user.email,
         "is_active": user.is_active,
+        "is_staff": user.is_staff,
         "last_login": user.last_login,
         "profile": {"is_verified": profile.is_verified,},
     }
+
+
+def validate_email_is_still_unique(current_email, new_email):
+    """
+    If the email changes, checks that it is still unique
+    :param str current_email: The current email of our user
+    :param str new_email: The new email provided
+    :return: The email initial data
+    :rtype: str
+    """
+    if new_email != current_email:
+        users = User.objects.filter(email=new_email)
+        if len(users) > 0:
+            raise ValidationError("This email is already taken")
+    return new_email
 
 
 def validate_password_confirmation(password, password_confirmation):

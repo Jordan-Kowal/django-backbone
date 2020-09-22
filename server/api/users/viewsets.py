@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 # Personal
 from jklib.django.drf.permissions import (
     AllowAny,
+    IsAdminOrOwner,
     IsAdminUser,
     IsAuthenticated,
     IsNotAuthenticated,
@@ -73,18 +74,9 @@ class UserViewSet(DynamicViewSet):
     known_actions = {
         "create": {"handler": CreateUserHandler, "permissions": (IsNotAuthenticated,),},
         "list": {"handler": ListUserHandler, "permissions": (IsAdminUser,),},
-        "retrieve": {
-            "handler": RetrieveUserHandler,
-            "permissions": (IsObjectOwner | IsAdminUser,),
-        },
-        "update": {
-            "handler": UpdateUserHandler,
-            "permissions": (IsObjectOwner | IsAdminUser,),
-        },
-        "destroy": {
-            "handler": DestroyUserHandler,
-            "permissions": (IsObjectOwner | IsAdminUser,),
-        },
+        "retrieve": {"handler": RetrieveUserHandler, "permissions": (IsAdminOrOwner,),},
+        "update": {"handler": UpdateUserHandler, "permissions": (IsAdminOrOwner,),},
+        "destroy": {"handler": DestroyUserHandler, "permissions": (IsAdminOrOwner,),},
     }
 
     extra_actions = {

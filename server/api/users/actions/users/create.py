@@ -115,6 +115,7 @@ class CreateUserSerializer(NotEmptyModelSerializer):
 class CreateUserHandler(ActionHandler):
     """Creates a new user and sends him the verification email"""
 
+    serializer_mode = "normal"
     serializer = CreateUserSerializer
 
     def main(self):
