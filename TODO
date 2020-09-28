@@ -12,7 +12,7 @@
 - [x] (JKLIB) Handle "staff vs users" serializers
 - [ ] Add "Staff" versions for services and tests
     - [x] create
-    - [ ] destroy
+    - [x] destroy
     - [x] list
     - [ ] perform_password_reset
     - [ ] request_password_reset

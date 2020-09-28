@@ -11,7 +11,6 @@ from jklib.django.drf.permissions import (
     IsAuthenticated,
     IsNotAuthenticated,
     IsNotVerified,
-    IsObjectOwner,
 )
 from jklib.django.drf.viewsets import DynamicViewSet
 
@@ -25,7 +24,6 @@ from .actions import (
     PerformPasswordResetHandler,
     RequestPasswordResetHandler,
     RetrieveUserHandler,
-    SelfUserHandler,
     SendVerificationEmailHandler,
     UpdatePasswordHandler,
     UpdateUserHandler,
@@ -80,27 +78,20 @@ class UserViewSet(DynamicViewSet):
     }
 
     extra_actions = {
-        # ---------- Self crud ----------
-        "self": {
-            "handler": SelfUserHandler,
-            "permissions": (IsAuthenticated,),  # Targets current user
-            "methods": ["get", "put", "delete"],
-            "url_path": "self",
-            "detail": False,
-        },
+        # ---------- Additional crud ----------
         "update_password": {
             "handler": UpdatePasswordHandler,
-            "permissions": (IsAuthenticated,),  # Targets current user
+            "permissions": (IsAdminOrOwner,),
             "methods": ["post"],
-            "url_path": "self/update_password",
+            "url_path": "update_password",
             "detail": False,
         },
         # ---------- Verification ----------
         "send_verification_email": {
             "handler": SendVerificationEmailHandler,
-            "permissions": (IsAuthenticated, IsNotVerified),  # Targets current user
+            "permissions": (IsAdminOrOwner, IsNotVerified),
             "methods": ["post"],
-            "url_path": "self/send_verification_email",
+            "url_path": "send_verification_email",
             "detail": False,
         },
         "verify": {
