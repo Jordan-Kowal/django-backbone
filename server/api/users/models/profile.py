@@ -7,7 +7,7 @@ from django.db import models
 
 # Personal
 from jklib.django.utils.emails import send_html_email, send_html_email_async
-from jklib.django.utils.network import build_url_with_params
+from jklib.django.utils.network import build_url
 
 # Third-party
 from api.core.utils.emails import render_email_template
@@ -161,8 +161,8 @@ class Profile(models.Model):
         root_url = settings.FRONTEND_ROOT_URL
         relative_url = self.EMAILS["password_reset"]["endpoint"]
         params = {"token": token_value}
-        url = f"{root_url}/{relative_url}"
-        return build_url_with_params(url, params)
+        parts = [root_url, relative_url]
+        return build_url(parts, params=params)
 
     def _build_verification_url(self, token_value):
         """
@@ -174,8 +174,8 @@ class Profile(models.Model):
         root_url = settings.FRONTEND_ROOT_URL
         relative_url = self.EMAILS["verify_email"]["endpoint"]
         params = {"token": token_value}
-        url = f"{root_url}/{relative_url}"
-        return build_url_with_params(url, params)
+        parts = [root_url, relative_url]
+        return build_url(parts, params=params)
 
     def _create_token(self, token_type, token_duration):
         """

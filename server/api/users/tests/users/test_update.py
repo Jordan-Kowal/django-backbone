@@ -17,7 +17,7 @@ from ._shared import USER_SERVICE_URL
 class TestUpdateUser(ActionTestCase):
     """TestCase for the 'update' service"""
 
-    service_url = f"{USER_SERVICE_URL}/"
+    service_base_url = f"{USER_SERVICE_URL}/"
     required_fields = ["email"]
 
     # ----------------------------------------

@@ -62,7 +62,6 @@ class UserViewSet(DynamicViewSet):
     Viewset for the User models.
     Services can be split into the following categories:
         Classic model CRUD
-        'Self' CRUD which automatically targets the user performing the request
         Services for the 'password reset' process
         Services for the 'verification' process
     """
@@ -84,7 +83,7 @@ class UserViewSet(DynamicViewSet):
             "permissions": (IsAdminOrOwner,),
             "methods": ["post"],
             "url_path": "update_password",
-            "detail": False,
+            "detail": True,
         },
         # ---------- Verification ----------
         "send_verification_email": {

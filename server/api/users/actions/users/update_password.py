@@ -96,7 +96,8 @@ class UpdatePasswordHandler(ActionHandler):
         :return: HTTP 204 with no payload once the user has been updated
         :rtype: Response
         """
-        serializer = self.get_valid_serializer(self.user, data=self.data, partial=True)
-        serializer.save()
-        self.user.profile.send_password_update_email()
+        user = self.viewset.get_object()
+        serializer = self.get_valid_serializer(user, data=self.data, partial=True)
+        updated_user = serializer.save()
+        updated_user.profile.send_password_update_email()
         return Response(None, status=HTTP_204_NO_CONTENT)

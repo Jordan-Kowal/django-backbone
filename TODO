@@ -17,7 +17,6 @@
     - [ ] perform_password_reset
     - [ ] request_password_reset
     - [x] retrieve
-    - [ ] self
     - [ ] send_verification_email
     - [x] update
     - [ ] update_password

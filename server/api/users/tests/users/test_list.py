@@ -17,7 +17,7 @@ from ._shared import USER_SERVICE_URL, assert_user_representation_matches_instan
 class TestListUsers(ActionTestCase):
     """TestCase for the 'list' action"""
 
-    service_url = f"{USER_SERVICE_URL}/"
+    service_base_url = f"{USER_SERVICE_URL}/"
 
     # ----------------------------------------
     # Behavior
@@ -47,17 +47,17 @@ class TestListUsers(ActionTestCase):
     def test_permissions(self):
         """Tests that unauthenticated users and non-admin users can't access the service"""
         # Logged out
-        response = self.client.get(self.service_url)
+        response = self.client.get(self.service_base_url)
         assert response.status_code == 401
         # Unauthorized
         self.create_user(authenticate=True)
-        response = self.client.get(self.service_url)
+        response = self.client.get(self.service_base_url)
         assert response.status_code == 403
 
     def test_list_one_user(self):
         """Tests that the service returns 1 user properly"""
         self.create_admin_user(authenticate=True)
-        response = self.client.get(self.service_url)
+        response = self.client.get(self.service_base_url)
         assert response.status_code == 200
         assert len(response.data) == 1
         self._assert_database_matches_user_representation(response.data)
@@ -66,7 +66,7 @@ class TestListUsers(ActionTestCase):
         """Tests that the service returns several users properly"""
         self.create_admin_user(authenticate=True)
         self.create_user()
-        response = self.client.get(self.service_url)
+        response = self.client.get(self.service_base_url)
         assert response.status_code == 200
         assert len(response.data) == 2
         self._assert_database_matches_user_representation(response.data)

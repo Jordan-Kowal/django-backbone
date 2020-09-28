@@ -17,7 +17,7 @@ from ._shared import USER_SERVICE_URL, assert_user_representation_matches_instan
 class TestRetrieveUser(ActionTestCase):
     """TestCase for the 'retrieve' action"""
 
-    service_url = f"{USER_SERVICE_URL}/"
+    service_base_url = f"{USER_SERVICE_URL}/"
 
     # ----------------------------------------
     # Behavior

@@ -19,7 +19,7 @@ from ._shared import USER_SERVICE_URL
 class TestSendVerificationEmail(ActionTestCase):
     """TestCase for the 'update_password' action"""
 
-    service_url = f"{USER_SERVICE_URL}/self/send_verification_email/"
+    service_base_url = f"{USER_SERVICE_URL}/self/send_verification_email/"
 
     # ----------------------------------------
     # Behavior
@@ -50,23 +50,23 @@ class TestSendVerificationEmail(ActionTestCase):
     def test_permissions(self):
         """Tests that you must be authenticated to use this service"""
         # 401 Unauthorized
-        response = self.client.post(self.service_url)
+        response = self.client.post(self.service_base_url)
         assert response.status_code == 401
         # 204 Ok
         self.client.force_authenticate(self.user)
-        response = self.client.post(self.service_url)
+        response = self.client.post(self.service_base_url)
         assert response.status_code == 204
         # 403 Already verified
         self.user.profile.is_verified = True
         self.user.profile.save()
-        response = self.client.post(self.service_url)
+        response = self.client.post(self.service_base_url)
         assert response.status_code == 403
 
     def test_success(self):
         """Tests that the verification token is created and the email is sent"""
         self.client.force_authenticate(self.user)
         # Response 204
-        response = self.client.post(self.service_url)
+        response = self.client.post(self.service_base_url)
         assert response.status_code == 204
         # Token exists
         user_tokens = Token.objects.filter(user=self.user, type="verify")

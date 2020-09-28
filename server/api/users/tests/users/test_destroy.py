@@ -18,7 +18,7 @@ from ._shared import USER_SERVICE_URL
 class TestDestroyUser(ActionTestCase):
     """TestCase for the 'destroy' action"""
 
-    service_url = f"{USER_SERVICE_URL}/"
+    service_base_url = f"{USER_SERVICE_URL}/"
 
     # ----------------------------------------
     # Behavior

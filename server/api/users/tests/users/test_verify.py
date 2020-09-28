@@ -18,7 +18,7 @@ from ._shared import USER_SERVICE_URL
 class TestVerifyUser(ActionTestCase):
     """TestCase for the 'verify' action"""
 
-    service_url = f"{USER_SERVICE_URL}/verify/"
+    service_base_url = f"{USER_SERVICE_URL}/verify/"
 
     # ----------------------------------------
     # Behavior
@@ -53,7 +53,7 @@ class TestVerifyUser(ActionTestCase):
     def test_required_fields(self):
         """Tests that the 'token' field is required"""
         payload = {"token": None}
-        response = self.client.post(self.service_url, payload)
+        response = self.client.post(self.service_base_url, payload)
         self.assert_field_has_error(response, "token")
 
     def test_invalid_token(self):
@@ -61,11 +61,11 @@ class TestVerifyUser(ActionTestCase):
         _, invalid_token = Token.create_new_token(self.user, "invalid", 300)
         # Unknown token
         payload = {"token": "unknown token"}
-        response = self.client.post(self.service_url, payload)
+        response = self.client.post(self.service_base_url, payload)
         self.assert_field_has_error(response, "token")
         # Token exists but wrong type
         payload = {"token": invalid_token}
-        response = self.client.post(self.service_url, payload)
+        response = self.client.post(self.service_base_url, payload)
         self.assert_field_has_error(response, "token")
 
     def test_already_used_token(self):
@@ -73,7 +73,7 @@ class TestVerifyUser(ActionTestCase):
         token_instance, token_value = Token.create_new_token(self.user, "verify", 300)
         token_instance.consume_token()
         payload = {"token": token_value}
-        response = self.client.post(self.service_url, payload)
+        response = self.client.post(self.service_base_url, payload)
         self.assert_field_has_error(response, "token")
 
     def test_success(self):
@@ -81,7 +81,7 @@ class TestVerifyUser(ActionTestCase):
         # Successful request
         _, token_value = Token.create_new_token(self.user, "verify", 300)
         payload = {"token": token_value}
-        response = self.client.post(self.service_url, payload)
+        response = self.client.post(self.service_base_url, payload)
         assert response.status_code == 204
         user_instance = User.objects.get(id=self.user.id)
         assert user_instance.profile.is_verified
@@ -89,5 +89,5 @@ class TestVerifyUser(ActionTestCase):
         subject = Profile.EMAILS["welcome"]["subject"]
         self.assert_email_was_sent(subject)
         # Trying again should fail
-        response = self.client.post(self.service_url, payload)
+        response = self.client.post(self.service_base_url, payload)
         self.assert_field_has_error(response, "token")

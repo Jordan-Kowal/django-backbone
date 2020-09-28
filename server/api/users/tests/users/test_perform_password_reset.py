@@ -18,7 +18,7 @@ from ._shared import USER_SERVICE_URL
 class TestPerformPasswordReset(ActionTestCase):
     """TestCase for the 'perform_password_reset' action"""
 
-    service_url = f"{USER_SERVICE_URL}/perform_password_reset/"
+    service_base_url = f"{USER_SERVICE_URL}/perform_password_reset/"
     required_fields = [
         "new_password",
         "confirm_new_password",
@@ -68,54 +68,54 @@ class TestPerformPasswordReset(ActionTestCase):
         """Tests that the service can be accessed only if disconnected"""
         # 403 Unauthorized
         self.client.force_authenticate(self.user)
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 403
         # 204 OK
         self.client.logout()
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 204
 
     def test_required_fields(self):
         """Tests that required fields are truly required"""
         self.assert_fields_are_required(
-            self.client.post, self.service_url, self.payload
+            self.client.post, self.service_base_url, self.payload
         )
 
     def test_password_strength(self):
         """Tests that the new password is strong enough"""
         self.payload["new_password"] = "weak"
         self.payload["confirm_new_password"] = "weak"
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "new_password")
 
     def test_confirm_password_matches_password(self):
         """Tests that the new password has been typed correctly twice"""
         self.payload["confirm_new_password"] = self.generate_random_string(10)
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "confirm_new_password")
 
     def test_invalid_token(self):
         """Tests that you must provide a token with the right value and type"""
         # Unknown token
         self.payload["token"] = "unknown token value"
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "token")
         # Token exists but wrong type
         _, token_with_wrong_type = Token.create_new_token(self.user, "invalid", 300)
         self.payload["token"] = token_with_wrong_type
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "token")
 
     def test_already_used_token(self):
         """Tests that you must provide a token that can be used"""
         self.token_instance.consume_token()
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "token")
 
     def test_success(self):
         """Tests that you can successfully change your password, and the token gets consumed"""
         # Successful request
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 204
         # Checking that only the new password now works
         user = User.objects.get(id=self.user.id)
@@ -125,5 +125,5 @@ class TestPerformPasswordReset(ActionTestCase):
         subject = Profile.EMAILS["password_update"]["subject"]
         self.assert_email_was_sent(subject)
         # Trying again should fail
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "token")

@@ -22,7 +22,7 @@ from ._shared import USER_SERVICE_URL
 class TestRequestPasswordReset(ActionTestCase):
     """TestCase for the 'request_password_reset' action"""
 
-    service_url = f"{USER_SERVICE_URL}/request_password_reset/"
+    service_base_url = f"{USER_SERVICE_URL}/request_password_reset/"
     required_fields = ["email"]
 
     # ----------------------------------------
@@ -56,34 +56,34 @@ class TestRequestPasswordReset(ActionTestCase):
         """Tests that the service can be accessed only if disconnected"""
         # 403 Unauthorized
         self.client.force_authenticate(self.user)
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 403
         # 202 OK
         self.client.logout()
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 202
 
     def test_required_fields(self):
         """Tests that 'email' is a required field"""
         self.assert_fields_are_required(
-            self.client.post, self.service_url, self.payload
+            self.client.post, self.service_base_url, self.payload
         )
 
     def test_email_format(self):
         """Tests that the email field must be an actual email"""
         # Almost an email
         self.payload["email"] = "invalid@email"
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "email")
         # Totally not an email
         self.payload["email"] = 33
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "email")
 
     def test_success_with_unknown_email(self):
         """Tests a success with a valid email, meaning a token was created and an email was sent"""
         # Successful request
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 202
         # Token exists
         user_tokens = Token.objects.filter(user=self.user, type="reset")
@@ -101,7 +101,7 @@ class TestRequestPasswordReset(ActionTestCase):
         users = User.objects.filter(email=self.payload["email"])
         assert len(users) == 0
         # Successful request
-        response = self.client.post(self.service_url, self.payload)
+        response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 202
         # No tokens
         tokens = Token.objects.filter(type="reset")
