@@ -11,6 +11,7 @@ from jklib.django.drf.permissions import (
     IsAuthenticated,
     IsNotAuthenticated,
     IsNotVerified,
+    IsObjectOwner,
 )
 from jklib.django.drf.viewsets import DynamicViewSet
 
@@ -41,6 +42,7 @@ class AuthViewSet(DynamicViewSet):
 
     extra_actions = {
         "login": {
+            "description": "Logs in using basic authentication",
             "handler": LoginHandler,
             "permissions": (IsNotAuthenticated,),
             "methods": ["post"],
@@ -48,6 +50,7 @@ class AuthViewSet(DynamicViewSet):
             "detail": False,
         },
         "logout": {
+            "description": "Disconnects the current user/browser",
             "handler": LogoutHandler,
             "permissions": (IsAuthenticated,),
             "methods": ["post"],
@@ -69,31 +72,54 @@ class UserViewSet(DynamicViewSet):
     queryset = User.objects.all()
 
     known_actions = {
-        "create": {"handler": CreateUserHandler, "permissions": (IsNotAuthenticated,),},
-        "list": {"handler": ListUserHandler, "permissions": (IsAdminUser,),},
-        "retrieve": {"handler": RetrieveUserHandler, "permissions": (IsAdminOrOwner,),},
-        "update": {"handler": UpdateUserHandler, "permissions": (IsAdminOrOwner,),},
-        "destroy": {"handler": DestroyUserHandler, "permissions": (IsAdminOrOwner,),},
+        "create": {
+            "description": "Creates a new user",
+            "handler": CreateUserHandler,
+            "permissions": (IsNotAuthenticated,),
+        },
+        "list": {
+            "description": "List existing users, only accessible to admins",
+            "handler": ListUserHandler,
+            "permissions": (IsAdminUser,),
+        },
+        "retrieve": {
+            "description": "Retrieve one specific user",
+            "handler": RetrieveUserHandler,
+            "permissions": (IsAdminOrOwner,),
+        },
+        "update": {
+            "description": "Update one specific users. Admin can update more fields",
+            "handler": UpdateUserHandler,
+            "permissions": (IsAdminOrOwner,),
+        },
+        "destroy": {
+            "description": "Delete one specific user",
+            "handler": DestroyUserHandler,
+            "permissions": (IsAdminOrOwner,),
+        },
     }
 
     extra_actions = {
         # ---------- Additional crud ----------
         "update_password": {
+            "description": "Update your password by providing the existing one",
             "handler": UpdatePasswordHandler,
-            "permissions": (IsAdminOrOwner,),
+            "permissions": (IsObjectOwner,),
             "methods": ["post"],
             "url_path": "update_password",
             "detail": True,
         },
         # ---------- Verification ----------
         "send_verification_email": {
+            "description": "Sends a verification email to a specific user",
             "handler": SendVerificationEmailHandler,
             "permissions": (IsAdminOrOwner, IsNotVerified),
             "methods": ["post"],
             "url_path": "send_verification_email",
-            "detail": False,
+            "detail": True,
         },
         "verify": {
+            "description": "Uses a token to 'verify' a user email address",
             "handler": VerifyHandler,
             "permissions": (AllowAny,),
             "methods": ["post"],
@@ -102,6 +128,7 @@ class UserViewSet(DynamicViewSet):
         },
         # ---------- Password reset ----------
         "request_password_reset": {
+            "description": "Ask for a password reset link by providing an email address",
             "handler": RequestPasswordResetHandler,
             "permissions": (IsNotAuthenticated,),
             "methods": ["post"],
@@ -109,6 +136,7 @@ class UserViewSet(DynamicViewSet):
             "detail": False,
         },
         "perform_password_reset": {
+            "description": "Update your password using a security token",
             "handler": PerformPasswordResetHandler,
             "permissions": (IsNotAuthenticated,),
             "methods": ["post"],

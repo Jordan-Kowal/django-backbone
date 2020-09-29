@@ -2,7 +2,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from django.core import mail
 from rest_framework.test import APIClient
 
 # Personal
@@ -17,9 +16,10 @@ from ._shared import USER_SERVICE_URL
 # > TestCase
 # --------------------------------------------------------------------------------
 class TestSendVerificationEmail(ActionTestCase):
-    """TestCase for the 'update_password' action"""
+    """TestCase for the 'send_verification_email' action"""
 
-    service_base_url = f"{USER_SERVICE_URL}/self/send_verification_email/"
+    service_base_url = f"{USER_SERVICE_URL}/"
+    service_extra_url = "send_verification_email/"
 
     # ----------------------------------------
     # Behavior
@@ -32,6 +32,7 @@ class TestSendVerificationEmail(ActionTestCase):
     def setUp(self):
         """Creates 1 basic user"""
         self.user = self.create_user()
+        self.user_url = self.detail_url(self.user.id)
 
     def teardown(self):
         """Removes all users and tokens from the database and logs out the current client"""
@@ -49,24 +50,31 @@ class TestSendVerificationEmail(ActionTestCase):
     # ----------------------------------------
     def test_permissions(self):
         """Tests that you must be authenticated to use this service"""
+        # Create additional users
+        admin = self.create_admin_user()
+        other_user = self.create_user()
+        other_user_url = self.detail_url(other_user.id)
         # 401 Unauthorized
-        response = self.client.post(self.service_base_url)
+        response = self.client.post(self.user_url)
         assert response.status_code == 401
-        # 204 Ok
+        # 403 Unauthorized (user and not owner)
         self.client.force_authenticate(self.user)
-        response = self.client.post(self.service_base_url)
-        assert response.status_code == 204
-        # 403 Already verified
-        self.user.profile.is_verified = True
-        self.user.profile.save()
-        response = self.client.post(self.service_base_url)
+        response = self.client.post(other_user_url)
         assert response.status_code == 403
+        # 204 Ok (user and owner)
+        response = self.client.post(self.user_url)
+        assert response.status_code == 204
+        # 204 Ok (admin but not owner)
+        self.client.logout()
+        self.client.force_authenticate(admin)
+        response = self.client.post(self.user_url)
+        assert response.status_code == 204
 
     def test_success(self):
         """Tests that the verification token is created and the email is sent"""
         self.client.force_authenticate(self.user)
         # Response 204
-        response = self.client.post(self.service_base_url)
+        response = self.client.post(self.user_url)
         assert response.status_code == 204
         # Token exists
         user_tokens = Token.objects.filter(user=self.user, type="verify")

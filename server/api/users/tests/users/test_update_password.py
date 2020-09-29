@@ -69,12 +69,12 @@ class TestUpdatePassword(ActionTestCase):
         self.payload["current_password"] = self.user_password
         response = self.client.post(self.user_url, self.payload)
         assert response.status_code == 204
-        # 204 Ok (admin but not owner)
+        # 403 Unauthorized (admin but not owner)
         self.client.logout()
         self.client.force_authenticate(admin)
         self.payload["current_password"] = other_user_password
         response = self.client.post(other_user_url, self.payload)
-        assert response.status_code == 204
+        assert response.status_code == 403
 
     def test_required_fields(self):
         """Tests that the required fields are truly required"""

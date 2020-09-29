@@ -14,15 +14,16 @@
     - [x] create
     - [x] destroy
     - [x] list
-    - [ ] perform_password_reset
-    - [ ] request_password_reset
+    - [x] perform_password_reset
+    - [x] request_password_reset
     - [x] retrieve
-    - [ ] send_verification_email
+    - [x] send_verification_email
     - [x] update
-    - [ ] update_password
-    - [ ] verify
+    - [x] update_password
+    - [x] verify
     - [ ] login
     - [ ] logout
+- [ ] New service override password
 - [ ] Update login/logout services with token auth
 - [ ] Write tests for auth services
 

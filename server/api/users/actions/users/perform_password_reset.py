@@ -80,6 +80,7 @@ class PerformPasswordResetHandler(ActionHandler):
     The user will receive an email if his password was updated
     """
 
+    serializer_mode = "normal"
     serializer = PerformPasswordResetSerializer
 
     def main(self):

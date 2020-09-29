@@ -34,6 +34,7 @@ class RequestPasswordResetHandler(ActionHandler):
     Because we send the email asynchronously, it does not impact the response time
     """
 
+    serializer_mode = "normal"
     serializer = RequestPasswordResetSerializer
 
     def main(self):

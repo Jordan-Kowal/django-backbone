@@ -13,10 +13,11 @@ from jklib.django.drf.actions import ActionHandler
 # --------------------------------------------------------------------------------
 class SendVerificationEmailHandler(ActionHandler):
     """
-    Sends the 'verification email' to the authenticated user
+    Sends the 'verification email' to the targeted user
     (It will automatically generate a new unique token/link sent in the email)
     """
 
+    serializer_mode = "normal"
     serializer = None
 
     def main(self):
@@ -25,5 +26,6 @@ class SendVerificationEmailHandler(ActionHandler):
         :return: A 204 HTTP response as the email is sent synchronously
         :rtype: Response
         """
-        self.user.profile.send_verification_email(async_=False)
+        user = self.viewset.get_object()
+        user.profile.send_verification_email(async_=False)
         return Response(None, HTTP_204_NO_CONTENT)

@@ -86,7 +86,10 @@ class UpdatePasswordSerializer(NotEmptySerializer):
 # > Handler
 # --------------------------------------------------------------------------------
 class UpdatePasswordHandler(ActionHandler):
-    """Updates the password of the authenticated user"""
+    """
+    Updates the password of the targeted User
+    Should and can only be done by the user himself
+    """
 
     serializer = UpdatePasswordSerializer
 

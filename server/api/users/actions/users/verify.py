@@ -2,7 +2,7 @@
 
 # Django
 from rest_framework.response import Response
-from rest_framework.serializers import CharField, ValidationError
+from rest_framework.serializers import CharField
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 # Personal
@@ -43,6 +43,7 @@ class VerifySerializer(NotEmptySerializer):
 class VerifyHandler(ActionHandler):
     """Verifies the user if the provided token is valid"""
 
+    serializer_mode = "normal"
     serializer = VerifySerializer
 
     def main(self):
