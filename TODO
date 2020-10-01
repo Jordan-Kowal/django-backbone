@@ -10,7 +10,7 @@
 #### Users API
 - [x] Move auth services from core to users
 - [x] (JKLIB) Handle "staff vs users" serializers
-- [ ] Add "Staff" versions for services and tests
+- [x] Add "Staff" versions for services and tests
     - [x] create
     - [x] destroy
     - [x] list
@@ -21,18 +21,24 @@
     - [x] update
     - [x] update_password
     - [x] verify
-    - [ ] login
-    - [ ] logout
-- [ ] New service override password
-- [ ] Update login/logout services with token auth
-- [ ] Write tests for auth services
+- [x] New service override password
+    - [x] Service
+    - [x] Test
+    - [x Postman
+- [ ] Login/Logout
+    - [ ] Setup token auth
+    - [ ] Login service and test
+    - [ ] Logout service and test
 
 #### Contact API
 - [ ] Update Contact model/admin
-- [ ] Write Contact services
-- [ ] Write tests for those services
+- [ ] Contact API service + test
+    - [ ] Create 
+    - [ ] List 
+    - [ ] Retrieve 
+    - [ ] Delete 
 - [ ] Ban spammer (either with IP ban from core or something else)
-- [ ] Write tests for ban scenario
+- [ ] Include ban test in Create service
 
 #### Emails
 Update the design and content of the following emails:

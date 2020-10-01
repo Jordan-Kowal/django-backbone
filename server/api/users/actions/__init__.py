@@ -7,6 +7,7 @@ from .auth.logout import LogoutHandler
 from .users.create import CreateUserHandler
 from .users.destroy import DestroyUserHandler
 from .users.list import ListUserHandler
+from .users.override_password import OverridePasswordHandler
 from .users.perform_password_reset import PerformPasswordResetHandler
 from .users.request_password_reset import RequestPasswordResetHandler
 from .users.retrieve import RetrieveUserHandler

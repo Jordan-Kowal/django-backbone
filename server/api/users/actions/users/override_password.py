@@ -1,9 +1,8 @@
-"""Handler for the 'update_password' action"""
+"""Handler for the 'override_password' action"""
 
 # Django
-from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
-from rest_framework.serializers import CharField, ValidationError
+from rest_framework.serializers import CharField
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 # Personal
@@ -17,18 +16,14 @@ from ._shared import validate_password_confirmation, validate_user_password
 # --------------------------------------------------------------------------------
 # > Serializer
 # --------------------------------------------------------------------------------
-class UpdatePasswordSerializer(NotEmptySerializer):
-    """
-    Serializer to update a user password while he is authenticated
-    Requires the current password for it to work
-    """
+class OverridePasswordSerializer(NotEmptySerializer):
+    """Serializer to force a new password"""
 
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    current_password = CharField(write_only=True, **required())
-    new_password = CharField(write_only=True, **required())
-    confirm_new_password = CharField(write_only=True, **required())
+    password = CharField(write_only=True, **required())
+    confirm_password = CharField(write_only=True, **required())
 
     # ----------------------------------------
     # Behavior
@@ -41,67 +36,54 @@ class UpdatePasswordSerializer(NotEmptySerializer):
         :return: The updated user instance
         :rtype: User
         """
-        new_hashed_password = validated_data["new_password"]
-        user.password = new_hashed_password
+        hashed_password = validated_data["password"]
+        user.password = hashed_password
         user.save()
         return user
 
     # ----------------------------------------
     # Validation
     # ----------------------------------------
-    def validate_current_password(self, current_password):
-        """
-        Must provide the right current password for the user, as a security measure
-        :param str current_password: Should be the user's current password
-        :return: Hash of the current password
-        :rtype: str
-        """
-        user = self.instance
-        if not user.check_password(current_password):
-            raise ValidationError("Current password is incorrect")
-        return make_password(current_password)
-
     @staticmethod
-    def validate_new_password(new_password):
+    def validate_password(password):
         """
         The new password must pass the security tests before being hashed
-        :param str new_password: The new password
+        :param str password: The new password
         :return: Hash of the new password
         :rtype: str
         """
-        return validate_user_password(new_password)
+        return validate_user_password(password)
 
-    def validate_confirm_new_password(self, confirm_new_password):
+    def validate_confirm_password(self, confirm_password):
         """
         Checks that the password has been typed correctly twice
-        :param str confirm_new_password: The password confirmation field
+        :param str confirm_password: The password confirmation field
         :return: The unchanged password confirmation
         :rtype: str
         """
-        new_password = self.initial_data["new_password"]
-        return validate_password_confirmation(new_password, confirm_new_password)
+        new_password = self.initial_data["password"]
+        return validate_password_confirmation(new_password, confirm_password)
 
 
 # --------------------------------------------------------------------------------
 # > Handler
 # --------------------------------------------------------------------------------
-class UpdatePasswordHandler(ActionHandler):
+class OverridePasswordHandler(ActionHandler):
     """
-    Updates the password of the targeted User while sending him a notification email
-    Should and can only be done by the user himself
+    Overrides the password of the targeted user without sending a notification email
+    Only admins should be allowed to perform this action
     """
 
     serializer_mode = "normal"
-    serializer = UpdatePasswordSerializer
+    serializer = OverridePasswordSerializer
 
     def main(self):
         """
-        Updates the user's password and sends him a notification email
+        Overrides the user's password without sending a notification email
         :return: HTTP 204 with no payload once the user has been updated
         :rtype: Response
         """
         user = self.viewset.get_object()
         serializer = self.get_valid_serializer(user, data=self.data)
-        updated_user = serializer.save()
-        updated_user.profile.send_password_update_email()
+        serializer.save()
         return Response(None, status=HTTP_204_NO_CONTENT)

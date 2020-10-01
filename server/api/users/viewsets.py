@@ -22,6 +22,7 @@ from .actions import (
     ListUserHandler,
     LoginHandler,
     LogoutHandler,
+    OverridePasswordHandler,
     PerformPasswordResetHandler,
     RequestPasswordResetHandler,
     RetrieveUserHandler,
@@ -107,6 +108,14 @@ class UserViewSet(DynamicViewSet):
             "permissions": (IsObjectOwner,),
             "methods": ["post"],
             "url_path": "update_password",
+            "detail": True,
+        },
+        "override_password": {
+            "description": "Allows an admin to override a user's password",
+            "handler": OverridePasswordHandler,
+            "permissions": (IsAdminUser,),
+            "methods": ["post"],
+            "url_path": "override_password",
             "detail": True,
         },
         # ---------- Verification ----------
