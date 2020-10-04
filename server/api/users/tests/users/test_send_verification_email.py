@@ -82,5 +82,5 @@ class TestSendVerificationEmail(ActionTestCase):
         assert len(user_tokens) == 1
         assert token.can_be_used
         # Email sent
-        subject = Profile.EMAILS["verify_email"]["subject"]
+        subject = Profile.EMAILS["verification_email"]["subject"]
         self.assert_email_was_sent(subject, async_=False)

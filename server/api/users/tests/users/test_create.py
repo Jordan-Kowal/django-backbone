@@ -114,5 +114,5 @@ class TestCreateUser(ActionTestCase):
         if user.profile.is_verified:
             subject = Profile.EMAILS["welcome"]["subject"]
         else:
-            subject = Profile.EMAILS["verify_email"]["subject"]
+            subject = Profile.EMAILS["verification_email"]["subject"]
         self.assert_email_was_sent(subject)

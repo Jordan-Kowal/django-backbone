@@ -116,7 +116,7 @@ class TestUpdatePassword(ActionTestCase):
         assert not user.check_password(previous_password)
         assert user.check_password(new_password)
         # Checking notification email was sent
-        subject = Profile.EMAILS["password_update"]["subject"]
+        subject = Profile.EMAILS["password_updated"]["subject"]
         self.assert_email_was_sent(subject)
 
     # ----------------------------------------

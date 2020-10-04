@@ -73,17 +73,13 @@ class ContactAdmin(admin.ModelAdmin):
         "created_at",
         "ip",
         "name",
-        "company",
         "email",
         "subject",
-        "message",
+        "body",
     ]
     radio_fields = {}
     raw_id_fields = []
     fieldsets = [
         ["Informations Structurelles", {"fields": ["id", "created_at",],}],
-        [
-            "Contenu",
-            {"fields": ["ip", "name", "company", "email", "subject", "message",],},
-        ],
+        ["Contenu", {"fields": ["ip", "name", "email", "subject", "body",],},],
     ]

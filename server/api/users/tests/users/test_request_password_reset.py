@@ -91,7 +91,7 @@ class TestRequestPasswordReset(ActionTestCase):
         assert len(user_tokens) == 1
         assert token.can_be_used
         # Checks the email was sent (asynchronously)
-        subject = Profile.EMAILS["password_reset"]["subject"]
+        subject = Profile.EMAILS["request_password_reset"]["subject"]
         self.assert_email_was_sent(subject)
 
     def test_success_with_known_email(self):
