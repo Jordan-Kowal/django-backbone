@@ -1,11 +1,27 @@
 # TODO
 
+#### JKLIB
+- [ ] Viewset update
+    - [ ] Serializer mode as enum
+    - [ ] Update serializers in app
+    - [ ] Implement app-wide permissions
+    - [ ] Implement viewset-wide permissions
+    - [ ] Refactor check_permissions
+
 #### Core API
 - [x] Make django script to delete migration files
 - [x] Make django script to deletes db > remove migrations > make migrations > migrate > create super user
 - [x] Create Operation and Task classes
 - [x] Extend Command class to provide "proceed" function
 - [x] Move those classes to jklib
+- [x] Settings
+    - [x] Move model info to settings
+    - [x] Restructure settings
+    - [x] Create usable template with default values
+- [ ] Add whitelist model
+- [ ] Add blacklist model
+- [ ] Add services to handle those listing
+- [ ] Add API layer so that blacklisted IP cant perform services
 
 #### Users API
 - [x] Move auth services from core to users
@@ -24,21 +40,22 @@
 - [x] New service override password
     - [x] Service
     - [x] Test
-    - [x Postman
+    - [x] Postman
 - [ ] Login/Logout
     - [ ] Setup token auth
-    - [ ] Login service and test
+    - [ ] Login service and test (should blacklist ip if too many fails)
     - [ ] Logout service and test
 
 #### Contact API
 - [ ] Update Contact model/admin
 - [ ] Contact API service + test
-    - [ ] Create 
+    - [ ] Create (should blacklist ip if too many)
     - [ ] List 
     - [ ] Retrieve 
     - [ ] Delete 
 - [ ] Ban spammer (either with IP ban from core or something else)
 - [ ] Include ban test in Create service
+- [ ] Set cron on server boot to delete entries
 
 #### Emails
 Update the design and content of the following emails:

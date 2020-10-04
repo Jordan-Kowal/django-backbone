@@ -23,20 +23,20 @@ class Profile(models.Model):
     """Extends the User model to provide additional and utility to our User"""
 
     # ----------------------------------------
-    # Constants
+    # Email templates
     # ----------------------------------------
     EMAILS = {
-        "password_update": {
-            "template": "users/emails/password_changed.html",
+        "password_updated": {
+            "template": "users/emails/password_updated.html",
             "subject": "Your password has been updated",
         },
-        "password_reset": {
-            "template": "users/emails/reset_password.html",
+        "request_password_reset": {
+            "template": "users/emails/request_password_reset.html",
             "subject": "Reset your password",
             "endpoint": "reset",
         },
-        "verify_email": {
-            "template": "users/emails/verify_email.html",
+        "verification_email": {
+            "template": "users/emails/verification_email.html",
             "subject": "Please verify your email address",
             "endpoint": "verify",
         },
@@ -95,12 +95,12 @@ class Profile(models.Model):
         else:
             send_html_email(subject, body, to=self.user.email)
 
-    def send_password_update_email(self, async_=True):
+    def send_password_updated_email(self, async_=True):
         """
-        Sends the 'password_update' email to our user
+        Sends the 'password_updated' email to our user
         :param bool async_: Whether the email will be sent asynchronously. Defaults to True.
         """
-        email = self.EMAILS["password_update"]
+        email = self.EMAILS["password_updated"]
         self.send_email(
             template_path=email["template"], subject=email["subject"], async_=async_
         )
@@ -110,8 +110,9 @@ class Profile(models.Model):
         Sends the 'reset_password' email to our user, which contains the reset link
         :param bool async_: Whether the email will be sent asynchronously. Defaults to True.
         """
-        _, token_value = self._create_token("reset", 7200)  # 2 hours
-        email = self.EMAILS["password_reset"]
+        token_type, token_duration = settings.RESET_TOKEN
+        _, token_value = self._create_token(token_type, token_duration)
+        email = self.EMAILS["request_password_reset"]
         context = {"password_reset_link": self._build_password_reset_url(token_value)}
         self.send_email(
             template_path=email["template"],
@@ -122,14 +123,15 @@ class Profile(models.Model):
 
     def send_verification_email(self, async_=True):
         """
-        Sends the 'verify_email' email to our user, which contains the verification link
+        Sends the 'verification_email' email to our user, which contains the verification link
         Note that the email will be sent only if the user is not already verified
         :param bool async_: Whether the email will be sent asynchronously. Defaults to True.
         """
         if self.is_verified:
             return
-        _, token_value = self._create_token("verify", 172800)  # 7 days
-        email = self.EMAILS["verify_email"]
+        token_type, token_duration = settings.VERIFY_TOKEN
+        _, token_value = self._create_token(token_type, token_duration)
+        email = self.EMAILS["verification_email"]
         context = {"verification_link": self._build_verification_url(token_value)}
         self.send_email(
             template_path=email["template"],
@@ -159,7 +161,7 @@ class Profile(models.Model):
         :rtype: str
         """
         root_url = settings.FRONTEND_ROOT_URL
-        relative_url = self.EMAILS["password_reset"]["endpoint"]
+        relative_url = self.EMAILS["request_password_reset"]["endpoint"]
         params = {"token": token_value}
         parts = [root_url, relative_url]
         return build_url(parts, params=params)
@@ -172,7 +174,7 @@ class Profile(models.Model):
         :rtype: str
         """
         root_url = settings.FRONTEND_ROOT_URL
-        relative_url = self.EMAILS["verify_email"]["endpoint"]
+        relative_url = self.EMAILS["verification_email"]["endpoint"]
         params = {"token": token_value}
         parts = [root_url, relative_url]
         return build_url(parts, params=params)

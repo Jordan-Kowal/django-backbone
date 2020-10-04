@@ -6,10 +6,10 @@ from secrets import token_urlsafe
 
 # Django
 from django.contrib.auth.models import User
-from django.db import models
+from django.db.models import CharField, DateTimeField
 
 # Personal
-from jklib.django.db.fields import ActiveField, ForeignKeyCascade, RequiredCharField
+from jklib.django.db.fields import ActiveField, ForeignKeyCascade, RequiredField
 from jklib.django.db.models import LifeCycleModel
 from jklib.django.db.queries import get_object_or_none
 
@@ -46,10 +46,10 @@ class Token(LifeCycleModel):
     # Fields
     # ----------------------------------------
     user = ForeignKeyCascade(User, related_name="tokens")
-    type = RequiredCharField(max_length=50)
-    value = RequiredCharField(unique=True, max_length=1000)
-    expired_at = models.DateTimeField(null=False)
-    used_at = models.DateTimeField(null=True)
+    type = RequiredField(CharField, max_length=50)
+    value = RequiredField(CharField, unique=True, max_length=1000)
+    expired_at = DateTimeField(null=False)
+    used_at = DateTimeField(null=True)
     is_active_token = ActiveField()
 
     # ----------------------------------------

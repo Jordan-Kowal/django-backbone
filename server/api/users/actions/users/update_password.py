@@ -103,5 +103,5 @@ class UpdatePasswordHandler(ActionHandler):
         user = self.viewset.get_object()
         serializer = self.get_valid_serializer(user, data=self.data)
         updated_user = serializer.save()
-        updated_user.profile.send_password_update_email()
+        updated_user.profile.send_password_updated_email()
         return Response(None, status=HTTP_204_NO_CONTENT)

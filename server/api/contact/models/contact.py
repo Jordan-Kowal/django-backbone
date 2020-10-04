@@ -1,9 +1,4 @@
-"""
-Description:
-    All the models used in this app
-Models:
-    Contact: Stores the contact requests made through the website contact form
-"""
+"""Contact"""
 
 
 # Built-in
@@ -12,10 +7,16 @@ from datetime import date, timedelta
 # Django
 from django.conf import settings
 from django.core.validators import MinLengthValidator
-from django.db import models
+from django.db.models import (
+    CharField,
+    EmailField,
+    GenericIPAddressField,
+    Model,
+    TextField,
+)
 
 # Personal
-from jklib.django.db.fields import DateCreatedField
+from jklib.django.db.fields import DateCreatedField, RequiredField
 from jklib.django.utils.emails import get_css_content, send_html_email
 from jklib.django.utils.network import get_server_domain
 from jklib.django.utils.templates import render_template
@@ -24,49 +25,46 @@ from jklib.django.utils.templates import render_template
 # --------------------------------------------------------------------------------
 # > Models
 # --------------------------------------------------------------------------------
-class Contact(models.Model):
-    """Stores the contact requests made through the website contact form"""
+class Contact(Model):
+    """Contact messages sent to our application"""
 
     # ----------------------------------------
-    # Settings
+    # Email templates
     # ----------------------------------------
-    RECORD_DURATION = 30  # days
+    EMAILS = {
+        "user_notification": {
+            "template": "common/emails/user_notification.html",
+            "subject": "Your message has been sent",
+        },
+        "admin_notification": {
+            "template": "common/emails/admin_notification.html",
+            "subject": "You have received a new message",
+        },
+    }
 
     # ----------------------------------------
     # Fields
     # ----------------------------------------
     created_at = DateCreatedField()
-    ip = models.GenericIPAddressField(
-        blank=False, db_index=True, null=False, verbose_name="Adresse IP",
-    )
-    name = models.CharField(
-        blank=False,
+    ip = RequiredField(GenericIPAddressField, db_index=True, verbose_name="IP Address",)
+    name = RequiredField(
+        CharField,
         max_length=100,
-        null=False,
         validators=[MinLengthValidator(3)],
-        verbose_name="Nom",
+        verbose_name="Name",
     )
-    company = models.CharField(
-        blank=True,
-        max_length=100,
-        null=False,
+    email = RequiredField(EmailField, verbose_name="Email",)
+    subject = RequiredField(
+        CharField,
+        max_length=50,
         validators=[MinLengthValidator(3)],
-        verbose_name="Société",
+        verbose_name="Subject",
     )
-    email = models.EmailField(blank=False, null=False, verbose_name="Email",)
-    subject = models.CharField(
-        blank=False,
-        max_length=100,
-        null=False,
-        validators=[MinLengthValidator(3)],
-        verbose_name="Objet",
-    )
-    message = models.TextField(
-        blank=False,
+    body = RequiredField(
+        TextField,
         max_length=2000,
-        null=False,
         validators=[MinLengthValidator(10)],
-        verbose_name="Message",
+        verbose_name="Body",
     )
 
     # ----------------------------------------
@@ -90,25 +88,17 @@ class Contact(models.Model):
     # Custom methods
     # ----------------------------------------
     @classmethod
-    def delete_old_entries(cls):
-        """Deletes the old record in the database, for security & privacy reasons"""
-        delta = timedelta(days=cls.RECORD_DURATION)
+    def clean_old_records(cls):
+        """Deletes records whose retention time is expired"""
+        delta = timedelta(days=settings.CONTACT_RECORD_DURATION_IN_DAYS)
         max_date = date.today() - delta
         old_entries = Contact.objects.filter(date_create__lt=max_date)
         old_entries.delete()
 
-    def send_contact_emails(self, to_admin=True, to_user=True):
-        """
-        Description:
-            Sends automatic emails after an contact has been created/sent
-        Args:
-            to_admin (bool): Whether the admin gets an alert email. Defaults to True.
-            to_user (bool): Whether the user gets a confirmation email. Defaults to True.
-        """
-        if to_admin:
-            self._admin_alert_email()
-        if to_user:
-            self._user_confirm_email()
+    def send_email_notifications(self):
+        """Notifies both the user and the designated admin that a contact request has been sent"""
+        self._admin_alert_email()
+        self._user_confirm_email()
 
     # ----------------------------------------
     # Private custom methods

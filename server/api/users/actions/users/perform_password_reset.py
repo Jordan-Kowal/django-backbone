@@ -103,7 +103,7 @@ class PerformPasswordResetHandler(ActionHandler):
         """
         user.password = password_hash
         user.save()
-        user.profile.send_password_update_email()
+        user.profile.send_password_updated_email()
 
     def _validate_serializer(self):
         """

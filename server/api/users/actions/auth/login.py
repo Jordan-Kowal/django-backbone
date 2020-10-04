@@ -54,6 +54,14 @@ class LoginSerializer(NotEmptyModelSerializer):
             raise ValidationError("Email is required")
         return email
 
+    @staticmethod
+    def validate_password(password):
+        """Makes the 'password' field required"""
+        password = password.trim()
+        if password == "":
+            raise ValidationError("Password is required")
+        return password
+
 
 # --------------------------------------------------------------------------------
 # > Handler
