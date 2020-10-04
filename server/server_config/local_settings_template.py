@@ -37,6 +37,9 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 RECAPTCHA_SITE_KEY = "fake captcha key"
 RECAPTCHA_SECRET_KEY = "fake captcha key"
 
+# DRF additional settings
+DRF_GLOBAL_PERMISSIONS = None
+
 
 # --------------------------------------------------------------------------------
 # > Database

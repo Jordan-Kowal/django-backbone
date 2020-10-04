@@ -1,6 +1,7 @@
 """TestCase for the 'perform_password_reset' action"""
 
 # Django
+from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 
@@ -30,8 +31,9 @@ class TestPerformPasswordReset(ActionTestCase):
     # ----------------------------------------
     @classmethod
     def setUpClass(cls):
-        """Sets up the API client"""
+        """Sets up the API client and the token type"""
         cls.client = APIClient()
+        cls.token_type, _ = settings.RESET_TOKEN
 
     def setUp(self):
         """Creates 1 basic user, 1 reset token for this user, and a valid payload for the service"""
@@ -39,7 +41,9 @@ class TestPerformPasswordReset(ActionTestCase):
         self.password = self.generate_random_string(20)
         self.user = self.create_user(password=self.password)
         # Generating and storing a token
-        token_instance, token_value = Token.create_new_token(self.user, "reset", 300)
+        token_instance, token_value = Token.create_new_token(
+            self.user, self.token_type, 300
+        )
         self.token_instance = token_instance
         self.token_value = token_value
         # Preparing a valid payload

@@ -1,6 +1,7 @@
 """TestCase for the 'verify' action"""
 
 # Django
+from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 
@@ -25,8 +26,9 @@ class TestVerifyUser(ActionTestCase):
     # ----------------------------------------
     @classmethod
     def setUpClass(cls):
-        """Sets up the API client"""
+        """Sets up the API client and the token type"""
         cls.client = APIClient()
+        cls.token_type, _ = settings.VERIFY_TOKEN
 
     def setUp(self):
         """Creates 1 basic user"""
@@ -70,7 +72,9 @@ class TestVerifyUser(ActionTestCase):
 
     def test_already_used_token(self):
         """Tests that you cannot use an already-used token"""
-        token_instance, token_value = Token.create_new_token(self.user, "verify", 300)
+        token_instance, token_value = Token.create_new_token(
+            self.user, self.token_type, 300
+        )
         token_instance.consume_token()
         payload = {"token": token_value}
         response = self.client.post(self.service_base_url, payload)
@@ -79,7 +83,7 @@ class TestVerifyUser(ActionTestCase):
     def test_success(self):
         """Tests that providing a valid token changes the profile to verified"""
         # Successful request
-        _, token_value = Token.create_new_token(self.user, "verify", 300)
+        _, token_value = Token.create_new_token(self.user, self.token_type, 300)
         payload = {"token": token_value}
         response = self.client.post(self.service_base_url, payload)
         assert response.status_code == 204

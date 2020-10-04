@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 # Personal
-from jklib.django.drf.actions import ActionHandler
+from jklib.django.drf.actions import ActionHandler, SerializerMode
 
 
 # --------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ class SendVerificationEmailHandler(ActionHandler):
     (It will automatically generate a new unique token/link sent in the email)
     """
 
-    serializer_mode = "normal"
+    serializer_mode = SerializerMode.NONE
     serializer = None
 
     def main(self):

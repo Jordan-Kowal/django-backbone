@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework.serializers import BooleanField
 
 # Personal
-from jklib.django.drf.actions import ModelActionHandler
+from jklib.django.drf.actions import ModelActionHandler, SerializerMode
 from jklib.django.drf.serializers import NotEmptyModelSerializer, required
 
 # Local
@@ -153,7 +153,7 @@ class UpdateUserSerializer(NotEmptyModelSerializer):
 class UpdateUserHandler(ModelActionHandler):
     """Updates a user data"""
 
-    serializer_mode = "user"
+    serializer_mode = SerializerMode.ROLE_BASED
     serializer = {"user": UpdateUserSerializer, "admin": UpdateAdminSerializer}
 
     def main(self):

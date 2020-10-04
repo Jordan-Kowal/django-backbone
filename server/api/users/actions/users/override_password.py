@@ -6,7 +6,7 @@ from rest_framework.serializers import CharField
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 # Personal
-from jklib.django.drf.actions import ActionHandler
+from jklib.django.drf.actions import ActionHandler, SerializerMode
 from jklib.django.drf.serializers import NotEmptySerializer, required
 
 # Local
@@ -74,7 +74,7 @@ class OverridePasswordHandler(ActionHandler):
     Only admins should be allowed to perform this action
     """
 
-    serializer_mode = "normal"
+    serializer_mode = SerializerMode.UNIQUE
     serializer = OverridePasswordSerializer
 
     def main(self):

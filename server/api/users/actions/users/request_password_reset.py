@@ -8,7 +8,7 @@ from rest_framework.status import HTTP_202_ACCEPTED
 
 # Personal
 from jklib.django.db.queries import get_object_or_none
-from jklib.django.drf.actions import ActionHandler
+from jklib.django.drf.actions import ActionHandler, SerializerMode
 from jklib.django.drf.serializers import NotEmptySerializer, required
 
 
@@ -34,7 +34,7 @@ class RequestPasswordResetHandler(ActionHandler):
     Because we send the email asynchronously, it does not impact the response time
     """
 
-    serializer_mode = "normal"
+    serializer_mode = SerializerMode.UNIQUE
     serializer = RequestPasswordResetSerializer
 
     def main(self):

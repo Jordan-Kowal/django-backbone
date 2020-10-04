@@ -1,7 +1,7 @@
 """Handler for the 'delete' action"""
 
 # Personal
-from jklib.django.drf.actions import ModelActionHandler
+from jklib.django.drf.actions import ModelActionHandler, SerializerMode
 
 
 # --------------------------------------------------------------------------------
@@ -10,7 +10,7 @@ from jklib.django.drf.actions import ModelActionHandler
 class DestroyUserHandler(ModelActionHandler):
     """Deletes a user from the database"""
 
-    serializer_mode = "normal"
+    serializer_mode = SerializerMode.NONE
     serializer = None
 
     def main(self):

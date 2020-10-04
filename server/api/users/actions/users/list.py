@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework.serializers import ModelSerializer
 
 # Personal
-from jklib.django.drf.actions import ModelActionHandler
+from jklib.django.drf.actions import ModelActionHandler, SerializerMode
 
 # Local
 from ._shared import user_representation
@@ -39,7 +39,7 @@ class ListUserSerializer(ModelSerializer):
 class ListUserHandler(ModelActionHandler):
     """Fetches the list of existing users"""
 
-    serializer_mode = "normal"
+    serializer_mode = SerializerMode.UNIQUE
     serializer = ListUserSerializer
 
     def main(self):

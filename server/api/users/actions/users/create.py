@@ -7,7 +7,7 @@ from rest_framework.serializers import CharField, ValidationError
 from rest_framework.status import HTTP_201_CREATED
 
 # Personal
-from jklib.django.drf.actions import ActionHandler
+from jklib.django.drf.actions import ActionHandler, SerializerMode
 from jklib.django.drf.serializers import NotEmptyModelSerializer, required
 
 # Local
@@ -115,7 +115,7 @@ class CreateUserSerializer(NotEmptyModelSerializer):
 class CreateUserHandler(ActionHandler):
     """Creates a new user and sends him the verification email"""
 
-    serializer_mode = "normal"
+    serializer_mode = SerializerMode.UNIQUE
     serializer = CreateUserSerializer
 
     def main(self):

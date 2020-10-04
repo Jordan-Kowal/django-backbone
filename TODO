@@ -2,11 +2,12 @@
 
 #### JKLIB
 - [ ] Viewset update
-    - [ ] Serializer mode as enum
+    - [x] Serializer mode as enum
     - [ ] Update serializers in app
-    - [ ] Implement app-wide permissions
-    - [ ] Implement viewset-wide permissions
-    - [ ] Refactor check_permissions
+    - [x] Implement app-wide permissions
+    - [x] Implement viewset-wide permissions
+    - [x] Refactor check_permissions
+    - [ ] Update viewsets in app
 
 #### Core API
 - [x] Make django script to delete migration files

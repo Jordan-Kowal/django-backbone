@@ -1,12 +1,13 @@
 """Handler for the 'verify' action"""
 
 # Django
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.serializers import CharField
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 # Personal
-from jklib.django.drf.actions import ActionHandler
+from jklib.django.drf.actions import ActionHandler, SerializerMode
 from jklib.django.drf.serializers import NotEmptySerializer, required
 
 # Local
@@ -34,7 +35,8 @@ class VerifySerializer(NotEmptySerializer):
         :return: Token instance that matches the provided token value
         :rtype: Token
         """
-        return validate_token(token, "verify")
+        token_type, _ = settings.VERIFY_TOKEN
+        return validate_token(token, token_type)
 
 
 # --------------------------------------------------------------------------------
@@ -43,7 +45,7 @@ class VerifySerializer(NotEmptySerializer):
 class VerifyHandler(ActionHandler):
     """Verifies the user if the provided token is valid"""
 
-    serializer_mode = "normal"
+    serializer_mode = SerializerMode.UNIQUE
     serializer = VerifySerializer
 
     def main(self):

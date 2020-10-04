@@ -4,6 +4,7 @@
 from time import sleep
 
 # Django
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from rest_framework.test import APIClient
@@ -30,8 +31,9 @@ class TestRequestPasswordReset(ActionTestCase):
     # ----------------------------------------
     @classmethod
     def setUpClass(cls):
-        """Sets up the API client"""
+        """Sets up the API client and the token type"""
         cls.client = APIClient()
+        cls.token_type, _ = settings.RESET_TOKEN
 
     def setUp(self):
         """Creates 1 basic user"""
@@ -86,7 +88,7 @@ class TestRequestPasswordReset(ActionTestCase):
         response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 202
         # Token exists
-        user_tokens = Token.objects.filter(user=self.user, type="reset")
+        user_tokens = Token.objects.filter(user=self.user, type=self.token_type)
         token = user_tokens[0]
         assert len(user_tokens) == 1
         assert token.can_be_used
@@ -104,7 +106,7 @@ class TestRequestPasswordReset(ActionTestCase):
         response = self.client.post(self.service_base_url, self.payload)
         assert response.status_code == 202
         # No tokens
-        tokens = Token.objects.filter(type="reset")
+        tokens = Token.objects.filter(type=self.token_type)
         assert len(tokens) == 0
         # No mail
         sleep(0.2)

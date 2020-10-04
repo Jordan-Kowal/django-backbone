@@ -39,6 +39,8 @@ from .actions import (
 class AuthViewSet(DynamicViewSet):
     """Endpoints related to auth management"""
 
+    viewset_permissions = None
+
     known_actions = {}
 
     extra_actions = {
@@ -71,6 +73,8 @@ class UserViewSet(DynamicViewSet):
     """
 
     queryset = User.objects.all()
+
+    viewset_permissions = None
 
     known_actions = {
         "create": {

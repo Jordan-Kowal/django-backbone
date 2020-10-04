@@ -17,6 +17,8 @@ class ContactViewset(DynamicViewSet):
 
     queryset = Contact.objects.all()
 
+    viewset_permissions = None
+
     known_actions = {
         "create": {
             "description": "Sends a new contact message",
