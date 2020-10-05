@@ -1,13 +1,13 @@
 # TODO
 
 #### JKLIB
-- [ ] Viewset update
+- [x] Viewset update
     - [x] Serializer mode as enum
-    - [ ] Update serializers in app
+    - [x] Update serializers in app
     - [x] Implement app-wide permissions
     - [x] Implement viewset-wide permissions
     - [x] Refactor check_permissions
-    - [ ] Update viewsets in app
+    - [x] Update viewsets in app
 
 #### Core API
 - [x] Make django script to delete migration files
@@ -20,9 +20,15 @@
     - [x] Restructure settings
     - [x] Create usable template with default values
 - [ ] Add whitelist model
-- [ ] Add blacklist model
-- [ ] Add services to handle those listing
-- [ ] Add API layer so that blacklisted IP cant perform services
+- [ ] Add blacklist model (do not blacklist a whitelisted ip)
+- [ ] Permission IsBlacklisted to global (quid impact on /api UI)
+- [ ] Add functions and services to handle those listing
+    - [ ] Add (create or update)
+    - [ ] Deactivate (Deactivate)
+    - [ ] Retrieve
+    - [ ] List
+    - [ ] Delete
+- [ ]  Deactivate them based on expiration date (daily check) with CRON
 
 #### Users API
 - [x] Move auth services from core to users
