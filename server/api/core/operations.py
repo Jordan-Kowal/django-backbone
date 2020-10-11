@@ -100,6 +100,13 @@ class TaskMakeAndDoMigrations(OperationTask):
 # --------------------------------------------------------------------------------
 # > Operations
 # --------------------------------------------------------------------------------
+class OperationInitDjango(Operation):
+    """Operation to initialize Django when starting from scratch"""
+
+    name = "Initializes Django"
+    tasks = [TaskMakeAndDoMigrations, TaskCreateSuperUser]
+
+
 class OperationRemoveMigrations(Operation):
     """Operation to remove migration files"""
 
