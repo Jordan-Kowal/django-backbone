@@ -19,16 +19,20 @@
     - [x] Move model info to settings
     - [x] Restructure settings
     - [x] Create usable template with default values
-- [ ] Add whitelist model
-- [ ] Add blacklist model (do not blacklist a whitelisted ip)
+- [x] Add IpAddress model
+- [ ] Add tests for the IpAddress model
 - [ ] Permission IsBlacklisted to global (quid impact on /api UI)
-- [ ] Add functions and services to handle those listing
-    - [ ] Add (create or update)
-    - [ ] Deactivate (Deactivate)
-    - [ ] Retrieve
-    - [ ] List
-    - [ ] Delete
+- [ ] Add tested services:
+    - [ ] (admin) create
+    - [ ] (admin) retrieve
+    - [ ] (admin) list
+    - [ ] (admin) update
+    - [ ] (admin) destroy
+    - [ ] (admin) blacklist
+    - [ ] (admin) whitelist
+    - [ ] (admin) clear
 - [ ]  Deactivate them based on expiration date (daily check) with CRON
+- [ ] Remove admins
 
 #### Users API
 - [x] Move auth services from core to users
@@ -48,13 +52,17 @@
     - [x] Service
     - [x] Test
     - [x] Postman
+- [ ] Add tests for the Profile model
+- [ ] Add tests for the Token model
 - [ ] Login/Logout
     - [ ] Setup token auth
     - [ ] Login service and test (should blacklist ip if too many fails)
     - [ ] Logout service and test
+- [ ] Remove admins
 
 #### Contact API
-- [ ] Update Contact model/admin
+- [ ] Update Contact model
+- [ ] Add model tests
 - [ ] Contact API service + test
     - [ ] Create (should blacklist ip if too many)
     - [ ] List 
@@ -63,6 +71,7 @@
 - [ ] Ban spammer (either with IP ban from core or something else)
 - [ ] Include ban test in Create service
 - [ ] Set cron on server boot to delete entries
+- [ ] Remove admins
 
 #### Emails
 Update the design and content of the following emails:

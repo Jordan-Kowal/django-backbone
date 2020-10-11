@@ -53,12 +53,12 @@ class Token(LifeCycleModel):
     is_active_token = ActiveField()
 
     # ----------------------------------------
-    # Meta, str, save, get_absolute_url
+    # Behavior (meta, str, save)
     # ----------------------------------------
     class Meta:
         """Meta class to setup our database table"""
 
-        db_table = "tokens"
+        db_table = "users_tokens"
         indexes = []
         ordering = ["-id"]
         verbose_name = "Token"

@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 from jklib.django.drf.tests import ActionTestCase
 
 # Local
-from ...models import Profile
+from ....models import Profile
 from ._shared import USER_SERVICE_URL
 
 

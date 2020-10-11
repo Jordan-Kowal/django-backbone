@@ -55,12 +55,12 @@ class Profile(models.Model):
     )
 
     # ----------------------------------------
-    # Meta, str, save, get_absolute_url
+    # Behavior (meta, str, save)
     # ----------------------------------------
     class Meta:
         """Meta class to setup our model"""
 
-        db_table = "user_profiles"
+        db_table = "users_profiles"
         indexes = []
         ordering = ["-id"]
         unique_together = []

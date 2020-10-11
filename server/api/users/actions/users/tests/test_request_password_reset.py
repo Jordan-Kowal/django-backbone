@@ -13,7 +13,7 @@ from rest_framework.test import APIClient
 from jklib.django.drf.tests import ActionTestCase
 
 # Local
-from ...models import Profile, Token
+from ....models import Profile, Token
 from ._shared import USER_SERVICE_URL
 
 
