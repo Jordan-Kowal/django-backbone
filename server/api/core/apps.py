@@ -12,3 +12,7 @@ class CoreConfig(AppConfig):
 
     name = "api.core"
     label = "api.core"
+
+    def ready(self):
+        """Starts signals at launch"""
+        import api.core.signals

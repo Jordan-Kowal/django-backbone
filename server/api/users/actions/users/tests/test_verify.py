@@ -34,11 +34,9 @@ class TestVerifyUser(ActionTestCase):
         """Creates 1 basic user"""
         self.user = self.create_user()
 
-    def teardown(self):
-        """Removes all users and tokens from the database and logs out the current client"""
-        User.objects.all().delete()
-        Token.objects.all().delete()
-        self.client.logout()
+    def tearDown(self):
+        """Not implemented"""
+        pass
 
     @classmethod
     def tearDownClass(cls):

@@ -46,10 +46,9 @@ class TestOverridePassword(ActionTestCase):
             "confirm_password": self.password,
         }
 
-    def teardown(self):
-        """Removes all users from the database and logs out the current client"""
-        User.objects.all().delete()
-        self.client.logout()
+    def tearDown(self):
+        """Not implemented"""
+        pass
 
     @classmethod
     def tearDownClass(cls):

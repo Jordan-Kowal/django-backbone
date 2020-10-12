@@ -6,11 +6,11 @@ from datetime import date, timedelta
 # Django
 from django.conf import settings
 from django.db.models import (
+    CharField,
     DateField,
     GenericIPAddressField,
     IntegerChoices,
     IntegerField,
-    TextField,
 )
 
 # Personal
@@ -21,17 +21,6 @@ from jklib.django.utils.network import get_client_ip
 
 
 # --------------------------------------------------------------------------------
-# > Enums
-# --------------------------------------------------------------------------------
-class IpStatus(IntegerChoices):
-    """Possible statuses for an IP Address"""
-
-    NONE = 1
-    WHITELISTED = 2
-    BLACKLISTED = 3
-
-
-# --------------------------------------------------------------------------------
 # > Models
 # --------------------------------------------------------------------------------
 class IpAddress(LifeCycleModel):
@@ -39,11 +28,28 @@ class IpAddress(LifeCycleModel):
     List of IP addresses that are either whitelisted or blacklisted
     Only works with IPv4 addresses
 
+    Some validation is done in the pre-save signal
+
     The API can be used on an instance or the class itself.
     When used as a class method, you must pass the Request object as parameter
         instance.method()               will target the instance
         class.method(request=request)   will find (or create) the instance using the request
     """
+
+    # ----------------------------------------
+    # Constants
+    # ----------------------------------------
+    COMMENT_MAX_LENGTH = 255
+
+    # ----------------------------------------
+    # Enums
+    # ----------------------------------------
+    class IpStatus(IntegerChoices):
+        """Possible statuses for an IP Address"""
+
+        NONE = 1
+        WHITELISTED = 2
+        BLACKLISTED = 3
 
     # ----------------------------------------
     # Fields
@@ -58,7 +64,7 @@ class IpAddress(LifeCycleModel):
         help_text="Expires at the end of said date",
     )
     active = ActiveField()
-    comment = TextField(max_length=1000)
+    comment = CharField(max_length=COMMENT_MAX_LENGTH)
 
     # ----------------------------------------
     # Behavior (meta, str, save)
@@ -80,6 +86,26 @@ class IpAddress(LifeCycleModel):
         return f"{self.ip}"
 
     # ----------------------------------------
+    # Validators (used in signals)
+    # ----------------------------------------
+    def validate_comment(self):
+        """
+        Checks that the comment is not too long
+        Specifically useful for sqlite3 who doesn't perform those checks (despite the 'max_length' parameter)
+        """
+        length = len(self.comment)
+        max_length = IpAddress.COMMENT_MAX_LENGTH
+        if length > max_length:
+            raise ValueError(
+                f"Value for 'comment' is too long (max: {max_length}, provided: {length})"
+            )
+
+    def validate_status(self):
+        """Checks that the status is part of the authorized inputs"""
+        if self.status not in self.IpStatus.values:
+            raise ValueError(f"Value for 'status' must belong to the 'IpStatus' enum")
+
+    # ----------------------------------------
     # API using Instance or Request
     # ----------------------------------------
     def blacklist(self, end_date=None, comment=None, request=None, override=False):
@@ -98,8 +124,8 @@ class IpAddress(LifeCycleModel):
             instance.comment = comment
         instance.expires_on = self._compute_valid_end_date(end_date)
         instance.active = True
-        if override or instance.status != IpStatus.WHITELISTED:
-            instance.status = IpStatus.BLACKLISTED
+        if override or instance.status != self.IpStatus.WHITELISTED:
+            instance.status = self.IpStatus.BLACKLISTED
         instance.save()
         return instance
 
@@ -114,7 +140,7 @@ class IpAddress(LifeCycleModel):
         instance = self._fetch_or_add(request)
         instance.expires_on = None
         instance.active = False
-        instance.status = IpStatus.NONE
+        instance.status = self.IpStatus.NONE
 
     def is_blacklisted(self, request=None):
         """
@@ -128,7 +154,7 @@ class IpAddress(LifeCycleModel):
         return (
             instance.active
             and (instance.expires_on >= date.today())
-            and instance.status == IpStatus.BLACKLISTED
+            and instance.status == self.IpStatus.BLACKLISTED
         )
 
     def is_whitelisted(self, request=None):
@@ -143,7 +169,7 @@ class IpAddress(LifeCycleModel):
         return (
             instance.active
             and (instance.expires_on >= date.today())
-            and instance.status == IpStatus.WHITELISTED
+            and instance.status == self.IpStatus.WHITELISTED
         )
 
     def whitelist(self, end_date=None, comment=None, request=None):
@@ -161,7 +187,7 @@ class IpAddress(LifeCycleModel):
             instance.comment = comment
         instance.expires_on = self._compute_valid_end_date(end_date)
         instance.active = True
-        instance.status = IpStatus.WHITELISTED
+        instance.status = self.IpStatus.WHITELISTED
         instance.save()
         return instance
 

@@ -8,6 +8,10 @@
     - [x] Implement viewset-wide permissions
     - [x] Refactor check_permissions
     - [x] Update viewsets in app
+- [x] Tests
+    - [x] ImprovedTestCase
+    - [x] ActionTestCase
+    - [x] ModelAPITestCase
 
 #### Core API
 - [x] Make django script to delete migration files
@@ -22,6 +26,7 @@
 - [x] Add IpAddress model
 - [ ] Add tests for the IpAddress model
 - [ ] Permission IsBlacklisted to global (quid impact on /api UI)
+- [ ] Add permission test in all actions (with shared function)
 - [ ] Add tested services:
     - [ ] (admin) create
     - [ ] (admin) retrieve
@@ -31,7 +36,10 @@
     - [ ] (admin) blacklist
     - [ ] (admin) whitelist
     - [ ] (admin) clear
-- [ ]  Deactivate them based on expiration date (daily check) with CRON
+- [ ] Clean up database
+    - [ ] Write the function
+    - [ ] Write a test
+    - [ ] Setup a cron job
 - [ ] Remove admins
 
 #### Users API
@@ -56,21 +64,25 @@
 - [ ] Add tests for the Token model
 - [ ] Login/Logout
     - [ ] Setup token auth
-    - [ ] Login service and test (should blacklist ip if too many fails)
+    - [ ] Login service and test
+    - [ ] Include a ban check based on login tries (model already exist?)
     - [ ] Logout service and test
 - [ ] Remove admins
 
 #### Contact API
-- [ ] Update Contact model
-- [ ] Add model tests
+- [ ] Contact Model
+    - [ ] Update model
+    - [ ] Include a ban check
+    - [ ] Write tests
 - [ ] Contact API service + test
-    - [ ] Create (should blacklist ip if too many)
+    - [ ] Create (should blacklist ip if too many) + Ban
     - [ ] List 
     - [ ] Retrieve 
-    - [ ] Delete 
-- [ ] Ban spammer (either with IP ban from core or something else)
-- [ ] Include ban test in Create service
-- [ ] Set cron on server boot to delete entries
+    - [ ] Delete
+- [ ] Clean up database
+    - [ ] Write the function
+    - [ ] Write a test
+    - [ ] Setup a cron job
 - [ ] Remove admins
 
 #### Emails

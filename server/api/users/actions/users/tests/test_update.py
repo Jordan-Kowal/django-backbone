@@ -34,10 +34,9 @@ class TestUpdateUser(ActionTestCase):
         self.generate_payloads()
         assert User.objects.count() == 2
 
-    def teardown(self):
-        """Removes all users from the database and logs out the current client"""
-        User.objects.all().delete()
-        self.client.logout()
+    def tearDown(self):
+        """Not implemented"""
+        pass
 
     @classmethod
     def tearDownClass(cls):

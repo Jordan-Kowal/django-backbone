@@ -36,11 +36,9 @@ class TestSendVerificationEmail(ActionTestCase):
         self.user = self.create_user()
         self.user_url = self.detail_url(self.user.id)
 
-    def teardown(self):
-        """Removes all users and tokens from the database and logs out the current client"""
-        User.objects.all().delete()
-        Token.objects.all().delete()
-        self.client.logout()
+    def tearDown(self):
+        """Not implemented"""
+        pass
 
     @classmethod
     def tearDownClass(cls):

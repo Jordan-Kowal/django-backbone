@@ -40,11 +40,9 @@ class TestRequestPasswordReset(ActionTestCase):
         self.user = self.create_user()
         self.payload = {"email": self.user.email}
 
-    def teardown(self):
-        """Removes all users and tokens from the database and logs out the current client"""
-        User.objects.all().delete()
-        Token.objects.all().delete()
-        self.client.logout()
+    def tearDown(self):
+        """Not implemented"""
+        pass
 
     @classmethod
     def tearDownClass(cls):
