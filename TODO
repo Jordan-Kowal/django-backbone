@@ -24,9 +24,9 @@
     - [x] Restructure settings
     - [x] Create usable template with default values
 - [x] Add IpAddress model
-- [ ] Add tests for the IpAddress model
+- [x] Add tests for the IpAddress model
 - [ ] Permission IsBlacklisted to global (quid impact on /api UI)
-- [ ] Add permission test in all actions (with shared function)
+- [ ] Add permission test in all actions (with shared function) `client.get(/my-url/, REMOTE_ADDR="127.0.0.1")`
 - [ ] Add tested services:
     - [ ] (admin) create
     - [ ] (admin) retrieve
@@ -37,8 +37,8 @@
     - [ ] (admin) whitelist
     - [ ] (admin) clear
 - [ ] Clean up database
-    - [ ] Write the function
-    - [ ] Write a test
+    - [x] Write the function
+    - [x] Write a test
     - [ ] Setup a cron job
 - [ ] Remove admins
 
@@ -60,6 +60,7 @@
     - [x] Service
     - [x] Test
     - [x] Postman
+- [ ] Better split existing tests
 - [ ] Add tests for the Profile model
 - [ ] Add tests for the Token model
 - [ ] Login/Logout

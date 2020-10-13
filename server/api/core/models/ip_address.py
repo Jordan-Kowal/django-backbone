@@ -120,13 +120,13 @@ class IpAddress(LifeCycleModel):
         :rtype: IpAddress
         """
         instance = self._fetch_or_add(request)
-        if comment is not None:
-            instance.comment = comment
-        instance.expires_on = self._compute_valid_end_date(end_date)
-        instance.active = True
         if override or instance.status != self.IpStatus.WHITELISTED:
+            if comment is not None:
+                instance.comment = comment
+            instance.expires_on = self._compute_valid_end_date(end_date)
+            instance.active = True
             instance.status = self.IpStatus.BLACKLISTED
-        instance.save()
+            instance.save()
         return instance
 
     def clear(self, request=None):
@@ -141,6 +141,8 @@ class IpAddress(LifeCycleModel):
         instance.expires_on = None
         instance.active = False
         instance.status = self.IpStatus.NONE
+        instance.save()
+        return instance
 
     def is_blacklisted(self, request=None):
         """
