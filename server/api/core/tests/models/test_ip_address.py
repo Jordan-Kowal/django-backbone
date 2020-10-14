@@ -7,7 +7,6 @@ from datetime import date, timedelta
 # Django
 from django.conf import settings
 from django.db import IntegrityError
-from rest_framework.test import APIRequestFactory
 
 # Personal
 from jklib.django.db.tests import ModelTestCase
@@ -200,7 +199,7 @@ class TestIpAddress(ModelTestCase):
     # ----------------------------------------
     def test_blacklist_from_request_general_behavior(self):
         """Tests the general behavior of the blacklist_from_request method"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         new_comment = "Blacklisted"
         end_date = date.today() + timedelta(days=3)
         instance = self.model_class.blacklist_from_request(
@@ -213,7 +212,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_blacklist_from_request_without_end_date(self):
         """Tests that the end_date is defaulted if not provided when blacklisting from request"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         instance = self.model_class.blacklist_from_request(fake_request)
         default_end_date = date.today() + timedelta(
             days=settings.IP_STATUS_DEFAULT_DURATION
@@ -224,7 +223,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_blacklist_from_request_override(self):
         """Tests that a whitelisted IP can be blacklisted only with the 'override' argument"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         fake_ip_address = get_client_ip(fake_request)
         self.payload["ip"] = fake_ip_address
         self.payload["status"] = IpAddress.IpStatus.WHITELISTED
@@ -247,7 +246,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_clear_from_request(self):
         """Tests 'clear_from_request' correctly resets the model fields"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         fake_ip_address = get_client_ip(fake_request)
         self.payload["ip"] = fake_ip_address
         self.payload["active"] = True
@@ -261,7 +260,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_whitelist_from_request_general_behavior(self):
         """Tests the general behavior of the whitelist_from_request method"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         new_comment = "Whitelisted"
         end_date = date.today() + timedelta(days=3)
         instance = self.model_class.whitelist_from_request(
@@ -274,7 +273,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_whitelist_from_request_without_end_date(self):
         """Tests that the end_date is defaulted if not provided when whitelisting from request"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         instance = self.model_class.whitelist_from_request(fake_request)
         default_end_date = date.today() + timedelta(
             days=settings.IP_STATUS_DEFAULT_DURATION
@@ -285,7 +284,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_whitelist_from_request_override(self):
         """Tests that a blacklisted IP can be whitelisted only with the 'override' argument"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         fake_ip_address = get_client_ip(fake_request)
         self.payload["ip"] = fake_ip_address
         self.payload["status"] = IpAddress.IpStatus.BLACKLISTED
@@ -308,7 +307,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_is_blacklisted_from_request(self):
         """Tests that a blacklisted IP is flagged as blacklisted"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         fake_ip_address = get_client_ip(fake_request)
         self.payload["ip"] = fake_ip_address
         self.model_class.objects.create(**self.payload)
@@ -317,7 +316,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_is_whitelisted_from_request(self):
         """Tests that a whitelisted IP is flagged as whitelisted"""
-        fake_request = self._build_fake_request()
+        fake_request = self.build_fake_request()
         fake_ip_address = get_client_ip(fake_request)
         self.payload["ip"] = fake_ip_address
         self.model_class.objects.create(**self.payload)
@@ -383,12 +382,3 @@ class TestIpAddress(ModelTestCase):
             instances.append(instance)
             clear_eligibility.append(to_be_cleared)
         return payloads, instances, clear_eligibility
-
-    @staticmethod
-    def _build_fake_request():
-        """
-        :return: Returns a fake APIRequest object
-        :rtype: APIRequest
-        """
-        factory = APIRequestFactory()
-        return factory.get("/")

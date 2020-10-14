@@ -10,7 +10,7 @@ from jklib.django.utils.emails import send_html_email, send_html_email_async
 from jklib.django.utils.network import build_url
 
 # Third-party
-from api.core.utils.emails import render_email_template
+from api.core.utils import render_email_template
 
 # Local
 from .token import Token

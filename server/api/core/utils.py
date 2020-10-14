@@ -1,4 +1,4 @@
-"""Utility functions for email management"""
+"""Utility functions for the core API"""
 
 
 # Django
@@ -16,18 +16,10 @@ from jklib.django.utils.templates import render_template
 def render_email_template(template_path, context=None):
     """
     Renders an email template with extended context and custom CSS
-
-    Parameters
-    ----------
-    template_path : str
-        Django path to the template file
-    context : dict
-        Context values for the template
-
-    Returns
-    -------
-    str
-        Our dynamically-generated HTML
+    :param str template_path: Django path to the template file
+    :param dict context: Context values for the template
+    :return: Our dynamically-generated HTML
+    :rtype: str
     """
     if context is None:
         context = {}
@@ -38,12 +30,8 @@ def render_email_template(template_path, context=None):
 
 def shared_email_context():
     """
-    Returns some static context useful for email templates
-
-    Returns
-    -------
-    dict
-        Basic context to be used in emails
+    :return: Basic context to be used in emails
+    :rtype: dict
     """
     return {
         "backend_url": get_server_domain(),
