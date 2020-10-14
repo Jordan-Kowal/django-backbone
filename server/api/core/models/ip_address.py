@@ -30,10 +30,16 @@ class IpAddress(LifeCycleModel):
 
     Some validation is done in the pre-save signal
 
-    The API can be used on an instance or the class itself.
-    When used as a class method, you must pass the Request object as parameter
-        instance.method()               will target the instance
-        class.method(request=request)   will find (or create) the instance using the request
+    The model is split in the following sections
+        Constants
+        Enums
+        Fields
+        Behavior
+        Validators
+        Instance Properties
+        Instance API
+        Request API
+        CRON jobs
     """
 
     # ----------------------------------------
@@ -103,112 +109,63 @@ class IpAddress(LifeCycleModel):
     def validate_status(self):
         """Checks that the status is part of the authorized inputs"""
         if self.status not in self.IpStatus.values:
-            raise ValueError(f"Value for 'status' must belong to the 'IpStatus' enum")
+            raise ValueError("Value for 'status' must belong to the 'IpStatus' enum")
 
     # ----------------------------------------
-    # API using Instance or Request
+    # Instance properties
     # ----------------------------------------
-    def blacklist(self, end_date=None, comment=None, request=None, override=False):
+    @property
+    def is_blacklisted(self):
         """
-        Blacklists an IP address
-        (If called from the class, the instance will be deduced from the 'request' param)
-        :param Date end_date: The desired expiration date
-        :param str comment: The comment to add in the instance
-        :param Request request: Request object that could be used to get/add the instance
-        :param bool override: Whether we allow blacklisting a whitelisted entry
-        :return: The updated instance
-        :rtype: IpAddress
-        """
-        instance = self._fetch_or_add(request)
-        if override or instance.status != self.IpStatus.WHITELISTED:
-            if comment is not None:
-                instance.comment = comment
-            instance.expires_on = self._compute_valid_end_date(end_date)
-            instance.active = True
-            instance.status = self.IpStatus.BLACKLISTED
-            instance.save()
-        return instance
-
-    def clear(self, request=None):
-        """
-        Clears an IP address by defaulting its fields to neutral values
-        (If called from the class, the instance will be deduced from the 'request' param)
-        :param Request request: Request object that could be used to get/add the instance
-        :return: The updated instance
-        :rtype: IpAddress
-        """
-        instance = self._fetch_or_add(request)
-        instance.expires_on = None
-        instance.active = False
-        instance.status = self.IpStatus.NONE
-        instance.save()
-        return instance
-
-    def is_blacklisted(self, request=None):
-        """
-        Checks if an IP address is blacklisted
-        (If called from the class, the instance will be deduced from the 'request' param)
-        :param Request request: Request object that could be used to get/add the instance
         :return: Whether the IP is blacklisted
         :rtype: bool
         """
-        instance = self._fetch_or_add(request)
         return (
-            instance.active
-            and (instance.expires_on >= date.today())
-            and instance.status == self.IpStatus.BLACKLISTED
+            self.active
+            and (self.expires_on >= date.today())
+            and self.status == self.IpStatus.BLACKLISTED
         )
 
-    def is_whitelisted(self, request=None):
+    @property
+    def is_whitelisted(self):
         """
-        Checks if an IP address is whitelisted
-        (If called from the class, the instance will be deduced from the 'request' param)
-        :param Request request: Request object that could be used to get/add the instance
         :return: Whether the IP is whitelisted
         :rtype: bool
         """
-        instance = self._fetch_or_add(request)
         return (
-            instance.active
-            and (instance.expires_on >= date.today())
-            and instance.status == self.IpStatus.WHITELISTED
+            self.active
+            and (self.expires_on >= date.today())
+            and self.status == self.IpStatus.WHITELISTED
         )
 
-    def whitelist(self, end_date=None, comment=None, request=None):
+    # ----------------------------------------
+    # API for instance
+    # ----------------------------------------
+    def blacklist(self, end_date=None, comment=None, override=False):
         """
-        Whitelists an IP address
-        (If called from the class, the instance will be deduced from the 'request' param)
+        Blacklists an IP address
         :param Date end_date: The desired expiration date
         :param str comment: The comment to add in the instance
-        :param Request request: Request object that could be used to get/add the instance
-        :return: The updated instance
-        :rtype: IpAddress
+        :param bool override: Whether we allow blacklisting a whitelisted entry
         """
-        instance = self._fetch_or_add(request)
-        if comment is not None:
-            instance.comment = comment
-        instance.expires_on = self._compute_valid_end_date(end_date)
-        instance.active = True
-        instance.status = self.IpStatus.WHITELISTED
-        instance.save()
-        return instance
+        self._update_status("blacklist", end_date, comment, override)
 
-    # ----------------------------------------
-    # CRON jobs
-    # ----------------------------------------
-    @staticmethod
-    def clear_expired_entries():
-        """Clears all IPs whose status has expired"""
-        today = date.today()
-        ips = IpAddress.objects.filter(expires_on__isnull=False).filter(
-            expires_on__lt=today
-        )
-        for ip in ips:
-            ip.clear()
+    def clear(self):
+        """Clears an IP address by defaulting its fields to neutral values"""
+        self.expires_on = None
+        self.active = False
+        self.status = self.IpStatus.NONE
+        self.save()
 
-    # ----------------------------------------
-    # Private methods
-    # ----------------------------------------
+    def whitelist(self, end_date=None, comment=None, override=False):
+        """
+        Whitelists an IP address
+        :param Date end_date: The desired expiration date
+        :param str comment: The comment to add in the instance
+        :param bool override: Whether we allow whitelisting a blacklisted entry
+        """
+        self._update_status("whitelist", end_date, comment, override)
+
     @staticmethod
     def _compute_valid_end_date(end_date):
         """
@@ -222,22 +179,138 @@ class IpAddress(LifeCycleModel):
             end_date = date.today() + delta_in_days
         return end_date
 
-    def _fetch_or_add(self, request=None):
+    def _update_status(self, action, end_date, comment, override):
         """
-        Fetches an existing IpAddress instance or create a new one. The logic applied is:
-            If performed on an instance, returns the instance
-            Else, tries to fetch an existing entry using the Request object
-            If none is found, creates a new instance
+        Whitelists or blacklists an IP and update all the required fields
+        :param str action: Action to perform, used to define the status check
+        :param Date end_date: The desired expiration date
+        :param str comment: The comment to add in the instance
+        :param bool override: Whether we allow whitelisting a blacklisted entry
+        """
+        if action == "whitelist":
+            status_check = self.IpStatus.BLACKLISTED
+            new_status = self.IpStatus.WHITELISTED
+        else:
+            status_check = self.IpStatus.WHITELISTED
+            new_status = self.IpStatus.BLACKLISTED
+        if override or self.status != status_check:
+            if comment is not None:
+                self.comment = comment
+            self.expires_on = self._compute_valid_end_date(end_date)
+            self.active = True
+            self.status = new_status
+            self.save()
+
+    # ----------------------------------------
+    # API for request
+    # ----------------------------------------
+    @classmethod
+    def blacklist_from_request(
+        cls, request, end_date=None, comment=None, override=False
+    ):
+        """
+        Blacklists an IP address using the provided Request object
+        :param Request request: Request object used to get the IP address
+        :param Date end_date: The desired expiration date
+        :param str comment: The comment to add in the instance
+        :param bool override: Whether we allow blacklisting a whitelisted entry
+        :return: The updated instance
+        :rtype: IpAddress
+        """
+        instance = cls._fetch_or_add(request)
+        instance.blacklist(end_date, comment, override)
+        return instance
+
+    @classmethod
+    def clear_from_request(cls, request):
+        """
+        Clears an IP address by defaulting its fields to neutral values
+        If IP instance does not exist, does not create it
+        :param Request request: Request object used to get the IP address
+        :return: The updated instance
+        :rtype: IpAddress
+        """
+        instance = cls._fetch(request)
+        if instance is not None:
+            instance.clear()
+        return instance
+
+    @classmethod
+    def whitelist_from_request(
+        cls, request, end_date=None, comment=None, override=False
+    ):
+        """
+        Whitelists an IP address using the provided Request object
+        :param Request request: Request object used to get the IP address
+        :param Date end_date: The desired expiration date
+        :param str comment: The comment to add in the instance
+        :param bool override: Whether we allow blacklisting a whitelisted entry
+        :return: The updated instance
+        :rtype: IpAddress
+        """
+        instance = cls._fetch_or_add(request)
+        instance.whitelist(end_date, comment, override)
+        return instance
+
+    @classmethod
+    def is_blacklisted_from_request(cls, request):
+        """
+        Checks if an IP address is blacklisted using the Request object
+        :param Request request: Request object that could be used to get/add the instance
+        :return: Whether the IP is blacklisted
+        :rtype: bool
+        """
+        instance = cls._fetch(request)
+        if instance is not None:
+            return instance.is_blacklisted
+        return False
+
+    @classmethod
+    def is_whitelisted_from_request(cls, request):
+        """
+        Checks if an IP address is whitelisted using the Request object
+        :param Request request: Request object that could be used to get/add the instance
+        :return: Whether the IP is whitelisted
+        :rtype: bool
+        """
+        instance = cls._fetch(request)
+        if instance is not None:
+            return instance.is_whitelisted
+        return False
+
+    @classmethod
+    def _fetch(cls, request):
+        """
+        Fetches an existing IpAddress instance using the Request object
+        :param Request request: A django Request object
+        :return: The existing instance linked to this IP
+        :rtype: IpAddress
+        """
+        ip_address = get_client_ip(request)
+        instance = get_object_or_none(cls, ip=ip_address)
+        return instance
+
+    @classmethod
+    def _fetch_or_add(cls, request):
+        """
+        Fetches an existing IpAddress instance or create a new one using the Request object
         :param Request request: A django Request object
         :return: The found (or newly-added) IpAddress instance
         :rtype: IpAddress
         """
-        if isinstance(self, (IpAddress,)):
-            return self
         ip_address = get_client_ip(request)
-        existing_object = get_object_or_none(IpAddress, ip=ip_address)
-        if existing_object is not None:
-            return existing_object
-        else:
-            obj = IpAddress(ip=ip_address, active=False)
-            return obj
+        instance = get_object_or_none(cls, ip=ip_address)
+        if instance is None:
+            instance = cls(ip=ip_address, active=False)
+        return instance
+
+    # ----------------------------------------
+    # CRON jobs
+    # ----------------------------------------
+    @classmethod
+    def clear_expired_entries(cls):
+        """Clears all IPs whose status has expired"""
+        today = date.today()
+        ips = cls.objects.filter(expires_on__isnull=False).filter(expires_on__lt=today)
+        for ip in ips:
+            ip.clear()

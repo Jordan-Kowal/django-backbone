@@ -25,8 +25,8 @@
     - [x] Create usable template with default values
 - [x] Add IpAddress model
 - [x] Add tests for the IpAddress model
-- [ ] Permission IsBlacklisted to global (quid impact on /api UI)
-- [ ] Add permission test in all actions (with shared function) `client.get(/my-url/, REMOTE_ADDR="127.0.0.1")`
+- [x] Permission IsNotBlacklisted to global
+- [ ] Add permission test in all actions (with shared function) 
 - [ ] Add tested services:
     - [ ] (admin) create
     - [ ] (admin) retrieve
