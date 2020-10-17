@@ -45,13 +45,18 @@ class TestListUsers(ActionTestCase):
     # ----------------------------------------
     def test_permissions(self):
         """Tests that unauthenticated users and non-admin users can't access the service"""
-        # Logged out
+        # 401 Unauthenticated
         response = self.client.get(self.service_base_url)
         assert response.status_code == 401
-        # Unauthorized
+        # User is 403 Unauthorized
         self.create_user(authenticate=True)
         response = self.client.get(self.service_base_url)
         assert response.status_code == 403
+        # Admin is 200 OK
+        self.client.logout()
+        self.create_admin_user(authenticate=True)
+        response = self.client.get(self.service_base_url)
+        assert response.status_code == 200
 
     def test_list_one_user(self):
         """Tests that the service returns 1 user properly"""

@@ -30,8 +30,8 @@ class TestUpdateUser(ActionTestCase):
 
     def setUp(self):
         """Creates 2 user (1 admin and 1 normal) and generates a valid payload"""
-        self.generate_users()
-        self.generate_payloads()
+        self._generate_users()
+        self._generate_payloads()
         assert User.objects.count() == 2
 
     def tearDown(self):
@@ -90,12 +90,12 @@ class TestUpdateUser(ActionTestCase):
     def test_email_format_as_user(self):
         """As a user, tests that the email field must be an actual email"""
         self.client.force_authenticate(self.user)
-        self.assert_email_format()
+        self._assert_email_format()
 
     def test_unique_email_as_user(self):
         """As a user, tests that we cannot change the email to an existing one"""
         self.client.force_authenticate(self.user)
-        self.assert_unique_email()
+        self._assert_unique_email()
 
     def test_update_success_as_user(self):
         """As a user, tests that we successfully updated our user"""
@@ -116,7 +116,7 @@ class TestUpdateUser(ActionTestCase):
         self.client.force_authenticate(self.user)
         # Preparing the payload
         user = User.objects.get(id=self.user.id)
-        self.update_payload_with_admin_fields(user)
+        self._update_payload_with_admin_fields(user)
         # Performing the request
         response = self.client.put(self.user_detail_url, self.payload)
         updated_user = User.objects.get(id=self.user.id)
@@ -139,18 +139,18 @@ class TestUpdateUser(ActionTestCase):
     def test_email_format_as_admin(self):
         """As an admin, tests that the email field must be an actual email"""
         self.client.force_authenticate(self.admin)
-        self.assert_email_format()
+        self._assert_email_format()
 
     def test_unique_email_as_admin(self):
         """As an admin, tests that we cannot change the email to an existing one"""
         self.client.force_authenticate(self.admin)
-        self.assert_unique_email()
+        self._assert_unique_email()
 
     def test_update_success_as_admin(self):
         """As an admin, tests that we successfully updated our user"""
         self.client.force_authenticate(self.admin)
         user = User.objects.get(id=self.user.id)
-        self.update_payload_with_admin_fields(user)
+        self._update_payload_with_admin_fields(user)
         # Performing the update
         response = self.client.put(self.user_detail_url, data=self.payload)
         updated_user = User.objects.get(id=self.user.id)
@@ -170,7 +170,7 @@ class TestUpdateUser(ActionTestCase):
     # ----------------------------------------
     # Private
     # ----------------------------------------
-    def assert_email_format(self):
+    def _assert_email_format(self):
         """Checks if the email format is correctly enforced"""
         # Almost an email
         self.payload["email"] = "invalid@email"
@@ -181,7 +181,7 @@ class TestUpdateUser(ActionTestCase):
         response = self.client.put(self.user_detail_url, data=self.payload)
         self.assert_field_has_error(response, "email")
 
-    def assert_unique_email(self):
+    def _assert_unique_email(self):
         """Tests that we cannot change the email to an existing one"""
         self.payload["email"] = self.admin.email
         response = self.client.put(self.user_detail_url, self.payload)
@@ -189,7 +189,7 @@ class TestUpdateUser(ActionTestCase):
         self.assert_field_has_error(response, "email")
         assert updated_user.email == self.user.email != self.admin.email
 
-    def generate_payloads(self):
+    def _generate_payloads(self):
         """Generates a valid payload for the service with unique data and stores it in self.payload"""
         data = self.generate_random_user_data()
         self.payload = {
@@ -198,14 +198,14 @@ class TestUpdateUser(ActionTestCase):
             "last_name": data["last_name"],
         }
 
-    def generate_users(self):
+    def _generate_users(self):
         """Creates 1 admin and 1 user and also stores their detail URL for the service"""
         self.admin = self.create_admin_user()
         self.admin_detail_url = self.detail_url(self.admin.id)
         self.user = self.create_user()
         self.user_detail_url = self.detail_url(self.user.id)
 
-    def update_payload_with_admin_fields(self, user):
+    def _update_payload_with_admin_fields(self, user):
         """
         Adds new fields to the payload, only used in the admin version of the service
         The fields are boolean and their values are opposite of the current ones

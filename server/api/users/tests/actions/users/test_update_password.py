@@ -35,7 +35,7 @@ class TestUpdatePassword(ActionTestCase):
         self.user_password = self.generate_random_string(20)
         self.user = self.create_user(password=self.user_password)
         self.user_url = self.detail_url(self.user.id)
-        self.generate_valid_payload()
+        self._generate_valid_payload()
 
     def tearDown(self):
         """Not implemented"""
@@ -121,7 +121,7 @@ class TestUpdatePassword(ActionTestCase):
     # ----------------------------------------
     # Private
     # ----------------------------------------
-    def generate_valid_payload(self):
+    def _generate_valid_payload(self):
         """Generates a valid payload for the service request"""
         new_password = self.generate_random_string(20)
         self.payload = {

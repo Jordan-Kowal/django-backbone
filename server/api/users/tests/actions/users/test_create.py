@@ -55,9 +55,16 @@ class TestCreateUser(ActionTestCase):
     def test_permissions(self):
         """Tests that this service is restricted to unauthenticated users"""
         self.create_user(authenticate=True)
+        assert User.objects.count() == 1
+        # Authenticated is 403
         response = self.client.post(self.service_base_url, data=self.payload)
         assert response.status_code == 403
         assert User.objects.count() == 1
+        # Unauthenticated is 201
+        self.client.logout()
+        response = self.client.post(self.service_base_url, data=self.payload)
+        assert response.status_code == 201
+        assert User.objects.count() == 2
 
     def test_required_fields(self):
         """Tests that required fields are indeed required"""
