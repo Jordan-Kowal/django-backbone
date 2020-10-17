@@ -62,7 +62,7 @@
     - [x] Postman
 - [x] Better split existing tests
 - [x] Add tests for the User model (only the part we change)
-- [ ] Add tests for the Profile model
+- [x] Add tests for the Profile model
 - [ ] Add tests for the Token model
 - [ ] Login/Logout
     - [ ] Setup token auth
