@@ -60,7 +60,8 @@
     - [x] Service
     - [x] Test
     - [x] Postman
-- [ ] Better split existing tests
+- [x] Better split existing tests
+- [x] Add tests for the User model (only the part we change)
 - [ ] Add tests for the Profile model
 - [ ] Add tests for the Token model
 - [ ] Login/Logout

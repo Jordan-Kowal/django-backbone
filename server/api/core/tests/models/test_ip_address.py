@@ -70,15 +70,15 @@ class TestIpAddress(ModelTestCase):
         self.assert_fields_are_required(self.payload)
         self.assert_instance_count_equals(0)
 
-    def test_status_choices(self):
-        """Tests that only a valid 'status' can be provided"""
+    def test_signal_status_choices(self):
+        """(Signal) Tests that only a valid 'status' can be provided"""
         self.payload["status"] = "Invalid status"
         with self.assertRaises(ValueError):
             self.model_class(**self.payload).save()
         self.assert_instance_count_equals(0)
 
-    def test_comment_length(self):
-        """Tests that the comment max_length cannot be exceeded"""
+    def test_signal_comment_length(self):
+        """(Signal) Tests that the comment max_length cannot be exceeded"""
         self.payload["comment"] = "*" * 300
         with self.assertRaises((IntegrityError, ValueError)):
             self.model_class(**self.payload).save()

@@ -9,7 +9,7 @@ from django.db import models
 from jklib.django.utils.emails import send_html_email, send_html_email_async
 from jklib.django.utils.network import build_url
 
-# Third-party
+# Application
 from api.core.utils import render_email_template
 
 # Local
@@ -49,7 +49,9 @@ class Profile(models.Model):
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="profile", blank=False, null=False
+    )
     is_verified = models.BooleanField(
         blank=True, default=False, null=False, verbose_name="Verified",
     )
