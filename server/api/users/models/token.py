@@ -34,6 +34,16 @@ class Token(LifeCycleModel):
         cleanup_expired_unused_tokens   --> Useful as a CRON to clean up the database
         deactivate_token                --> When you want to preemptively kill a token
         deactivate_user_tokens          --> When you want to deactivate all the tokens of a user
+
+    The code is split into the following sections:
+        Constants
+        Fields
+        Behavior
+        Validators
+        Properties
+        Public API
+        Cron jobs
+        Private
     """
 
     # ----------------------------------------
@@ -41,14 +51,15 @@ class Token(LifeCycleModel):
     # ----------------------------------------
     MIN_DURATION = 300  # 5 minutes
     MAX_DURATION = 604800  # 7 days
+    TYPE_MAX_LENGTH = 50
 
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    user = ForeignKeyCascade(User, related_name="tokens")
-    type = RequiredField(CharField, max_length=50)
+    user = RequiredField(ForeignKeyCascade, User, related_name="tokens")
+    type = RequiredField(CharField, max_length=TYPE_MAX_LENGTH)
     value = RequiredField(CharField, unique=True, max_length=1000)
-    expired_at = DateTimeField(null=False)
+    expired_at = RequiredField(DateTimeField)
     used_at = DateTimeField(null=True)
     is_active_token = ActiveField()
 
@@ -72,15 +83,52 @@ class Token(LifeCycleModel):
         return f"{self.value}"
 
     # ----------------------------------------
+    # Validators (used in signals)
+    # ----------------------------------------
+    def validate_type(self):
+        """
+        Checks that the type is not too long
+        Specifically useful for sqlite3 who doesn't perform those checks (despite the 'max_length' parameter)
+        """
+        if self.type:
+            length = len(self.type)
+            max_length = self.TYPE_MAX_LENGTH
+            if length > max_length:
+                raise ValueError(
+                    f"Value for 'type' is too long (max: {max_length}, provided: {length})"
+                )
+
+    # ----------------------------------------
+    # Properties
+    # ----------------------------------------
+    @property
+    def can_be_used(self):
+        """
+        :return: Checks if the token is active, not used, and not expired
+        :rtype: bool
+        """
+        return self.is_active_token and (not self.is_used) and (not self.is_expired)
+
+    @property
+    def is_expired(self):
+        """
+        :return: Whether the token has expired
+        :rtype: bool
+        """
+        now = datetime.now(timezone.utc)
+        return self.expired_at < now
+
+    @property
+    def is_used(self):
+        """
+        :return: Whether the token has been used
+        :rtype: bool
+        """
+        return self.used_at is not None
+
+    # ----------------------------------------
     # Public API
     # ----------------------------------------
-    @classmethod
-    def cleanup_expired_unused_tokens(cls):
-        """Deletes all the tokens that are expired and haven't been used"""
-        now = datetime.now(timezone.utc)
-        expired_unused_tokens = cls.objects.filter(used_at=None, expired_at__lt=now)
-        expired_unused_tokens.delete()
-
     def consume_token(self):
         """Deactivates the token and stores its used timestamp"""
         self.used_at = datetime.now(timezone.utc)
@@ -142,35 +190,17 @@ class Token(LifeCycleModel):
             return None
 
     # ----------------------------------------
-    # Properties
+    # Cron jobs
     # ----------------------------------------
-    @property
-    def can_be_used(self):
-        """
-        :return: Checks if the token is active, not used, and not expired
-        :rtype: bool
-        """
-        return self.is_active_token and (not self.is_used) and (not self.is_expired)
-
-    @property
-    def is_expired(self):
-        """
-        :return: Whether the token has expired
-        :rtype: bool
-        """
+    @classmethod
+    def cleanup_expired_unused_tokens(cls):
+        """Deletes all the tokens that are expired and haven't been used"""
         now = datetime.now(timezone.utc)
-        return self.expired_at < now
-
-    @property
-    def is_used(self):
-        """
-        :return: Whether the token has been used
-        :rtype: bool
-        """
-        return self.used_at is not None
+        expired_unused_tokens = cls.objects.filter(used_at=None, expired_at__lt=now)
+        expired_unused_tokens.delete()
 
     # ----------------------------------------
-    # Private class methods
+    # Private
     # ----------------------------------------
     @classmethod
     def _generate_unique_token(cls):

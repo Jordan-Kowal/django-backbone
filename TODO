@@ -63,7 +63,8 @@
 - [x] Better split existing tests
 - [x] Add tests for the User model (only the part we change)
 - [x] Add tests for the Profile model
-- [ ] Add tests for the Token model
+- [x] Add tests for the Token model
+- [ ] Use Enum or named tuples for profile emails
 - [ ] Login/Logout
     - [ ] Setup token auth
     - [ ] Login service and test

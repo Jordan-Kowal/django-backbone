@@ -3,9 +3,10 @@
 # Django
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db import models
+from django.db.models import CASCADE, BooleanField, Model, OneToOneField
 
 # Personal
+from jklib.django.db.fields import RequiredField
 from jklib.django.utils.emails import send_html_email, send_html_email_async
 from jklib.django.utils.network import build_url
 
@@ -19,7 +20,7 @@ from .token import Token
 # --------------------------------------------------------------------------------
 # > Models
 # --------------------------------------------------------------------------------
-class Profile(models.Model):
+class Profile(Model):
     """Extends the User model to provide additional and utility to our User"""
 
     # ----------------------------------------
@@ -49,10 +50,8 @@ class Profile(models.Model):
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="profile", blank=False, null=False
-    )
-    is_verified = models.BooleanField(
+    user = RequiredField(OneToOneField, User, on_delete=CASCADE, related_name="profile")
+    is_verified = BooleanField(
         blank=True, default=False, null=False, verbose_name="Verified",
     )
 

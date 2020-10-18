@@ -79,7 +79,7 @@ class TestIpAddress(ModelTestCase):
 
     def test_signal_comment_length(self):
         """(Signal) Tests that the comment max_length cannot be exceeded"""
-        self.payload["comment"] = "*" * 300
+        self.payload["comment"] = "a" * (self.model_class.COMMENT_MAX_LENGTH + 1)
         with self.assertRaises((IntegrityError, ValueError)):
             self.model_class(**self.payload).save()
         self.assert_instance_count_equals(0)

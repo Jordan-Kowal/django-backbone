@@ -61,7 +61,9 @@ class IpAddress(LifeCycleModel):
     # Fields
     # ----------------------------------------
     ip = RequiredField(GenericIPAddressField, protocol="IPv4", unique=True)
-    status = IntegerField(choices=IpStatus.choices, default=IpStatus.NONE)
+    status = RequiredField(
+        IntegerField, choices=IpStatus.choices, default=IpStatus.NONE
+    )
     expires_on = DateField(
         blank=False,
         null=True,
