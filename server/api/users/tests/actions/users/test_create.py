@@ -118,7 +118,7 @@ class TestCreateUser(ActionTestCase):
         assert_user_representation_matches_instance(response.data, user)
         # Check the email was sent
         if user.profile.is_verified:
-            subject = Profile.EMAILS["welcome"]["subject"]
+            subject = Profile.EmailTemplate.WELCOME.subject
         else:
-            subject = Profile.EMAILS["verification_email"]["subject"]
+            subject = Profile.EmailTemplate.VERIFY_EMAIL.subject
         self.assert_email_was_sent(subject)

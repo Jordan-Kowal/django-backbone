@@ -1,5 +1,9 @@
 """Profile"""
 
+# Built-in
+from collections import namedtuple
+from enum import Enum
+
 # Django
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -16,6 +20,11 @@ from api.core.utils import render_email_template
 # Local
 from .token import Token
 
+# --------------------------------------------------------------------------------
+# > Helpers
+# --------------------------------------------------------------------------------
+EmailInfo = namedtuple("EmailInfo", ["template", "subject", "endpoint"])
+
 
 # --------------------------------------------------------------------------------
 # > Models
@@ -24,28 +33,25 @@ class Profile(Model):
     """Extends the User model to provide additional and utility to our User"""
 
     # ----------------------------------------
-    # Email templates
+    # Enums
     # ----------------------------------------
-    EMAILS = {
-        "password_updated": {
-            "template": "users/emails/password_updated.html",
-            "subject": "Your password has been updated",
-        },
-        "request_password_reset": {
-            "template": "users/emails/request_password_reset.html",
-            "subject": "Reset your password",
-            "endpoint": "reset",
-        },
-        "verification_email": {
-            "template": "users/emails/verification_email.html",
-            "subject": "Please verify your email address",
-            "endpoint": "verify",
-        },
-        "welcome": {
-            "template": "users/emails/welcome.html",
-            "subject": "Welcome to our website !",
-        },
-    }
+    class EmailTemplate(EmailInfo, Enum):
+        """Enum of namedtuples that store our email template data"""
+
+        PASSWORD_UPDATED = EmailInfo(
+            "users/emails/password_updated.html", "Your password has been updated", None
+        )
+        REQUEST_PASSWORD_RESET = EmailInfo(
+            "users/emails/request_password_reset.html", "Reset your password", "reset"
+        )
+        VERIFY_EMAIL = EmailInfo(
+            "users/emails/verification_email.html",
+            "Please verify your email address",
+            "verify",
+        )
+        WELCOME = EmailInfo(
+            "users/emails/welcome.html", "Welcome to our website !", None
+        )
 
     # ----------------------------------------
     # Fields
@@ -101,9 +107,9 @@ class Profile(Model):
         Sends the 'password_updated' email to our user
         :param bool async_: Whether the email will be sent asynchronously. Defaults to True.
         """
-        email = self.EMAILS["password_updated"]
+        email = self.EmailTemplate.PASSWORD_UPDATED
         self.send_email(
-            template_path=email["template"], subject=email["subject"], async_=async_
+            template_path=email.template, subject=email.subject, async_=async_
         )
 
     def send_reset_password_email(self, async_=True):
@@ -113,11 +119,11 @@ class Profile(Model):
         """
         token_type, token_duration = settings.RESET_TOKEN
         _, token_value = self._create_token(token_type, token_duration)
-        email = self.EMAILS["request_password_reset"]
+        email = self.EmailTemplate.REQUEST_PASSWORD_RESET
         context = {"password_reset_link": self._build_password_reset_url(token_value)}
         self.send_email(
-            template_path=email["template"],
-            subject=email["subject"],
+            template_path=email.template,
+            subject=email.subject,
             context=context,
             async_=async_,
         )
@@ -132,11 +138,11 @@ class Profile(Model):
             return
         token_type, token_duration = settings.VERIFY_TOKEN
         _, token_value = self._create_token(token_type, token_duration)
-        email = self.EMAILS["verification_email"]
+        email = self.EmailTemplate.VERIFY_EMAIL
         context = {"verification_link": self._build_verification_url(token_value)}
         self.send_email(
-            template_path=email["template"],
-            subject=email["subject"],
+            template_path=email.template,
+            subject=email.subject,
             context=context,
             async_=async_,
         )
@@ -146,9 +152,9 @@ class Profile(Model):
         Sends the 'welcome' email to our user
         :param bool async_: Whether the email will be sent asynchronously. Defaults to True.
         """
-        email = self.EMAILS["welcome"]
+        email = self.EmailTemplate.WELCOME
         self.send_email(
-            template_path=email["template"], subject=email["subject"], async_=async_
+            template_path=email.template, subject=email.subject, async_=async_
         )
 
     # ----------------------------------------
@@ -162,7 +168,7 @@ class Profile(Model):
         :rtype: str
         """
         root_url = settings.FRONTEND_ROOT_URL
-        relative_url = self.EMAILS["request_password_reset"]["endpoint"]
+        relative_url = self.EmailTemplate.REQUEST_PASSWORD_RESET.endpoint
         params = {"token": token_value}
         parts = [root_url, relative_url]
         return build_url(parts, params=params)
@@ -175,7 +181,7 @@ class Profile(Model):
         :rtype: str
         """
         root_url = settings.FRONTEND_ROOT_URL
-        relative_url = self.EMAILS["verification_email"]["endpoint"]
+        relative_url = self.EmailTemplate.VERIFY_EMAIL.endpoint
         params = {"token": token_value}
         parts = [root_url, relative_url]
         return build_url(parts, params=params)

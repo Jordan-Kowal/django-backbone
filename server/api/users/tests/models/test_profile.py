@@ -60,14 +60,14 @@ class TestProfile(ModelTestCase):
 
     def test_send_password_updated_email(self):
         """Tests that the password updated email is sent correctly"""
-        subject = self.model_class.EMAILS["password_updated"]["subject"]
+        subject = self.model_class.EmailTemplate.PASSWORD_UPDATED.subject
         user = self.create_user()
         user.profile.send_password_updated_email()
         self.assert_email_was_sent(subject)
 
     def test_send_reset_password_email(self):
         """Tests that the reset password email is sent correctly with a valid token"""
-        subject = self.model_class.EMAILS["request_password_reset"]["subject"]
+        subject = self.model_class.EmailTemplate.REQUEST_PASSWORD_RESET.subject
         user = self.create_user()
         user.profile.send_reset_password_email()
         token_type, _ = settings.RESET_TOKEN
@@ -76,7 +76,7 @@ class TestProfile(ModelTestCase):
 
     def test_send_verification_email(self):
         """Tests that the verification email is sent only to unverified users, and includes a valid token"""
-        subject = self.model_class.EMAILS["verification_email"]["subject"]
+        subject = self.model_class.EmailTemplate.VERIFY_EMAIL.subject
         user = self.create_user()
         # Verified
         user.profile.is_verified = True
@@ -94,7 +94,7 @@ class TestProfile(ModelTestCase):
 
     def test_send_welcome_email(self):
         """Tests that the welcome email is sent correctly"""
-        subject = self.model_class.EMAILS["welcome"]["subject"]
+        subject = self.model_class.EmailTemplate.WELCOME.subject
         user = self.create_user()
         user.profile.send_welcome_email()
         self.assert_email_was_sent(subject)

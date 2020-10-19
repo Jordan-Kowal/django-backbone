@@ -124,7 +124,7 @@ class TestPerformPasswordReset(ActionTestCase):
         assert not user.check_password(self.password)
         assert user.check_password(self.payload["new_password"])
         # Checking that the update email has been sent
-        subject = Profile.EMAILS["password_updated"]["subject"]
+        subject = Profile.EmailTemplate.PASSWORD_UPDATED.subject
         self.assert_email_was_sent(subject)
         # Trying again should fail
         response = self.client.post(self.service_base_url, self.payload)

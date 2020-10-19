@@ -88,7 +88,7 @@ class TestVerifyUser(ActionTestCase):
         user_instance = User.objects.get(id=self.user.id)
         assert user_instance.profile.is_verified
         # Welcome email was sent
-        subject = Profile.EMAILS["welcome"]["subject"]
+        subject = Profile.EmailTemplate.WELCOME.subject
         self.assert_email_was_sent(subject)
         # Trying again should fail
         response = self.client.post(self.service_base_url, payload)
