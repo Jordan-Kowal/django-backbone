@@ -33,7 +33,7 @@ class TestIpAddress(ModelTestCase):
     """
 
     model_class = IpAddress
-    required_fields = ["ip"]
+    required_fields = ["ip", "status"]
 
     # ----------------------------------------
     # Behavior

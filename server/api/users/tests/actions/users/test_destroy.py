@@ -56,10 +56,10 @@ class TestDestroyUser(ActionTestCase):
         self.client.force_authenticate(self.user)
         response = self.client.delete(self.admin_detail_url)
         assert response.status_code == 403
-        # 200 Owner
+        # 204 Owner
         response = self.client.delete(self.user_detail_url)
         assert response.status_code == 204
-        # 200 Admin
+        # 204 Admin
         self.client.logout()
         third_user = self.create_user()
         third_user_detail_url = self.detail_url(third_user.id)

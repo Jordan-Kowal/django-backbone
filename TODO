@@ -1,12 +1,13 @@
 # TODO
 
 #### JKLIB
-TBD
+- [ ] Add :raises ErrorType: to functions docstring
 
 #### Core API
+- [ ] Add :raises ErrorType: to functions docstring
 - [ ] Add permission test in all actions (with shared function) 
 - [ ] Add tested services:
-    - [ ] (admin) create
+    - [x] (admin) create
     - [ ] (admin) retrieve
     - [ ] (admin) list
     - [ ] (admin) update
@@ -14,12 +15,13 @@ TBD
     - [ ] (admin) blacklist
     - [ ] (admin) whitelist
     - [ ] (admin) clear
+    - [ ] (admin) clear_all
 - [ ] Clean up database
     - [x] Write the function
     - [x] Write a test
     - [ ] Setup a cron job
 - [ ] Remove admins
-
+ 
 #### Users API
 - [x] Use Enum and/or named tuples for profile emails
 - [ ] Login/Logout
