@@ -9,7 +9,7 @@
 - [ ] Add tested services:
     - [x] (admin) create
     - [x] (admin) retrieve
-    - [ ] (admin) list
+    - [x] (admin) list
     - [ ] (admin) update
     - [ ] (admin) destroy
     - [ ] (admin) blacklist

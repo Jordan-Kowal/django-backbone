@@ -10,10 +10,31 @@ Split into the following categories:
 from datetime import date
 
 # Django
-from rest_framework.serializers import ValidationError
+from rest_framework.serializers import ModelSerializer, ValidationError
 
 # Application
 from api.core.models import IpAddress
+
+
+# --------------------------------------------------------------------------------
+# > Serializers
+# --------------------------------------------------------------------------------
+class RetrieveIpSerializer(ModelSerializer):
+    """Model serializer to fetch our IpAddress data"""
+
+    class Meta:
+        """Meta class to setup the serializer"""
+
+        model = IpAddress
+
+    def to_representation(self, ip_address):
+        """
+        Returns the formatted IpAddress data
+        :param IpAddress ip_address: The created IpAddress
+        :return: Dict with our formatted IpAddress data
+        :rtype: dict
+        """
+        return ip_address_representation(ip_address)
 
 
 # --------------------------------------------------------------------------------
