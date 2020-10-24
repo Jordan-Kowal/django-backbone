@@ -11,7 +11,7 @@
     - [x] (admin) retrieve
     - [x] (admin) list
     - [ ] (admin) update
-    - [ ] (admin) destroy
+    - [x] (admin) destroy
     - [ ] (admin) blacklist
     - [ ] (admin) whitelist
     - [ ] (admin) clear

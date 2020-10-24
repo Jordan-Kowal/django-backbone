@@ -8,7 +8,7 @@ from jklib.django.drf.viewsets import DynamicViewSet
 from api.core.models import IpAddress
 
 # Local
-from .actions import CreateIpHandler, ListIpHandler, RetrieveIpHandler
+from .actions import CreateIpHandler, DestroyIpHandler, ListIpHandler, RetrieveIpHandler
 
 
 # --------------------------------------------------------------------------------
@@ -39,6 +39,11 @@ class IpViewSet(DynamicViewSet):
         "retrieve": {
             "description": "Fetches an existing IP",
             "handler": RetrieveIpHandler,
+            "permissions": None,
+        },
+        "destroy": {
+            "description": "Deletes an existing IP",
+            "handler": DestroyIpHandler,
             "permissions": None,
         },
     }
