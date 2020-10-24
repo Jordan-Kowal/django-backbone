@@ -86,7 +86,7 @@ class CreateIpSerializer(NotEmptyModelSerializer):
 # > Handler
 # --------------------------------------------------------------------------------
 class CreateIpHandler(ModelActionHandler):
-    """WIP"""
+    """Registers a new IP with the provided info"""
 
     serializer_mode = SerializerMode.UNIQUE
     serializer = CreateIpSerializer

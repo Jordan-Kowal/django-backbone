@@ -50,12 +50,6 @@ STATUS_TO_ENUM = {
 
 STATUS_CHOICES = list(STATUS_TO_ENUM.keys())
 
-STATUS_TO_STRING = {
-    IpAddress.IpStatus.NONE: "NONE",
-    IpAddress.IpStatus.WHITELISTED: "WHITELISTED",
-    IpAddress.IpStatus.BLACKLISTED: "BLACKLISTED",
-}
-
 
 # --------------------------------------------------------------------------------
 # > Validators

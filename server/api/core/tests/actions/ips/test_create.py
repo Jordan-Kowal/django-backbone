@@ -140,7 +140,7 @@ class TestCreateIp(ActionTestCase):
         assert response.status_code == 400
         assert IpAddress.objects.count() == 1
 
-    def test_success(self):
+    def test_create_success(self):
         """Tests that we created an IP address successfully"""
         response = self.client.post(self.service_base_url, data=self.payload)
         assert response.status_code == 201

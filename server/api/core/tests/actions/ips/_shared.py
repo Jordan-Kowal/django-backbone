@@ -1,10 +1,36 @@
 """Shared constants, functions, and classes for our IP service tests"""
 
+# Built-in
+from datetime import date, timedelta
+
+# Application
+from api.core.models import IpAddress
 
 # --------------------------------------------------------------------------------
 # > Constants
 # --------------------------------------------------------------------------------
 SERVICE_URL = "/api/ips"
+DEFAULT_VALUES = {
+    "ip": "127.0.0.1",
+    "status": IpAddress.IpStatus.NONE,
+    "expires_on": date.today() + timedelta(days=60),
+    "active": False,
+    "comment": "Test",
+}
+
+
+# --------------------------------------------------------------------------------
+# > Utilities
+# --------------------------------------------------------------------------------
+def create_ip_address(**kwargs):
+    """
+    Creates an IpAddress instance using default parameters and the one provided
+    :param kwargs: Parameters to override the default values
+    :return: The created IpAddress instance
+    :rtype: IpAddress
+    """
+    data = {**DEFAULT_VALUES, **kwargs}
+    return IpAddress.objects.create(**data)
 
 
 # --------------------------------------------------------------------------------

@@ -2,3 +2,4 @@
 
 # Local
 from .create import CreateIpHandler
+from .retrieve import RetrieveIpHandler

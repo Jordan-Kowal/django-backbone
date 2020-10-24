@@ -8,7 +8,7 @@
 - [ ] Add permission test in all actions (with shared function) 
 - [ ] Add tested services:
     - [x] (admin) create
-    - [ ] (admin) retrieve
+    - [x] (admin) retrieve
     - [ ] (admin) list
     - [ ] (admin) update
     - [ ] (admin) destroy
