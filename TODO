@@ -10,7 +10,7 @@
     - [x] (admin) create
     - [x] (admin) retrieve
     - [x] (admin) list
-    - [ ] (admin) update
+    - [x] (admin) update
     - [x] (admin) destroy
     - [ ] (admin) blacklist
     - [ ] (admin) whitelist
@@ -57,7 +57,19 @@ Update the design and content of the following emails:
 - [ ] Contact
     - [ ] Admin alert
     - [ ] User alert
-    - [ ] Config either in settings or Contact class
+    - [ ] Config either in 
+    
+#### Better test runner
+- [ ] Wrap around existing test module 
+- [ ] Hide original test module output
+- [ ] Better output (colored, file structure, percentage and quantity per file/folder)
+- [ ] Interactive shell 
+- [ ] Choose failed test to see error and then go back
+- [ ] Options 
+    - [ ] -s --stacktrace to show all errors stacktrace directly 
+    - [ ] -f --failed to rerun failed tests
+    - [ ] -o --output to output results in a file
+    - [ ] -v --vanilla Use our module but run the original test command without our wrapper
 
 #### Others
 - [ ] Update README.md

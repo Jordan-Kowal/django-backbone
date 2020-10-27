@@ -8,7 +8,13 @@ from jklib.django.drf.viewsets import DynamicViewSet
 from api.core.models import IpAddress
 
 # Local
-from .actions import CreateIpHandler, DestroyIpHandler, ListIpHandler, RetrieveIpHandler
+from .actions import (
+    CreateIpHandler,
+    DestroyIpHandler,
+    ListIpHandler,
+    RetrieveIpHandler,
+    UpdateIpHandler,
+)
 
 
 # --------------------------------------------------------------------------------
@@ -19,6 +25,8 @@ class IpViewSet(DynamicViewSet):
     Viewset for the IpAddress models.
     Services can be split into the following categories:
         Classic model CRUD
+        IP registration (blacklist/whitelist)
+        IP clearing
     """
 
     queryset = IpAddress.objects.all()
@@ -39,6 +47,11 @@ class IpViewSet(DynamicViewSet):
         "retrieve": {
             "description": "Fetches an existing IP",
             "handler": RetrieveIpHandler,
+            "permissions": None,
+        },
+        "update": {
+            "description": "Updates an existing IP",
+            "handler": UpdateIpHandler,
             "permissions": None,
         },
         "destroy": {
