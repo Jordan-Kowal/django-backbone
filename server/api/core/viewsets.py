@@ -9,6 +9,7 @@ from api.core.models import IpAddress
 
 # Local
 from .actions import (
+    BlacklistExistingIpHandler,
     CreateIpHandler,
     DestroyIpHandler,
     ListIpHandler,
@@ -25,7 +26,8 @@ class IpViewSet(DynamicViewSet):
     Viewset for the IpAddress models.
     Services can be split into the following categories:
         Classic model CRUD
-        IP registration (blacklist/whitelist)
+        IP blacklisting
+        IP whitelisting
         IP clearing
     """
 
@@ -61,4 +63,21 @@ class IpViewSet(DynamicViewSet):
         },
     }
 
-    extra_actions = {}
+    extra_actions = {
+        # "blacklist_new": {
+        #     "description": "Creates and blacklists an IP",
+        #     "handler": BlacklistIpHandler,
+        #     "permissions": None,
+        #     "methods": ["post"],
+        #     "url_path": "blacklist",
+        #     "detail": False,
+        # },
+        "blacklist_existing": {
+            "description": "Blacklists an existing IP",
+            "handler": BlacklistExistingIpHandler,
+            "permissions": None,
+            "methods": ["post"],
+            "url_path": "blacklist",
+            "detail": True,
+        },
+    }

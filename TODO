@@ -12,8 +12,10 @@
     - [x] (admin) list
     - [x] (admin) update
     - [x] (admin) destroy
-    - [ ] (admin) blacklist
-    - [ ] (admin) whitelist
+    - [x] (admin) blacklist_existing
+    - [ ] (admin) blacklist_new
+    - [ ] (admin) whitelist_existing
+    - [ ] (admin) whitelist_new
     - [ ] (admin) clear
     - [ ] (admin) clear_all
 - [ ] Clean up database

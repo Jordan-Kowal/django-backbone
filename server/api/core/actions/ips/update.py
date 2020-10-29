@@ -19,7 +19,7 @@ class UpdateIpHandler(ModelActionHandler):
     def main(self):
         """
         Updates the IpAddress model with the provided data
-        :return: HTTP 201 response with the IpAddress data
+        :return: HTTP 200 response with the IpAddress data
         :rtype: Response
         """
         return self.model_update()
