@@ -8,10 +8,11 @@ from rest_framework.test import APIClient
 from jklib.django.drf.tests import ActionTestCase
 
 # Local
-from ....models import IpAddress
 from ._shared import (
     SERVICE_URL,
+    assert_admin_permissions,
     assert_representation_matches_instance,
+    assert_unknown_ip,
     create_ip_address,
 )
 
@@ -23,6 +24,7 @@ class TestRetrieveIp(ActionTestCase):
     """TestCase for the 'retrieve' action"""
 
     service_base_url = f"{SERVICE_URL}/"
+    valid_status_code = 200
 
     # ----------------------------------------
     # Behavior
@@ -54,32 +56,29 @@ class TestRetrieveIp(ActionTestCase):
     # ----------------------------------------
     def test_permissions(self):
         """Tests that only admin user can retrieve an IP"""
-        # 401 Unauthenticated
-        self.client.logout()
-        response = self.client.get(self.first_ip_url)
-        assert response.status_code == 401
-        # 403 Not admin
-        self.create_user(authenticate=True)
-        response = self.client.get(self.first_ip_url)
-        assert response.status_code == 403
-        # 201 Admin
-        self.client.logout()
-        self.client.force_authenticate(self.admin)
-        response = self.client.get(self.first_ip_url)
-        assert response.status_code == 200
+        user = self.create_user()
+        assert_admin_permissions(
+            client=self.client,
+            protocol=self.client.get,
+            url=self.first_ip_url,
+            payload=None,
+            valid_status_code=self.valid_status_code,
+            admin=self.admin,
+            user=user,
+        )
 
     def test_unknown_ip_address(self):
         """Tests that we cannot fetch an unknown IP"""
         unknown_url = self.detail_url(10)
-        # Admin should get 404
-        assert IpAddress.objects.count() == 2
-        response = self.client.get(unknown_url)
-        assert response.status_code == 404
-        # User should get 403
-        self.client.logout()
-        self.create_user(authenticate=True)
-        response = self.client.get(unknown_url)
-        assert response.status_code == 403
+        user = self.create_user()
+        assert_unknown_ip(
+            client=self.client,
+            protocol=self.client.get,
+            url=unknown_url,
+            payload=None,
+            admin=self.admin,
+            user=user,
+        )
 
     def test_retrieve_success(self):
         """Tests that we can successfully retrieve an IP"""
@@ -88,5 +87,5 @@ class TestRetrieveIp(ActionTestCase):
             (self.second_ip, self.second_ip_url),
         ]:
             response = self.client.get(url)
-            assert response.status_code == 200
+            assert response.status_code == self.valid_status_code
             assert_representation_matches_instance(response.data, instance)

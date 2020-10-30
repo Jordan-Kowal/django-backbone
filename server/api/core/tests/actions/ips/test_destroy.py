@@ -9,7 +9,12 @@ from jklib.django.drf.tests import ActionTestCase
 
 # Local
 from ....models import IpAddress
-from ._shared import SERVICE_URL, create_ip_address
+from ._shared import (
+    SERVICE_URL,
+    assert_admin_permissions,
+    assert_unknown_ip,
+    create_ip_address,
+)
 
 
 # --------------------------------------------------------------------------------
@@ -19,6 +24,7 @@ class TestDestroyUser(ActionTestCase):
     """TestCase for the 'destroy' action"""
 
     service_base_url = f"{SERVICE_URL}/"
+    valid_status_code = 204
 
     # ----------------------------------------
     # Behavior
@@ -50,43 +56,38 @@ class TestDestroyUser(ActionTestCase):
     # ----------------------------------------
     def test_permissions(self):
         """Tests that only admin users can use this service"""
-        # 401 Unauthenticated
-        self.client.logout()
-        response = self.client.delete(self.first_ip_url)
-        assert response.status_code == 401
-        assert IpAddress.objects.count() == 2
-        # 403 User
-        self.create_user(authenticate=True)
-        response = self.client.delete(self.first_ip_url)
-        assert response.status_code == 403
-        assert IpAddress.objects.count() == 2
-        # 204 Admin
-        self.client.logout()
-        self.client.force_authenticate(self.admin)
-        response = self.client.delete(self.first_ip_url)
-        assert response.status_code == 204
+        user = self.create_user()
+        assert_admin_permissions(
+            client=self.client,
+            protocol=self.client.delete,
+            url=self.first_ip_url,
+            payload=None,
+            valid_status_code=self.valid_status_code,
+            admin=self.admin,
+            user=user,
+        )
         assert IpAddress.objects.count() == 1
 
-    def test_unknown_object(self):
+    def test_unknown_ip_address(self):
         """Tests that you get an error when trying to delete an unknown object"""
-        # 404 for Admin
         unknown_url = self.detail_url(10)
-        response = self.client.delete(unknown_url)
-        assert response.status_code == 404
-        assert IpAddress.objects.count() == 2
-        # 403 for User
-        self.client.logout()
-        self.create_user(authenticate=True)
-        response = self.client.delete(unknown_url)
-        assert response.status_code == 403
+        user = self.create_user()
+        assert_unknown_ip(
+            client=self.client,
+            protocol=self.client.delete,
+            url=unknown_url,
+            payload=None,
+            admin=self.admin,
+            user=user,
+        )
         assert IpAddress.objects.count() == 2
 
     def test_destroy_success(self):
         """Tests that you can successfully delete an IP"""
         assert IpAddress.objects.count() == 2
         response = self.client.delete(self.first_ip_url)
-        assert response.status_code == 204
+        assert response.status_code == self.valid_status_code
         assert IpAddress.objects.count() == 1
         response = self.client.delete(self.second_ip_url)
-        assert response.status_code == 204
+        assert response.status_code == self.valid_status_code
         assert IpAddress.objects.count() == 0

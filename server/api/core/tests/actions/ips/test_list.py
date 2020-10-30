@@ -10,6 +10,7 @@ from jklib.django.drf.tests import ActionTestCase
 from ....models import IpAddress
 from ._shared import (
     SERVICE_URL,
+    assert_admin_permissions,
     assert_representation_matches_instance,
     create_ip_address,
 )
@@ -22,6 +23,7 @@ class TestListUsers(ActionTestCase):
     """TestCase for the 'list' action"""
 
     service_base_url = f"{SERVICE_URL}/"
+    valid_status_code = 200
 
     # ----------------------------------------
     # Behavior
@@ -51,25 +53,22 @@ class TestListUsers(ActionTestCase):
         """Tests that only admin can access this service"""
         create_ip_address()
         assert IpAddress.objects.count() == 1
-        # 401 Unauthenticated
-        self.client.logout()
-        response = self.client.get(self.service_base_url)
-        assert response.status_code == 401
-        # User is 403 Unauthorized
-        self.create_user(authenticate=True)
-        response = self.client.get(self.service_base_url)
-        assert response.status_code == 403
-        # Admin is 200 OK
-        self.client.logout()
-        self.client.force_authenticate(self.admin)
-        response = self.client.get(self.service_base_url)
-        assert response.status_code == 200
+        user = self.create_user()
+        assert_admin_permissions(
+            client=self.client,
+            protocol=self.client.get,
+            url=self.service_base_url,
+            payload=None,
+            valid_status_code=self.valid_status_code,
+            admin=self.admin,
+            user=user,
+        )
 
     def test_list_zero(self):
         """Tests that the service works even if there's no object"""
         assert IpAddress.objects.count() == 0
         response = self.client.get(self.service_base_url)
-        assert response.status_code == 200
+        assert response.status_code == self.valid_status_code
         assert len(response.data) == 0
 
     def test_list_one(self):
@@ -77,7 +76,7 @@ class TestListUsers(ActionTestCase):
         first_ip = create_ip_address()
         assert IpAddress.objects.count() == 1
         response = self.client.get(self.service_base_url)
-        assert response.status_code == 200
+        assert response.status_code == self.valid_status_code
         assert len(response.data) == 1
         assert_representation_matches_instance(response.data[0], first_ip)
 
@@ -90,7 +89,7 @@ class TestListUsers(ActionTestCase):
         assert IpAddress.objects.count() == 3
         # Perform the request
         response = self.client.get(self.service_base_url)
-        assert response.status_code == 200
+        assert response.status_code == self.valid_status_code
         assert len(response.data) == 3
         # Check all instances
         instances = [first_ip, second_ip, third_ip]

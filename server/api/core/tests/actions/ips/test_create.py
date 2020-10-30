@@ -1,8 +1,5 @@
 """TestCase for the 'create' action"""
 
-# Built-in
-from datetime import date, timedelta
-
 # Django
 from rest_framework.test import APIClient
 
@@ -11,7 +8,14 @@ from jklib.django.drf.tests import ActionTestCase
 
 # Local
 from ....models import IpAddress
-from ._shared import SERVICE_URL, assert_representation_matches_instance
+from ._shared import (
+    SERVICE_URL,
+    assert_admin_permissions,
+    assert_comment_length,
+    assert_representation_matches_instance,
+    assert_valid_expires_on,
+    assert_valid_status,
+)
 
 
 # --------------------------------------------------------------------------------
@@ -22,6 +26,7 @@ class TestCreateIp(ActionTestCase):
 
     required_fields = ["ip", "status"]
     service_base_url = f"{SERVICE_URL}/"
+    valid_status_code = 201
 
     # ----------------------------------------
     # Behavior
@@ -56,21 +61,16 @@ class TestCreateIp(ActionTestCase):
     # ----------------------------------------
     def test_permissions(self):
         """Tests that only admin users can access this service"""
-        # 401 Unauthenticated
-        self.client.logout()
-        response = self.client.post(self.service_base_url, data=self.payload)
-        assert response.status_code == 401
-        assert IpAddress.objects.count() == 0
-        # 403 Not admin
-        self.create_user(authenticate=True)
-        response = self.client.post(self.service_base_url, data=self.payload)
-        assert response.status_code == 403
-        assert IpAddress.objects.count() == 0
-        # 201 Admin
-        self.client.logout()
-        self.client.force_authenticate(self.admin)
-        response = self.client.post(self.service_base_url, data=self.payload)
-        assert response.status_code == 201
+        user = self.create_user()
+        assert_admin_permissions(
+            client=self.client,
+            protocol=self.client.post,
+            url=self.service_base_url,
+            payload=self.payload,
+            valid_status_code=self.valid_status_code,
+            admin=self.admin,
+            user=user,
+        )
         assert IpAddress.objects.count() == 1
 
     def test_required_fields(self):
@@ -82,50 +82,33 @@ class TestCreateIp(ActionTestCase):
 
     def test_valid_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
-        # Invalid dates
-        past_date = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-        invalid_format_date = (date.today() - timedelta(days=1)).strftime("%Y-%d")
-        for date_value in [past_date, invalid_format_date]:
-            self.payload["expires_on"] = date_value
-            response = self.client.post(self.service_base_url, data=self.payload)
-            self.assert_field_has_error(response, "expires_on")
-        assert IpAddress.objects.count() == 0
-        # Valid dates
-        raw_date = date.today() + timedelta(days=1)
-        formatted_date = raw_date.strftime("%Y-%m-%d")
-        for date_value in [raw_date, formatted_date]:
-            self.payload["expires_on"] = date_value
-            response = self.client.post(self.service_base_url, data=self.payload)
-            assert response.status_code == 201
-            assert IpAddress.objects.count() == 1
-            IpAddress.objects.all().delete()
+        assert_valid_expires_on(
+            protocol=self.client.post,
+            url=self.service_base_url,
+            payload=self.payload,
+            valid_status_code=self.valid_status_code,
+            clean_up=True,
+        )
 
-    def test_valid_status(self):
+    def test_valid_status_code(self):
         """Tests that you must provide a valid status"""
-        # Invalid statuses
-        unknown_integer = 999
-        unknown_string = "TEST"
-        unsupported_value = 3.3
-        for status in [unknown_integer, unknown_string, unsupported_value]:
-            self.payload["status"] = status
-            response = self.client.post(self.service_base_url, data=self.payload)
-            self.assert_field_has_error(response, "status")
-        # Valid statuses
-        status_as_integer = 1
-        status_as_string = "WHITELISTED"
-        for status in [status_as_integer, status_as_string]:
-            self.payload["status"] = status
-            response = self.client.post(self.service_base_url, data=self.payload)
-            assert response.status_code == 201
-            assert IpAddress.objects.count() == 1
-            IpAddress.objects.all().delete()
+        assert_valid_status(
+            protocol=self.client.post,
+            url=self.service_base_url,
+            payload=self.payload,
+            valid_status_code=self.valid_status_code,
+            clean_up=True,
+        )
 
     def test_comment_length(self):
         """Tests that the comment cannot exceed the max length"""
-        self.payload["comment"] = "a" * (IpAddress.COMMENT_MAX_LENGTH + 1)
-        response = self.client.post(self.service_base_url, data=self.payload)
-        self.assert_field_has_error(response, "comment")
-        assert IpAddress.objects.count() == 0
+        assert_comment_length(
+            protocol=self.client.post,
+            url=self.service_base_url,
+            payload=self.payload,
+            valid_status_code=self.valid_status_code,
+        )
+        assert IpAddress.objects.count() == 1
 
     def test_unique_ip(self):
         """Tests that you cannot create the same IP twice"""

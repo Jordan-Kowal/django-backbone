@@ -12,7 +12,13 @@ from datetime import date
 
 # Django
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import (
+    BooleanField,
+    CharField,
+    DateField,
+    ModelSerializer,
+    ValidationError,
+)
 
 # Personal
 from jklib.django.drf.serializers import NotEmptyModelSerializer, required
@@ -38,6 +44,91 @@ STATUS_CHOICES = list(STATUS_TO_ENUM.keys())
 # --------------------------------------------------------------------------------
 # > Serializers
 # --------------------------------------------------------------------------------
+class BlacklistOrWhitelistExistingIpSerializer(ModelSerializer):
+    """
+    Serializer to blacklist or whitelist an existing IP
+    The choice between blacklist/whitelist should happen in the ActionHandler
+    """
+
+    # Overridden to pass default values and make them truly optional
+    expires_on = DateField(default=None, allow_null=True)
+    comment = CharField(max_length=IpAddress.COMMENT_MAX_LENGTH, default="")
+    override = BooleanField(default=False)
+
+    # ----------------------------------------
+    # Behavior
+    # ----------------------------------------
+    class Meta:
+        """Meta class to setup the serializer"""
+
+        model = IpAddress
+        fields = [
+            "expires_on",
+            "comment",
+            "override",
+        ]
+
+    # ----------------------------------------
+    # Validation
+    # ----------------------------------------
+    @staticmethod
+    def validate_expires_on(expiration_date):
+        """
+        If a date is provided, check that it is not in the past
+        :param date expiration_date: The provided datetime value
+        :return: The untouched expiration date
+        :rtype: date
+        """
+        if expiration_date:
+            expiration_date = validate_expires_on(expiration_date)
+        return expiration_date
+
+
+class BlacklistOrWhitelistNewIpSerializer(NotEmptyModelSerializer):
+    """
+    Serializer to create and blacklist/whitelist an IpAddress instance
+    Similar to the CreateOrUpdateIpSerializer but with fewer fields
+    The choice between blacklist/whitelist should happen in the ActionHandler
+    """
+
+    # ----------------------------------------
+    # Behavior
+    # ----------------------------------------
+    class Meta:
+        """Meta class to setup the serializer"""
+
+        model = IpAddress
+        fields = [
+            "ip",
+            "expires_on",
+            "comment",
+        ]
+
+    def to_representation(self, ip_address):
+        """
+        Returns the formatted IpAddress data
+        :param IpAddress ip_address: The created or updated IpAddress
+        :return: Dict with our formatted IpAddress data
+        :rtype: dict
+        """
+        return ip_address_representation(ip_address)
+
+    # ----------------------------------------
+    # Validation
+    # ----------------------------------------
+    @staticmethod
+    def validate_expires_on(expiration_date):
+        """
+        If a date is provided, check that it is not in the past
+        :param date expiration_date: The provided datetime value
+        :return: The untouched expiration date
+        :rtype: date
+        """
+        if expiration_date:
+            expiration_date = validate_expires_on(expiration_date)
+        return expiration_date
+
+
 class CreateOrUpdateIpSerializer(NotEmptyModelSerializer):
     """
     Serializer to create or update an IpAddress instance

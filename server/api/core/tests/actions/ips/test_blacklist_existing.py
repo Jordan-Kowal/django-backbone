@@ -1,11 +1,7 @@
 """TestCase for the 'blacklist_existing' action"""
 
 
-# Built-in
-from datetime import date, timedelta
-
 # Django
-from django.conf import settings
 from rest_framework.test import APIClient
 
 # Personal
@@ -15,7 +11,13 @@ from jklib.django.drf.tests import ActionTestCase
 from ....models import IpAddress
 from ._shared import (
     SERVICE_URL,
+    assert_admin_permissions,
+    assert_comment_length,
+    assert_expires_on_is_optional,
+    assert_override_condition,
     assert_representation_matches_instance,
+    assert_unknown_ip,
+    assert_valid_expires_on,
     create_ip_address,
 )
 
@@ -28,6 +30,7 @@ class TestBlacklistExistingIp(ActionTestCase):
 
     service_base_url = f"{SERVICE_URL}/"
     service_extra_url = "blacklist/"
+    valid_status_code = 200
 
     # ----------------------------------------
     # Behavior
@@ -62,99 +65,78 @@ class TestBlacklistExistingIp(ActionTestCase):
     # ----------------------------------------
     def test_permissions(self):
         """Tests that only admin user can retrieve an IP"""
-        # 401 Unauthenticated
-        self.client.logout()
-        response = self.client.post(self.ip_url)
-        assert response.status_code == 401
-        # 403 Not admin
-        self.create_user(authenticate=True)
-        response = self.client.post(self.ip_url)
-        assert response.status_code == 403
-        # 201 Admin
-        self.client.logout()
-        self.client.force_authenticate(self.admin)
-        response = self.client.post(self.ip_url)
-        assert response.status_code == 200
+        user = self.create_user()
+        assert_admin_permissions(
+            client=self.client,
+            protocol=self.client.post,
+            url=self.ip_url,
+            payload=self.default_payload,
+            valid_status_code=self.valid_status_code,
+            admin=self.admin,
+            user=user,
+        )
 
-    def test_unknown_ip_address(self):
-        """Tests that we cannot fetch an unknown IP"""
+    def test_unknown_ip(self):
+        """Tests that we cannot blacklist an unknown IP"""
         unknown_url = self.detail_url(10)
-        # Admin should get 404
-        response = self.client.post(unknown_url)
-        assert response.status_code == 404
-        # User should get 403
-        self.client.logout()
-        self.create_user(authenticate=True)
-        response = self.client.post(unknown_url)
-        assert response.status_code == 403
+        user = self.create_user()
+        assert_unknown_ip(
+            client=self.client,
+            protocol=self.client.post,
+            url=unknown_url,
+            payload=self.default_payload,
+            admin=self.admin,
+            user=user,
+        )
 
     def test_comment_length(self):
         """Tests that the comment has a length limit"""
-        # Too long should fail
-        self.default_payload["comment"] = "a" * (IpAddress.COMMENT_MAX_LENGTH + 1)
-        response = self.client.post(self.ip_url, data=self.default_payload)
-        self.assert_field_has_error(response, "comment")
-        # Long enough
-        self.default_payload["comment"] = "a" * IpAddress.COMMENT_MAX_LENGTH
-        response = self.client.post(self.ip_url, data=self.default_payload)
-        assert response.status_code == 200
+        assert_comment_length(
+            protocol=self.client.post,
+            url=self.ip_url,
+            payload=self.default_payload,
+            valid_status_code=self.valid_status_code,
+        )
 
     def test_expires_on_optional(self):
         """Tests that the 'expires_on' gets defaulted if not provided"""
-        # With a given date
-        expiration_date = (date.today() + timedelta(days=100)).strftime("%Y-%m-%d")
-        self.default_payload["expires_on"] = expiration_date
-        response = self.client.post(self.ip_url, data=self.default_payload)
-        assert response.status_code == 200
-        updated_ip = IpAddress.objects.get(pk=self.ip.id)
-        assert updated_ip.expires_on.strftime("%Y-%m-%d") == expiration_date
-        # Without date
-        self.default_payload["expires_on"] = None
-        response = self.client.post(self.ip_url, data=self.default_payload)
-        assert response.status_code == 200
-        updated_ip = IpAddress.objects.get(pk=self.ip.id)
-        expected_date = date.today() + timedelta(
-            days=settings.IP_STATUS_DEFAULT_DURATION
+        assert_expires_on_is_optional(
+            protocol=self.client.post,
+            url=self.ip_url,
+            payload=self.default_payload,
+            valid_status_code=self.valid_status_code,
+            id_=self.ip.id,
         )
-        assert updated_ip.expires_on == expected_date
 
     def test_valid_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
-        # Invalid dates
-        past_date = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-        invalid_format_date = (date.today() - timedelta(days=1)).strftime("%Y-%d")
-        for date_value in [past_date, invalid_format_date]:
-            self.default_payload["expires_on"] = date_value
-            response = self.client.post(self.ip_url, data=self.default_payload)
-            self.assert_field_has_error(response, "expires_on")
-        # Valid dates
-        raw_date = date.today() + timedelta(days=1)
-        formatted_date = raw_date.strftime("%Y-%m-%d")
-        for date_value in [raw_date, formatted_date]:
-            self.default_payload["expires_on"] = date_value
-            response = self.client.post(self.ip_url, data=self.default_payload)
-            assert response.status_code == 200
+        assert_valid_expires_on(
+            protocol=self.client.post,
+            url=self.ip_url,
+            payload=self.default_payload,
+            valid_status_code=self.valid_status_code,
+            clean_up=False,
+        )
 
-    def test_override_on_whitelisted(self):
+    def test_override_check(self):
         """Tests that a whitelisted IP can be blacklisted only with 'override=True'"""
         second_ip = create_ip_address(ip="127.0.0.2")
         second_ip_url = self.detail_url(second_ip.id)
         second_ip.whitelist()
-        # Whitelisted without override
-        response = self.client.post(second_ip_url, data=self.default_payload)
-        self.assert_field_has_error(response, "override")
-        # With override
-        self.default_payload["override"] = True
-        response = self.client.post(second_ip_url, data=self.default_payload)
-        assert response.status_code == 200
-        updated_ip = IpAddress.objects.get(pk=second_ip.id)
-        assert updated_ip.status == IpAddress.IpStatus.BLACKLISTED
+        assert_override_condition(
+            protocol=self.client.post,
+            url=second_ip_url,
+            payload=self.default_payload,
+            valid_status_code=self.valid_status_code,
+            id_=second_ip.id,
+            ip_status=IpAddress.IpStatus.BLACKLISTED,
+        )
 
     def test_blacklist_success(self):
         """Tests that we can successfully blacklist an existing IP"""
         assert not self.ip.is_blacklisted
         response = self.client.post(self.ip_url)
-        assert response.status_code == 200
+        assert response.status_code == self.valid_status_code
         updated_instance = IpAddress.objects.get(pk=self.ip.id)
         assert updated_instance.is_blacklisted
         assert_representation_matches_instance(response.data, updated_instance)

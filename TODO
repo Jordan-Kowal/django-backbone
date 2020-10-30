@@ -18,6 +18,7 @@
     - [ ] (admin) whitelist_new
     - [ ] (admin) clear
     - [ ] (admin) clear_all
+    - [x] Mutualize tests
 - [ ] Clean up database
     - [x] Write the function
     - [x] Write a test
