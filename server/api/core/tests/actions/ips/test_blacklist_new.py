@@ -1,4 +1,5 @@
-"""TestCase for the 'create' action"""
+"""TestCase for the 'blacklist_new' action"""
+
 
 # Django
 from rest_framework.test import APIClient
@@ -12,21 +13,21 @@ from ._shared import (
     SERVICE_URL,
     assert_admin_permissions,
     assert_comment_length,
+    assert_expires_on_is_optional,
     assert_representation_matches_instance,
     assert_unique_ip_on_creation,
     assert_valid_expires_on,
-    assert_valid_status,
 )
 
 
 # --------------------------------------------------------------------------------
 # > TestCase
 # --------------------------------------------------------------------------------
-class TestCreateIp(ActionTestCase):
-    """TestCase for the 'create' action"""
+class TestBlacklistNewIp(ActionTestCase):
+    """TestCase for the 'blacklist_new' action"""
 
-    required_fields = ["ip", "status"]
-    service_base_url = f"{SERVICE_URL}/"
+    required_fields = ["ip"]
+    service_base_url = f"{SERVICE_URL}/blacklist/"
     valid_status_code = 201
 
     # ----------------------------------------
@@ -42,9 +43,7 @@ class TestCreateIp(ActionTestCase):
         self.admin = self.create_admin_user(authenticate=True)
         self.payload = {
             "ip": "127.0.0.1",
-            "status": "WHITELISTED",
             "expires_on": None,
-            "active": False,
             "comment": "Test comment",
         }
 
@@ -64,41 +63,31 @@ class TestCreateIp(ActionTestCase):
         """Tests that only admin users can access this service"""
         user = self.create_user()
         assert_admin_permissions(
-            client=self.client,
-            protocol=self.client.post,
-            url=self.service_base_url,
-            payload=self.payload,
-            valid_status_code=self.valid_status_code,
-            admin=self.admin,
-            user=user,
+            self.client,
+            self.client.post,
+            self.service_base_url,
+            self.payload,
+            self.valid_status_code,
+            self.admin,
+            user,
         )
         assert IpAddress.objects.count() == 1
 
     def test_required_fields(self):
-        """Tests that required fields are truly required"""
+        """Tests that the required fields are truly required"""
         self.assert_fields_are_required(
             self.client.post, self.service_base_url, self.payload
         )
         assert IpAddress.objects.count() == 0
 
-    def test_valid_expires_on(self):
-        """Tests that you must provide a valid date in format and value"""
-        assert_valid_expires_on(
+    def test_unique_ip(self):
+        """Tests that you cannot create the same IP twice"""
+        assert_unique_ip_on_creation(
             protocol=self.client.post,
             url=self.service_base_url,
             payload=self.payload,
             valid_status_code=self.valid_status_code,
-            clean_up=True,
-        )
-
-    def test_valid_status_code(self):
-        """Tests that you must provide a valid status"""
-        assert_valid_status(
-            protocol=self.client.post,
-            url=self.service_base_url,
-            payload=self.payload,
-            valid_status_code=self.valid_status_code,
-            clean_up=True,
+            count=0,
         )
 
     def test_comment_length(self):
@@ -111,20 +100,32 @@ class TestCreateIp(ActionTestCase):
         )
         assert IpAddress.objects.count() == 1
 
-    def test_unique_ip(self):
-        """Tests that you cannot create the same IP twice"""
-        assert_unique_ip_on_creation(
+    def test_expires_on_optional(self):
+        """Tests that the 'expires_on' gets defaulted if not provided"""
+        assert_expires_on_is_optional(
             protocol=self.client.post,
             url=self.service_base_url,
             payload=self.payload,
             valid_status_code=self.valid_status_code,
-            count=0,
+            id_=1,
+            creation=True,
         )
 
-    def test_create_success(self):
-        """Tests that we created an IP address successfully"""
+    def test_valid_expires_on(self):
+        """Tests that you must provide a valid date in format and value"""
+        assert_valid_expires_on(
+            protocol=self.client.post,
+            url=self.service_base_url,
+            payload=self.payload,
+            valid_status_code=self.valid_status_code,
+            clean_up=True,
+        )
+
+    def test_blacklist_success(self):
+        """Tests that we can successfully create and blacklist an IP"""
         response = self.client.post(self.service_base_url, data=self.payload)
-        assert response.status_code == 201
+        assert response.status_code == self.valid_status_code
         assert IpAddress.objects.count() == 1
-        ip_address = IpAddress.objects.get(pk=1)
-        assert_representation_matches_instance(response.data, ip_address)
+        created_instance = IpAddress.objects.get(pk=response.data["id"])
+        assert created_instance.is_blacklisted
+        assert_representation_matches_instance(response.data, created_instance)

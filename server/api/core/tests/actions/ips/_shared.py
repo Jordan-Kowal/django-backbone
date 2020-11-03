@@ -90,7 +90,9 @@ def assert_comment_length(protocol, url, payload, valid_status_code):
     assert response.status_code == valid_status_code
 
 
-def assert_expires_on_is_optional(protocol, url, payload, valid_status_code, id_):
+def assert_expires_on_is_optional(
+    protocol, url, payload, valid_status_code, id_, creation=False
+):
     """
     Tests that the 'expires_on' gets defaulted if not provided
     :param func protocol: The client method to use (get, post, etc)
@@ -99,22 +101,28 @@ def assert_expires_on_is_optional(protocol, url, payload, valid_status_code, id_
     :type payload: dict or None
     :param int valid_status_code: The expected status code when the query is successful
     :param int id_: The IpAddress id to fetch and check the instance
+    :param bool creation: In creation mode, IP will be removed and the ID incremented
     :return:
     """
-    # With a given date
+    # With date
     expiration_date = (date.today() + timedelta(days=100)).strftime("%Y-%m-%d")
     payload["expires_on"] = expiration_date
     response = protocol(url, data=payload)
     assert response.status_code == valid_status_code
-    updated_ip = IpAddress.objects.get(pk=id_)
-    assert updated_ip.expires_on.strftime("%Y-%m-%d") == expiration_date
+    instance = IpAddress.objects.get(pk=id_)
+    assert instance.expires_on.strftime("%Y-%m-%d") == expiration_date
+    if creation:
+        IpAddress.objects.get(pk=id_).delete()
+        id_ += 1
     # Without date
     payload["expires_on"] = None
     response = protocol(url, data=payload)
     assert response.status_code == valid_status_code
-    updated_ip = IpAddress.objects.get(pk=id_)
+    instance = IpAddress.objects.get(pk=id_)
     expected_date = date.today() + timedelta(days=settings.IP_STATUS_DEFAULT_DURATION)
-    assert updated_ip.expires_on == expected_date
+    assert instance.expires_on == expected_date
+    if creation:
+        IpAddress.objects.get(pk=id_).delete()
 
 
 def assert_override_condition(
@@ -178,6 +186,26 @@ def assert_unknown_ip(client, protocol, url, payload, admin, user):
     client.force_authenticate(user)
     response = protocol(url, data=payload)
     assert response.status_code in expected_status_codes
+
+
+def assert_unique_ip_on_creation(protocol, url, payload, valid_status_code, count):
+    """
+    Tests that you cannot create the same IP twice
+    :param func protocol: The client method to use (get, post, etc)
+    :param str url: The target url
+    :param payload: The data payload to send
+    :type payload: dict or None
+    :param int valid_status_code: The expected status code when the query is successful
+    :param int count: The current number of instances, before the creation
+    """
+    # First should succeed
+    response = protocol(url, data=payload)
+    assert response.status_code == valid_status_code
+    assert IpAddress.objects.count() == (count + 1)
+    # Second should fail
+    response = protocol(url, data=payload)
+    assert response.status_code == 400
+    assert IpAddress.objects.count() == (count + 1)
 
 
 def assert_valid_expires_on(protocol, url, payload, valid_status_code, clean_up=False):

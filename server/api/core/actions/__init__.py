@@ -3,6 +3,7 @@
 # Local
 from .ips import (
     BlacklistExistingIpHandler,
+    BlacklistNewIpHandler,
     CreateIpHandler,
     DestroyIpHandler,
     ListIpHandler,

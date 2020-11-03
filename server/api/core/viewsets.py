@@ -8,8 +8,9 @@ from jklib.django.drf.viewsets import DynamicViewSet
 from api.core.models import IpAddress
 
 # Local
-from .actions import (  # BlacklistNewIpHandler,
+from .actions import (
     BlacklistExistingIpHandler,
+    BlacklistNewIpHandler,
     CreateIpHandler,
     DestroyIpHandler,
     ListIpHandler,
@@ -64,14 +65,14 @@ class IpViewSet(DynamicViewSet):
     }
 
     extra_actions = {
-        # "blacklist_new": {
-        #     "description": "Creates and blacklists an IP",
-        #     "handler": BlacklistNewIpHandler,
-        #     "permissions": None,
-        #     "methods": ["post"],
-        #     "url_path": "blacklist",
-        #     "detail": False,
-        # },
+        "blacklist_new": {
+            "description": "Creates and blacklists an IP",
+            "handler": BlacklistNewIpHandler,
+            "permissions": None,
+            "methods": ["post"],
+            "url_path": "blacklist",
+            "detail": False,
+        },
         "blacklist_existing": {
             "description": "Blacklists an existing IP",
             "handler": BlacklistExistingIpHandler,
