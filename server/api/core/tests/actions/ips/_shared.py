@@ -17,7 +17,7 @@ from api.core.models import IpAddress
 # --------------------------------------------------------------------------------
 SERVICE_URL = "/api/ips"
 DEFAULT_VALUES = {
-    "ip": "127.0.0.1",
+    "ip": "127.0.0.10",
     "status": IpAddress.IpStatus.NONE,
     "expires_on": date.today() + timedelta(days=60),
     "active": False,

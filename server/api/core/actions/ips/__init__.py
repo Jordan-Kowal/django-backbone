@@ -8,3 +8,5 @@ from .destroy import DestroyIpHandler
 from .list import ListIpHandler
 from .retrieve import RetrieveIpHandler
 from .update import UpdateIpHandler
+from .whitelist_existing import WhitelistExistingIpHandler
+from .whitelist_new import WhitelistNewIpHandler

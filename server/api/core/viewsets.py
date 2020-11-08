@@ -16,6 +16,8 @@ from .actions import (
     ListIpHandler,
     RetrieveIpHandler,
     UpdateIpHandler,
+    WhitelistExistingIpHandler,
+    WhitelistNewIpHandler,
 )
 
 
@@ -79,6 +81,22 @@ class IpViewSet(DynamicViewSet):
             "permissions": None,
             "methods": ["post"],
             "url_path": "blacklist",
+            "detail": True,
+        },
+        "whitelist_new": {
+            "description": "Creates and whitelists an IP",
+            "handler": WhitelistNewIpHandler,
+            "permissions": None,
+            "methods": ["post"],
+            "url_path": "whitelist",
+            "detail": False,
+        },
+        "whitelist_existing": {
+            "description": "Whitelists an existing IP",
+            "handler": WhitelistExistingIpHandler,
+            "permissions": None,
+            "methods": ["post"],
+            "url_path": "whitelist",
             "detail": True,
         },
     }

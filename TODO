@@ -13,9 +13,9 @@
     - [x] (admin) update
     - [x] (admin) destroy
     - [x] (admin) blacklist_existing
-    - [ ] (admin) blacklist_new
-    - [ ] (admin) whitelist_existing
-    - [ ] (admin) whitelist_new
+    - [x] (admin) blacklist_new
+    - [x] (admin) whitelist_existing
+    - [x] (admin) whitelist_new
     - [ ] (admin) clear
     - [ ] (admin) clear_all
     - [x] Mutualize tests

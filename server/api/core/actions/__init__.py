@@ -9,4 +9,6 @@ from .ips import (
     ListIpHandler,
     RetrieveIpHandler,
     UpdateIpHandler,
+    WhitelistExistingIpHandler,
+    WhitelistNewIpHandler,
 )

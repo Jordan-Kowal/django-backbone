@@ -1,4 +1,4 @@
-"""TestCase for the 'blacklist_new' action"""
+"""TestCase for the 'whitelist_new' action"""
 
 
 # Django
@@ -23,11 +23,11 @@ from ._shared import (
 # --------------------------------------------------------------------------------
 # > TestCase
 # --------------------------------------------------------------------------------
-class TestBlacklistNewIp(ActionTestCase):
-    """TestCase for the 'blacklist_new' action"""
+class TestWhitelistNewIp(ActionTestCase):
+    """TestCase for the 'whitelist_new' action"""
 
     required_fields = ["ip"]
-    service_base_url = f"{SERVICE_URL}/blacklist/"
+    service_base_url = f"{SERVICE_URL}/whitelist/"
     valid_status_code = 201
 
     # ----------------------------------------
@@ -121,11 +121,11 @@ class TestBlacklistNewIp(ActionTestCase):
             clean_up=True,
         )
 
-    def test_blacklist_success(self):
-        """Tests that we can successfully create and blacklist an IP"""
+    def test_whitelist_success(self):
+        """Tests that we can successfully create and whitelist an IP"""
         response = self.client.post(self.service_base_url, data=self.payload)
         assert response.status_code == self.valid_status_code
         assert IpAddress.objects.count() == 1
         created_instance = IpAddress.objects.get(pk=response.data["id"])
-        assert created_instance.is_blacklisted
+        assert created_instance.is_whitelisted
         assert_representation_matches_instance(response.data, created_instance)

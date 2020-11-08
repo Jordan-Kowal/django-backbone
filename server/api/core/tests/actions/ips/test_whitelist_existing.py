@@ -1,4 +1,4 @@
-"""TestCase for the 'blacklist_existing' action"""
+"""TestCase for the 'whitelist_existing' action"""
 
 
 # Django
@@ -25,11 +25,11 @@ from ._shared import (
 # --------------------------------------------------------------------------------
 # > TestCase
 # --------------------------------------------------------------------------------
-class TestBlacklistExistingIp(ActionTestCase):
-    """TestCase for the 'blacklist_existing' action"""
+class TestWhitelistExistingIp(ActionTestCase):
+    """TestCase for the 'whitelist_existing' action"""
 
     service_base_url = f"{SERVICE_URL}/"
-    service_extra_url = "blacklist/"
+    service_extra_url = "whitelist/"
     valid_status_code = 200
 
     # ----------------------------------------
@@ -64,7 +64,7 @@ class TestBlacklistExistingIp(ActionTestCase):
     # Tests
     # ----------------------------------------
     def test_permissions(self):
-        """Tests that only admin user can use this service"""
+        """Tests that only admin user can retrieve an IP"""
         user = self.create_user()
         assert_admin_permissions(
             client=self.client,
@@ -77,7 +77,7 @@ class TestBlacklistExistingIp(ActionTestCase):
         )
 
     def test_unknown_ip(self):
-        """Tests that we cannot blacklist an unknown IP"""
+        """Tests that we cannot whitelist an unknown IP"""
         unknown_url = self.detail_url(10)
         user = self.create_user()
         assert_unknown_ip(
@@ -119,24 +119,24 @@ class TestBlacklistExistingIp(ActionTestCase):
         )
 
     def test_override_check(self):
-        """Tests that a whitelisted IP can be blacklisted only with 'override=True'"""
+        """Tests that a blacklisted IP can be whitelisted only with 'override=True'"""
         second_ip = create_ip_address(ip="127.0.0.2")
         second_ip_url = self.detail_url(second_ip.id)
-        second_ip.whitelist()
+        second_ip.blacklist()
         assert_override_condition(
             protocol=self.client.post,
             url=second_ip_url,
             payload=self.default_payload,
             valid_status_code=self.valid_status_code,
             id_=second_ip.id,
-            ip_status=IpAddress.IpStatus.BLACKLISTED,
+            ip_status=IpAddress.IpStatus.WHITELISTED,
         )
 
-    def test_blacklist_success(self):
+    def test_whitelist_success(self):
         """Tests that we can successfully blacklist an existing IP"""
-        assert not self.ip.is_blacklisted
+        assert not self.ip.is_whitelisted
         response = self.client.post(self.ip_url)
         assert response.status_code == self.valid_status_code
         updated_instance = IpAddress.objects.get(pk=self.ip.id)
-        assert updated_instance.is_blacklisted
+        assert updated_instance.is_whitelisted
         assert_representation_matches_instance(response.data, updated_instance)
