@@ -4,6 +4,8 @@
 from .ips import (
     BlacklistExistingIpHandler,
     BlacklistNewIpHandler,
+    ClearAllIpsHandler,
+    ClearIpHandler,
     CreateIpHandler,
     DestroyIpHandler,
     ListIpHandler,

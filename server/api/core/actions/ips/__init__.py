@@ -3,6 +3,8 @@
 # Local
 from .blacklist_existing import BlacklistExistingIpHandler
 from .blacklist_new import BlacklistNewIpHandler
+from .clear import ClearIpHandler
+from .clear_all import ClearAllIpsHandler
 from .create import CreateIpHandler
 from .destroy import DestroyIpHandler
 from .list import ListIpHandler

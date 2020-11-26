@@ -16,8 +16,8 @@
     - [x] (admin) blacklist_new
     - [x] (admin) whitelist_existing
     - [x] (admin) whitelist_new
-    - [ ] (admin) clear
-    - [ ] (admin) clear_all
+    - [x] (admin) clear
+    - [x] (admin) clear_all
     - [x] Mutualize tests
 - [ ] Clean up database
     - [x] Write the function
@@ -61,18 +61,6 @@ Update the design and content of the following emails:
     - [ ] Admin alert
     - [ ] User alert
     - [ ] Config either in 
-    
-#### Better test runner
-- [ ] Wrap around existing test module 
-- [ ] Hide original test module output
-- [ ] Better output (colored, file structure, percentage and quantity per file/folder)
-- [ ] Interactive shell 
-- [ ] Choose failed test to see error and then go back
-- [ ] Options 
-    - [ ] -s --stacktrace to show all errors stacktrace directly 
-    - [ ] -f --failed to rerun failed tests
-    - [ ] -o --output to output results in a file
-    - [ ] -v --vanilla Use our module but run the original test command without our wrapper
 
 #### Others
 - [ ] Update README.md

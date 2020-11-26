@@ -11,6 +11,8 @@ from api.core.models import IpAddress
 from .actions import (
     BlacklistExistingIpHandler,
     BlacklistNewIpHandler,
+    ClearAllIpsHandler,
+    ClearIpHandler,
     CreateIpHandler,
     DestroyIpHandler,
     ListIpHandler,
@@ -67,6 +69,7 @@ class IpViewSet(DynamicViewSet):
     }
 
     extra_actions = {
+        # Blacklist
         "blacklist_new": {
             "description": "Creates and blacklists an IP",
             "handler": BlacklistNewIpHandler,
@@ -83,6 +86,7 @@ class IpViewSet(DynamicViewSet):
             "url_path": "blacklist",
             "detail": True,
         },
+        # Whitelist
         "whitelist_new": {
             "description": "Creates and whitelists an IP",
             "handler": WhitelistNewIpHandler,
@@ -98,5 +102,22 @@ class IpViewSet(DynamicViewSet):
             "methods": ["post"],
             "url_path": "whitelist",
             "detail": True,
+        },
+        # Clear
+        "clear": {
+            "description": "Clears an existing IP",
+            "handler": ClearIpHandler,
+            "permissions": None,
+            "methods": ["post"],
+            "url_path": "clear",
+            "detail": True,
+        },
+        "clear_all": {
+            "description": "Clears all existing IPs (can be restricted to a specific status)",
+            "handler": ClearAllIpsHandler,
+            "permissions": None,
+            "methods": ["post"],
+            "url_path": "clear_all",
+            "detail": False,
         },
     }
