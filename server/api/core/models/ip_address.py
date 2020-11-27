@@ -18,6 +18,7 @@ from jklib.django.db.fields import ActiveField, RequiredField
 from jklib.django.db.models import LifeCycleModel
 from jklib.django.db.queries import get_object_or_none
 from jklib.django.utils.network import get_client_ip
+from jklib.django.utils.settings import get_config
 
 
 # --------------------------------------------------------------------------------
@@ -45,6 +46,7 @@ class IpAddress(LifeCycleModel):
     # ----------------------------------------
     # Constants
     # ----------------------------------------
+    DEFAULT_DURATION = 30  # Overridable by settings.IP_STATUS_DEFAULT_DURATION
     COMMENT_MAX_LENGTH = 255
 
     # ----------------------------------------
@@ -75,6 +77,41 @@ class IpAddress(LifeCycleModel):
     comment = CharField(max_length=COMMENT_MAX_LENGTH)
 
     # ----------------------------------------
+    # Instance properties
+    # ----------------------------------------
+    @property
+    def default_duration(self):
+        """
+        :return: The default duration for a status, which can be overridden in the settings
+        :rtype: int
+        """
+        return get_config("IP_STATUS_DEFAULT_DURATION", self.DEFAULT_DURATION)
+
+    @property
+    def is_blacklisted(self):
+        """
+        :return: Whether the IP is blacklisted
+        :rtype: bool
+        """
+        return (
+            self.active
+            and (self.expires_on >= date.today())
+            and self.status == self.IpStatus.BLACKLISTED
+        )
+
+    @property
+    def is_whitelisted(self):
+        """
+        :return: Whether the IP is whitelisted
+        :rtype: bool
+        """
+        return (
+            self.active
+            and (self.expires_on >= date.today())
+            and self.status == self.IpStatus.WHITELISTED
+        )
+
+    # ----------------------------------------
     # Behavior (meta, str, save)
     # ----------------------------------------
     class Meta:
@@ -102,7 +139,7 @@ class IpAddress(LifeCycleModel):
         Specifically useful for sqlite3 who doesn't perform those checks (despite the 'max_length' parameter)
         """
         length = len(self.comment)
-        max_length = IpAddress.COMMENT_MAX_LENGTH
+        max_length = self.COMMENT_MAX_LENGTH
         if length > max_length:
             raise ValueError(
                 f"Value for 'comment' is too long (max: {max_length}, provided: {length})"
@@ -112,33 +149,6 @@ class IpAddress(LifeCycleModel):
         """Checks that the status is part of the authorized inputs"""
         if self.status not in self.IpStatus.values:
             raise ValueError("Value for 'status' must belong to the 'IpStatus' enum")
-
-    # ----------------------------------------
-    # Instance properties
-    # ----------------------------------------
-    @property
-    def is_blacklisted(self):
-        """
-        :return: Whether the IP is blacklisted
-        :rtype: bool
-        """
-        return (
-            self.active
-            and (self.expires_on >= date.today())
-            and self.status == self.IpStatus.BLACKLISTED
-        )
-
-    @property
-    def is_whitelisted(self):
-        """
-        :return: Whether the IP is whitelisted
-        :rtype: bool
-        """
-        return (
-            self.active
-            and (self.expires_on >= date.today())
-            and self.status == self.IpStatus.WHITELISTED
-        )
 
     # ----------------------------------------
     # API for instance
@@ -168,8 +178,7 @@ class IpAddress(LifeCycleModel):
         """
         self._update_status("whitelist", end_date, comment, override)
 
-    @staticmethod
-    def _compute_valid_end_date(end_date):
+    def _compute_valid_end_date(self, end_date):
         """
         Defaults the expiration date if none is provided
         :param Date end_date: The desired expiration date
@@ -177,7 +186,7 @@ class IpAddress(LifeCycleModel):
         :rtype: Date
         """
         if end_date is None:
-            delta_in_days = timedelta(days=settings.IP_STATUS_DEFAULT_DURATION)
+            delta_in_days = timedelta(days=self.default_duration)
             end_date = date.today() + delta_in_days
         return end_date
 

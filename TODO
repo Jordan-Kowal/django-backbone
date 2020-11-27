@@ -5,24 +5,6 @@
 
 #### Core API
 - [ ] Add :raises ErrorType: to functions docstring
-- [ ] Add permission test in all actions (with shared function) 
-- [ ] Add tested services:
-    - [x] (admin) create
-    - [x] (admin) retrieve
-    - [x] (admin) list
-    - [x] (admin) update
-    - [x] (admin) destroy
-    - [x] (admin) blacklist_existing
-    - [x] (admin) blacklist_new
-    - [x] (admin) whitelist_existing
-    - [x] (admin) whitelist_new
-    - [x] (admin) clear
-    - [x] (admin) clear_all
-    - [x] Mutualize tests
-- [ ] Clean up database
-    - [x] Write the function
-    - [x] Write a test
-    - [ ] Setup a cron job
 - [ ] Remove admins
  
 #### Users API
@@ -47,20 +29,28 @@
 - [ ] Clean up database
     - [ ] Write the function
     - [ ] Write a test
-    - [ ] Setup a cron job
 - [ ] Remove admins
 
 #### Emails
-Update the design and content of the following emails:
-- [ ] Users
-    - [ ] Verify
-    - [ ] Welcome
-    - [ ] Password reset
-    - [ ] Password update
-- [ ] Contact
-    - [ ] Admin alert
-    - [ ] User alert
-    - [ ] Config either in 
+- [ ] Rework css into SASS with variables for easier setup
+- [ ] Simplify css/design for easier setup
+- [ ] Update the emails
+    - [ ] Users
+        - [ ] Verify
+        - [ ] Welcome
+        - [ ] Password reset
+        - [ ] Password update
+    - [ ] Contact
+        - [ ] Admin alert
+        - [ ] User alert
+        - [ ] Config either in 
+
+#### Packages
+- [ ] CRON package
+   - [ ] Setup IpAddress automatic clear cron
+   - [ ] Setup Contact cleanup cron
+- [ ] Test runner
+- [ ] Pretty errors
 
 #### Others
 - [ ] Update README.md

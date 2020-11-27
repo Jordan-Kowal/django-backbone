@@ -49,9 +49,13 @@ class Profile(Model):
             "Please verify your email address",
             "verify",
         )
-        WELCOME = EmailInfo(
-            "users/emails/welcome.html", "Welcome to our website !", None
-        )
+        WELCOME = EmailInfo("users/emails/welcome.html", "Welcome", None)
+
+    # ----------------------------------------
+    # Constants
+    # ----------------------------------------
+    RESET_TOKEN = ("reset", 7200)  # 2 hours
+    VERIFY_TOKEN = ("verify", 172800)  # 7 days
 
     # ----------------------------------------
     # Fields
@@ -117,7 +121,7 @@ class Profile(Model):
         Sends the 'reset_password' email to our user, which contains the reset link
         :param bool async_: Whether the email will be sent asynchronously. Defaults to True.
         """
-        token_type, token_duration = settings.RESET_TOKEN
+        token_type, token_duration = self.RESET_TOKEN
         _, token_value = self._create_token(token_type, token_duration)
         email = self.EmailTemplate.REQUEST_PASSWORD_RESET
         context = {"password_reset_link": self._build_password_reset_url(token_value)}
@@ -136,7 +140,7 @@ class Profile(Model):
         """
         if self.is_verified:
             return
-        token_type, token_duration = settings.VERIFY_TOKEN
+        token_type, token_duration = self.VERIFY_TOKEN
         _, token_value = self._create_token(token_type, token_duration)
         email = self.EmailTemplate.VERIFY_EMAIL
         context = {"verification_link": self._build_verification_url(token_value)}

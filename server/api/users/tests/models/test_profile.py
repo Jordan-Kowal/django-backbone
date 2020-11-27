@@ -1,7 +1,6 @@
 """Tests for the 'Profile' model"""
 
 # Django
-from django.conf import settings
 from django.db import IntegrityError, transaction
 
 # Personal
@@ -70,7 +69,7 @@ class TestProfile(ModelTestCase):
         subject = self.model_class.EmailTemplate.REQUEST_PASSWORD_RESET.subject
         user = self.create_user()
         user.profile.send_reset_password_email()
-        token_type, _ = settings.RESET_TOKEN
+        token_type, _ = Profile.RESET_TOKEN
         self._assert_token_has_been_created(user, token_type)
         self.assert_email_was_sent(subject)
 
@@ -88,7 +87,7 @@ class TestProfile(ModelTestCase):
         user.profile.is_verified = False
         user.profile.save()
         user.profile.send_verification_email()
-        token_type, _ = settings.VERIFY_TOKEN
+        token_type, _ = Profile.VERIFY_TOKEN
         self._assert_token_has_been_created(user, token_type)
         self.assert_email_was_sent(subject)
 

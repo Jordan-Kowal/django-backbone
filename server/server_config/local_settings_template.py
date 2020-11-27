@@ -33,13 +33,6 @@ SESSION_COOKIE_SECURE = False
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-# Recaptcha
-RECAPTCHA_SITE_KEY = "fake captcha key"
-RECAPTCHA_SECRET_KEY = "fake captcha key"
-
-# DRF additional settings
-DRF_GLOBAL_PERMISSIONS = None
-
 
 # --------------------------------------------------------------------------------
 # > Database
@@ -72,16 +65,3 @@ SUPER_USER = {
     "password": "fake password",
     "email": "fake_email@fake_domain.com",
 }
-
-# --------------------------------------------------------------------------------
-# > Models related settings
-# --------------------------------------------------------------------------------
-# User
-RESET_TOKEN = ("reset", 7200)  # 2 hours
-VERIFY_TOKEN = ("verify", 172800)  # 7 days
-
-# Contact
-CONTACT_RECORD_DURATION_IN_DAYS = 30  # days
-
-# IPs
-IP_STATUS_DEFAULT_DURATION = 30  # days

@@ -1,8 +1,6 @@
 """TestCase for the 'send_verification_email' action"""
 
 # Django
-from django.conf import settings
-from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 
 # Personal
@@ -29,7 +27,7 @@ class TestSendVerificationEmail(ActionTestCase):
     def setUpClass(cls):
         """Sets up the API client and the token type"""
         cls.client = APIClient()
-        cls.token_type, _ = settings.VERIFY_TOKEN
+        cls.token_type, _ = Profile.VERIFY_TOKEN
 
     def setUp(self):
         """Creates 1 basic user"""

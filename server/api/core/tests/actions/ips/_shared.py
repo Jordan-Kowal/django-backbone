@@ -119,7 +119,7 @@ def assert_expires_on_is_optional(
     response = protocol(url, data=payload)
     assert response.status_code == valid_status_code
     instance = IpAddress.objects.get(pk=id_)
-    expected_date = date.today() + timedelta(days=settings.IP_STATUS_DEFAULT_DURATION)
+    expected_date = date.today() + timedelta(days=instance.default_duration)
     assert instance.expires_on == expected_date
     if creation:
         IpAddress.objects.get(pk=id_).delete()

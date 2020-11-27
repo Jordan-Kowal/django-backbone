@@ -55,19 +55,10 @@ INSTALLED_APPS = [
     # API
     # --------------------
     "api.core",
-    "api.contact",
+    # "api.contact",
     "api.users",
 ]
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.BasicAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAdminUser",  # Root and default access
-    ],
-    "TEST_REQUEST_DEFAULT_FORMAT": "json",
-}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -106,6 +97,23 @@ WSGI_APPLICATION = "server_config.wsgi.application"
 
 
 # --------------------------------------------------------------------------------
+# > DRF
+# --------------------------------------------------------------------------------
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.BasicAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAdminUser",  # Root and default access
+    ],
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
+}
+
+# DRF additional settings
+DRF_GLOBAL_PERMISSIONS = None
+
+
+# --------------------------------------------------------------------------------
 # > Password and logins
 # --------------------------------------------------------------------------------
 LOGIN_URL = "user_login"
@@ -118,16 +126,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 10,
-        },
+        "OPTIONS": {"min_length": 10,},
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
 
@@ -135,23 +137,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # > Internationalization
 # --------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
-LANGUAGE_CODE = "fr-fr"
+LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-LANGUAGES = (("fr-fr", "Français"),)
-
-
-# --------------------------------------------------------------------------------
-# > Email settings
-# --------------------------------------------------------------------------------
-EMAIL_CSS = "core/css/emails.css"
-# Contact
-CONTACT_EMAIL_TEMPLATES = {
-    "alert": "common/emails/contact_alert.html",
-    "confirm": "common/emails/contact_confirm.html",
-}
+LANGUAGES = (("en-us", "English"),)
 
 
 # --------------------------------------------------------------------------------
@@ -159,50 +150,23 @@ CONTACT_EMAIL_TEMPLATES = {
 # --------------------------------------------------------------------------------
 FIRST_DAY_OF_WEEK = 1
 SITE_ID = 1
+EMAIL_CSS = "core/css/emails.css"
 
 
 # --------------------------------------------------------------------------------
-# > Local Settings
+# > Model settings
 # --------------------------------------------------------------------------------
-# It should AT LEAST contain the following:
-#   Security:
-#       SECRET_KEY
-#       DEBUG
-#       ALLOWED_HOST
-#       SECURE_SSL_REDIRECT
-#       FRONTEND_ROOT_URL
-#
-#   reCAPTCHA
-#       RECAPTCHA_SITE_KEY
-#       RECAPTCHA_SECRET_KEY
-#
-#   Cookies
-#       CSRF_COOKIE_HTTPONLY
-#       CSRF_COOKIE_SECURE
-#
-#   Session
-#       SESSION_COOKIE_AGE
-#       SESSION_COOKIE_HTTPONLY
-#       SESSION_COOKIE_SECURE
-#       SESSION_ENGINE
-#       SESSION_EXPIRE_AT_BROWSER_CLOSE
-#
-#   Databases:
-#       DATABASES
-#
-#   Emails:
-#       EMAIL_BACKEND
-#       EMAIL_HOST
-#       EMAIL_PORT
-#       EMAIL_USE_TLS
-#       EMAIL_HOST_USER
-#       EMAIL_HOST_PASSWORD
-#
-#   Custom Django Commands:
-#       SUPER_USER (dict with username, password, email)
+# Contact
+CONTACT_RETENTION_DAYS = 30  # days
 
+# IpAddress
+IP_STATUS_DEFAULT_DURATION = 30  # days
+
+
+# --------------------------------------------------------------------------------
+# > Local settings
+# --------------------------------------------------------------------------------
 try:
-    # Local
     from .local_settings import *
 except ImportError as e:
     print(e)

@@ -1,7 +1,6 @@
 """Handler for the 'perform_password_reset' action"""
 
 # Django
-from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.serializers import CharField
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -11,7 +10,7 @@ from jklib.django.drf.actions import ActionHandler, SerializerMode
 from jklib.django.drf.serializers import NotEmptySerializer, required
 
 # Local
-from ...models import Token
+from ...models import Profile, Token
 from ._shared import (
     validate_password_confirmation,
     validate_token,
@@ -68,7 +67,7 @@ class PerformPasswordResetSerializer(NotEmptySerializer):
         :return: Token instance that matches the provided token value
         :rtype: Token
         """
-        token_type, _ = settings.RESET_TOKEN
+        token_type, _ = Profile.RESET_TOKEN
         return validate_token(token, token_type)
 
 

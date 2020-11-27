@@ -28,7 +28,7 @@ class TestVerifyUser(ActionTestCase):
     def setUpClass(cls):
         """Sets up the API client and the token type"""
         cls.client = APIClient()
-        cls.token_type, _ = settings.VERIFY_TOKEN
+        cls.token_type, _ = Profile.VERIFY_TOKEN
 
     def setUp(self):
         """Creates 1 basic user"""
