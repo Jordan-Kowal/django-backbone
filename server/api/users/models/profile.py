@@ -30,10 +30,18 @@ EmailInfo = namedtuple("EmailInfo", ["template", "subject", "endpoint"])
 # > Models
 # --------------------------------------------------------------------------------
 class Profile(Model):
-    """Extends the User model to provide additional and utility to our User"""
+    """
+    Extends the User model to provide additional and utility to our User
+    Split into the following sub-sections:
+        Constants
+        Fields
+        Behavior
+        Public API
+        Private methods
+    """
 
     # ----------------------------------------
-    # Enums
+    # Constants
     # ----------------------------------------
     class EmailTemplate(EmailInfo, Enum):
         """Enum of namedtuples that store our email template data"""
@@ -51,9 +59,6 @@ class Profile(Model):
         )
         WELCOME = EmailInfo("users/emails/welcome.html", "Welcome", None)
 
-    # ----------------------------------------
-    # Constants
-    # ----------------------------------------
     RESET_TOKEN = ("reset", 7200)  # 2 hours
     VERIFY_TOKEN = ("verify", 172800)  # 7 days
 

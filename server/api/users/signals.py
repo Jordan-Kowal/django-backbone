@@ -3,7 +3,6 @@ Signals for the users API
 We use them to:
     User: Create a Profile instance linked to our User on creation
     User: Override the username by the email address on update
-    Token: Check the provided data is valid
 That way, we can use the email address as username and authentication credentials
 """
 
@@ -15,7 +14,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 # Local
-from .models import Profile, Token
+from .models import Profile
 
 
 # --------------------------------------------------------------------------------
@@ -37,9 +36,3 @@ def username_is_email(sender, instance, **kwargs):
     if not instance.email:
         raise IntegrityError("User must have a valid email")
     instance.username = instance.email
-
-
-@receiver(pre_save, sender=Token)
-def validate_token_data(sender, instance, **kwargs):
-    """Checks that the token type is not too long"""
-    instance.validate_type()

@@ -60,7 +60,7 @@ class Token(LifeCycleModel):
     type = RequiredField(CharField, max_length=TYPE_MAX_LENGTH)
     value = RequiredField(CharField, unique=True, max_length=1000)
     expired_at = RequiredField(DateTimeField)
-    used_at = DateTimeField(null=True)
+    used_at = DateTimeField(null=True, blank=True)
     is_active_token = ActiveField()
 
     # ----------------------------------------
@@ -83,9 +83,9 @@ class Token(LifeCycleModel):
         return f"{self.value}"
 
     # ----------------------------------------
-    # Validators (used in signals)
+    # Validators
     # ----------------------------------------
-    def validate_type(self):
+    def clean_type(self):
         """
         Checks that the type is not too long
         Specifically useful for sqlite3 who doesn't perform those checks (despite the 'max_length' parameter)

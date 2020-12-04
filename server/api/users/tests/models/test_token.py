@@ -5,7 +5,7 @@ from datetime import timedelta
 from secrets import token_urlsafe
 
 # Django
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.utils import timezone
 
 # Personal
@@ -19,7 +19,14 @@ from ...models import Token
 # > TestCase
 # --------------------------------------------------------------------------------
 class TestToken(ModelTestCase):
-    """Tests the Token model"""
+    """
+    Tests the Token model. Split into the following sections:
+        Behavior
+        Fields Tests
+        Properties Tests
+        API Tests
+        Cron Jobs Tests
+    """
 
     model_class = Token
     required_fields = ["user", "type", "value", "expired_at"]
@@ -62,15 +69,23 @@ class TestToken(ModelTestCase):
         self.assert_fields_are_required(self.payload)
         self.assert_instance_count_equals(0)
 
-    def test_type_max_length(self):
-        """Tests that the 'type' field max length is enforced"""
-        self.payload["type"] = "a" * (self.model_class.TYPE_MAX_LENGTH + 1)
+    def test_user(self):
+        """Tests that the 'user' expectsa User instance"""
+        self.payload["user"] = "Not a user"
         with transaction.atomic():
-            with self.assertRaises((IntegrityError, ValueError)):
+            with self.assertRaises(self.common_errors):
                 self.model_class.objects.create(**self.payload)
         self.assert_instance_count_equals(0)
 
-    def test_unique_value(self):
+    def test_type(self):
+        """Tests that the 'type' field max length is enforced"""
+        self.payload["type"] = "a" * (self.model_class.TYPE_MAX_LENGTH + 1)
+        with transaction.atomic():
+            with self.assertRaises(self.common_errors):
+                self.model_class.objects.create(**self.payload)
+        self.assert_instance_count_equals(0)
+
+    def test_value(self):
         """Tests the unique constraint of the 'value' field"""
         token = self.model_class.objects.create(**self.payload)
         user_2 = self.create_user()
@@ -85,9 +100,33 @@ class TestToken(ModelTestCase):
         }
         # Creating the second token should not work
         with transaction.atomic():
-            with self.assertRaises(IntegrityError):
+            with self.assertRaises(self.common_errors):
                 self.model_class.objects.create(**payload_2)
         self.assert_instance_count_equals(1)
+
+    def test_expired_at(self):
+        """Tests that the 'expired_at' expects a date"""
+        self.payload["expired_at"] = "Not a date"
+        with transaction.atomic():
+            with self.assertRaises(self.common_errors):
+                self.model_class.objects.create(**self.payload)
+        self.assert_instance_count_equals(0)
+
+    def test_used_at(self):
+        """Tests that the 'used_at' expects a date"""
+        self.payload["used_at"] = "Not a date"
+        with transaction.atomic():
+            with self.assertRaises(self.common_errors):
+                self.model_class.objects.create(**self.payload)
+        self.assert_instance_count_equals(0)
+
+    def test_is_active_token(self):
+        """Tests that the 'is_active_token' expects a boolean"""
+        self.payload["user"] = "Not a boolean"
+        with transaction.atomic():
+            with self.assertRaises(self.common_errors):
+                self.model_class.objects.create(**self.payload)
+        self.assert_instance_count_equals(0)
 
     # ----------------------------------------
     # Properties Tests
