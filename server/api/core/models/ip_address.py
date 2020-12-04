@@ -31,7 +31,6 @@ class IpAddress(LifeCycleModel):
         Constants
         Fields
         Behavior
-        Validators
         Instance Properties
         Instance API
         Request API
@@ -92,35 +91,15 @@ class IpAddress(LifeCycleModel):
         return f"{self.ip}"
 
     # ----------------------------------------
-    # Validators
-    # ----------------------------------------
-    def clean_comment(self):
-        """
-        Checks that the comment is not too long
-        Specifically useful for sqlite3 who doesn't perform those checks (despite the 'max_length' parameter)
-        """
-        length = len(self.comment)
-        max_length = self.COMMENT_MAX_LENGTH
-        if length > max_length:
-            raise ValueError(
-                f"Value for 'comment' is too long (max: {max_length}, provided: {length})"
-            )
-
-    def clean_status(self):
-        """Checks that the status is part of the authorized inputs"""
-        if self.status not in self.IpStatus.values:
-            raise ValueError("Value for 'status' must belong to the 'IpStatus' enum")
-
-    # ----------------------------------------
     # Properties
     # ----------------------------------------
-    @property
-    def default_duration(self):
+    @classmethod
+    def get_default_duration(cls):
         """
         :return: The default duration for a status, which can be overridden in the settings
         :rtype: int
         """
-        return get_config("IP_STATUS_DEFAULT_DURATION", self.DEFAULT_DURATION)
+        return get_config("IP_STATUS_DEFAULT_DURATION", cls.DEFAULT_DURATION)
 
     @property
     def is_blacklisted(self):
@@ -182,7 +161,7 @@ class IpAddress(LifeCycleModel):
         :rtype: Date
         """
         if end_date is None:
-            delta_in_days = timedelta(days=self.default_duration)
+            delta_in_days = timedelta(days=self.get_default_duration())
             end_date = date.today() + delta_in_days
         return end_date
 

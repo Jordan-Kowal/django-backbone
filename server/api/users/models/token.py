@@ -39,7 +39,6 @@ class Token(LifeCycleModel):
         Constants
         Fields
         Behavior
-        Validators
         Properties
         Public API
         Cron jobs
@@ -81,22 +80,6 @@ class Token(LifeCycleModel):
         :rtype: str
         """
         return f"{self.value}"
-
-    # ----------------------------------------
-    # Validators
-    # ----------------------------------------
-    def clean_type(self):
-        """
-        Checks that the type is not too long
-        Specifically useful for sqlite3 who doesn't perform those checks (despite the 'max_length' parameter)
-        """
-        if self.type:
-            length = len(self.type)
-            max_length = self.TYPE_MAX_LENGTH
-            if length > max_length:
-                raise ValueError(
-                    f"Value for 'type' is too long (max: {max_length}, provided: {length})"
-                )
 
     # ----------------------------------------
     # Properties

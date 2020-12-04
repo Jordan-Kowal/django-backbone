@@ -112,13 +112,15 @@ class TestIpAddress(ModelTestCase):
     # ----------------------------------------
     # Instance properties tests
     # ----------------------------------------
-    def test_default_duration(self):
+    def test_get_default_duration(self):
         """Tests the default duration returns the settings duration"""
         instance = self.model_class.objects.create(**self.payload)
         if hasattr(settings, "IP_STATUS_DEFAULT_DURATION"):
-            assert instance.default_duration == settings.IP_STATUS_DEFAULT_DURATION
+            assert (
+                instance.get_default_duration() == settings.IP_STATUS_DEFAULT_DURATION
+            )
         else:
-            assert instance.default_duration == instance.DEFAULT_DURATION
+            assert instance.get_default_duration() == instance.DEFAULT_DURATION
 
     def test_is_blacklisted(self):
         """Tests that a blacklisted IP is flagged as blacklisted"""
@@ -154,7 +156,9 @@ class TestIpAddress(ModelTestCase):
         """Tests that the end_date is defaulted if not provided when blacklisting"""
         instance = self.model_class.objects.create(**self.payload)
         instance.blacklist()
-        default_end_date = date.today() + timedelta(days=instance.default_duration)
+        default_end_date = date.today() + timedelta(
+            days=instance.get_default_duration()
+        )
         assert instance.active
         assert instance.status == IpAddress.IpStatus.BLACKLISTED
         assert instance.expires_on == default_end_date
@@ -201,7 +205,9 @@ class TestIpAddress(ModelTestCase):
         """Tests that the end_date is defaulted if not provided when whitelisting"""
         instance = self.model_class.objects.create(**self.payload)
         instance.whitelist()
-        default_end_date = date.today() + timedelta(days=instance.default_duration)
+        default_end_date = date.today() + timedelta(
+            days=instance.get_default_duration()
+        )
         assert instance.active
         assert instance.status == IpAddress.IpStatus.WHITELISTED
         assert instance.expires_on == default_end_date
@@ -242,7 +248,9 @@ class TestIpAddress(ModelTestCase):
         """Tests that the end_date is defaulted if not provided when blacklisting from request"""
         fake_request = self.build_fake_request()
         instance = self.model_class.blacklist_from_request(fake_request)
-        default_end_date = date.today() + timedelta(days=instance.default_duration)
+        default_end_date = date.today() + timedelta(
+            days=instance.get_default_duration()
+        )
         assert instance.active
         assert instance.status == IpAddress.IpStatus.BLACKLISTED
         assert instance.expires_on == default_end_date
@@ -301,7 +309,9 @@ class TestIpAddress(ModelTestCase):
         """Tests that the end_date is defaulted if not provided when whitelisting from request"""
         fake_request = self.build_fake_request()
         instance = self.model_class.whitelist_from_request(fake_request)
-        default_end_date = date.today() + timedelta(days=instance.default_duration)
+        default_end_date = date.today() + timedelta(
+            days=instance.get_default_duration()
+        )
         assert instance.active
         assert instance.status == IpAddress.IpStatus.WHITELISTED
         assert instance.expires_on == default_end_date

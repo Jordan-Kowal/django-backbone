@@ -6,6 +6,7 @@ from django.conf import settings
 
 # Personal
 from jklib.django.utils.emails import get_css_content
+from jklib.django.utils.network import get_server_domain
 from jklib.django.utils.templates import render_template
 
 
@@ -33,6 +34,7 @@ def shared_email_context():
     :rtype: dict
     """
     return {
+        "domain": get_server_domain(),
         "frontend_url": settings.FRONTEND_ROOT_URL,
         "css": get_css_content(settings.EMAIL_CSS),
     }

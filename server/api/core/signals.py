@@ -2,6 +2,7 @@
 
 
 # Django
+from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -18,6 +19,6 @@ def automatic_pre_save_full_clean(sender, instance, **kwargs):
     :param Model instance: The model instance
     :param kwargs:
     """
-    whitelist = {Session}
+    whitelist = {Session, User}
     if sender not in whitelist:
         instance.full_clean()
