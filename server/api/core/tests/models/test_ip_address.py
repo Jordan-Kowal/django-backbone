@@ -6,7 +6,6 @@ from datetime import date, timedelta
 
 # Django
 from django.conf import settings
-from django.db import IntegrityError
 
 # Personal
 from jklib.django.db.tests import ModelTestCase
@@ -70,17 +69,38 @@ class TestIpAddress(ModelTestCase):
         self.assert_fields_are_required(self.payload)
         self.assert_instance_count_equals(0)
 
-    def test_signal_status_choices(self):
-        """(Signal) Tests that only a valid 'status' can be provided"""
-        self.payload["status"] = "Invalid status"
-        with self.assertRaises(ValueError):
+    def test_ip(self):
+        """Tests that the IP must be valid"""
+        self.payload["ip"] = "Invalid IP"
+        with self.assertRaises(self.common_errors):
             self.model_class(**self.payload).save()
         self.assert_instance_count_equals(0)
 
-    def test_signal_comment_length(self):
-        """(Signal) Tests that the comment max_length cannot be exceeded"""
+    def test_status(self):
+        """Tests that only a valid 'status' can be provided"""
+        self.payload["status"] = "Invalid status"
+        with self.assertRaises(self.common_errors):
+            self.model_class(**self.payload).save()
+        self.assert_instance_count_equals(0)
+
+    def test_expires_on(self):
+        """Tests that the date must be valid"""
+        self.payload["expires_on"] = "Invalid date"
+        with self.assertRaises(self.common_errors):
+            self.model_class(**self.payload).save()
+        self.assert_instance_count_equals(0)
+
+    def test_active(self):
+        """Tests that the active field must be valid"""
+        self.payload["active"] = "Not a boolean"
+        with self.assertRaises(self.common_errors):
+            self.model_class(**self.payload).save()
+        self.assert_instance_count_equals(0)
+
+    def test_comment(self):
+        """Tests that the comment max_length cannot be exceeded"""
         self.payload["comment"] = "a" * (self.model_class.COMMENT_MAX_LENGTH + 1)
-        with self.assertRaises((IntegrityError, ValueError)):
+        with self.assertRaises(self.common_errors):
             self.model_class(**self.payload).save()
         self.assert_instance_count_equals(0)
 
@@ -105,12 +125,16 @@ class TestIpAddress(ModelTestCase):
         instance = self.model_class.objects.create(**self.payload)
         instance.blacklist()
         assert instance.is_blacklisted
+        instance.whitelist(override=True)
+        assert not instance.is_blacklisted
 
     def test_is_whitelisted(self):
         """Tests that a whitelisted IP is flagged as whitelisted"""
         instance = self.model_class.objects.create(**self.payload)
         instance.whitelist()
         assert instance.is_whitelisted
+        instance.blacklist(override=True)
+        assert not instance.is_whitelisted
 
     # ----------------------------------------
     # Instance API tests

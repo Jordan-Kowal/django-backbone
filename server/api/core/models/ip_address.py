@@ -4,7 +4,6 @@
 from datetime import date, timedelta
 
 # Django
-from django.conf import settings
 from django.db.models import (
     CharField,
     DateField,
@@ -28,12 +27,8 @@ class IpAddress(LifeCycleModel):
     """
     List of IP addresses that are either whitelisted or blacklisted
     Only works with IPv4 addresses
-
-    Some validation is done in the pre-save signal
-
     The model is split in the following sections
         Constants
-        Enums
         Fields
         Behavior
         Validators
@@ -46,12 +41,13 @@ class IpAddress(LifeCycleModel):
     # ----------------------------------------
     # Constants
     # ----------------------------------------
-    DEFAULT_DURATION = 30  # Overridable by settings.IP_STATUS_DEFAULT_DURATION
+    # Static
     COMMENT_MAX_LENGTH = 255
 
-    # ----------------------------------------
-    # Enums
-    # ----------------------------------------
+    # Overridable
+    DEFAULT_DURATION = 30  # settings.IP_STATUS_DEFAULT_DURATION
+
+    # Statuses
     class IpStatus(IntegerChoices):
         """Possible statuses for an IP Address"""
 
@@ -67,17 +63,56 @@ class IpAddress(LifeCycleModel):
         IntegerField, choices=IpStatus.choices, default=IpStatus.NONE
     )
     expires_on = DateField(
-        blank=False,
+        blank=True,
         null=True,
         default=None,
         db_index=True,
         help_text="Expires at the end of said date",
     )
     active = ActiveField()
-    comment = CharField(max_length=COMMENT_MAX_LENGTH)
+    comment = CharField(max_length=COMMENT_MAX_LENGTH, blank=True)
 
     # ----------------------------------------
-    # Instance properties
+    # Behavior (meta, str, save)
+    # ----------------------------------------
+    class Meta:
+        """Meta class to setup our database table"""
+
+        db_table = "core_ip_addresses"
+        indexes = []
+        ordering = ["-id"]
+        verbose_name = "IP Address"
+        verbose_name_plural = "IP Addresses"
+
+    def __str__(self):
+        """
+        :return: Returns the IP address
+        :rtype: str
+        """
+        return f"{self.ip}"
+
+    # ----------------------------------------
+    # Validators
+    # ----------------------------------------
+    def clean_comment(self):
+        """
+        Checks that the comment is not too long
+        Specifically useful for sqlite3 who doesn't perform those checks (despite the 'max_length' parameter)
+        """
+        length = len(self.comment)
+        max_length = self.COMMENT_MAX_LENGTH
+        if length > max_length:
+            raise ValueError(
+                f"Value for 'comment' is too long (max: {max_length}, provided: {length})"
+            )
+
+    def clean_status(self):
+        """Checks that the status is part of the authorized inputs"""
+        if self.status not in self.IpStatus.values:
+            raise ValueError("Value for 'status' must belong to the 'IpStatus' enum")
+
+    # ----------------------------------------
+    # Properties
     # ----------------------------------------
     @property
     def default_duration(self):
@@ -110,45 +145,6 @@ class IpAddress(LifeCycleModel):
             and (self.expires_on >= date.today())
             and self.status == self.IpStatus.WHITELISTED
         )
-
-    # ----------------------------------------
-    # Behavior (meta, str, save)
-    # ----------------------------------------
-    class Meta:
-        """Meta class to setup our database table"""
-
-        db_table = "core_ip_addresses"
-        indexes = []
-        ordering = ["-id"]
-        verbose_name = "IP Address"
-        verbose_name_plural = "IP Addresses"
-
-    def __str__(self):
-        """
-        :return: Returns the IP address
-        :rtype: str
-        """
-        return f"{self.ip}"
-
-    # ----------------------------------------
-    # Validators (used in signals)
-    # ----------------------------------------
-    def validate_comment(self):
-        """
-        Checks that the comment is not too long
-        Specifically useful for sqlite3 who doesn't perform those checks (despite the 'max_length' parameter)
-        """
-        length = len(self.comment)
-        max_length = self.COMMENT_MAX_LENGTH
-        if length > max_length:
-            raise ValueError(
-                f"Value for 'comment' is too long (max: {max_length}, provided: {length})"
-            )
-
-    def validate_status(self):
-        """Checks that the status is part of the authorized inputs"""
-        if self.status not in self.IpStatus.values:
-            raise ValueError("Value for 'status' must belong to the 'IpStatus' enum")
 
     # ----------------------------------------
     # API for instance

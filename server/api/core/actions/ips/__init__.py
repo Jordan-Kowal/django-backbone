@@ -1,4 +1,4 @@
-"""Services from the "ips" management"""
+"""Service actions from the "ips" management API"""
 
 # Local
 from .blacklist_existing import BlacklistExistingIpHandler

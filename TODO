@@ -4,6 +4,10 @@
 - [ ] Add :raises ErrorType: to functions docstring
 
 #### Core API
+- [ ] Clean management
+    - [ ] Enable full clean en save (https://github.com/fish-ball/django-fullclean/blob/master/django_fullclean/__init__.py)
+    - [ ] Rewrite signals as clean_ functions
+    - [ ] Add tests on Profile, Token, IpAddress, and Contact to cover all fields
 - [ ] Add :raises ErrorType: to functions docstring
 - [ ] Remove admins
  
@@ -18,11 +22,10 @@
 
 #### Contact API
 - [ ] Contact Model
-    - [ ] Update model
-    - [ ] Include a ban check
+    - [ ] Write model
     - [ ] Write tests
 - [ ] Contact API service + test
-    - [ ] Create (should blacklist ip if too many) + Ban
+    - [ ] Create (with ban check)
     - [ ] List 
     - [ ] Retrieve 
     - [ ] Delete
