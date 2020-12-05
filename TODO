@@ -8,7 +8,6 @@
 - [ ] Remove admins
  
 #### Users API
-- [x] Use Enum and/or named tuples for profile emails
 - [ ] Login/Logout
     - [ ] Setup token auth
     - [ ] Login service and test
@@ -17,17 +16,17 @@
 - [ ] Remove admins
 
 #### Contact API
-- [ ] Contact Model
-    - [ ] Write model
-    - [ ] Write tests
+- [x] Contact Model
+    - [x] Write model
+    - [x] Write tests
 - [ ] Contact API service + test
     - [ ] Create (with ban check)
     - [ ] List 
     - [ ] Retrieve 
     - [ ] Delete
-- [ ] Clean up database
-    - [ ] Write the function
-    - [ ] Write a test
+- [x] Clean up database
+    - [x] Write the function
+    - [x] Write a test
 - [ ] Remove admins
 
 #### Emails

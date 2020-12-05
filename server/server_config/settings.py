@@ -55,8 +55,8 @@ INSTALLED_APPS = [
     # API
     # --------------------
     "api.core",
-    # "api.contact",
     "api.users",
+    "api.contact",
 ]
 
 
@@ -158,6 +158,11 @@ EMAIL_CSS = "core/css/emails.css"
 # --------------------------------------------------------------------------------
 # Contact
 CONTACT_RETENTION_DAYS = 30  # days
+CONTACT_API_BAN_SETTINGS = {
+    "max_requests": 3,
+    "day_range": 30,  # days
+    "ban_duration": 30,  # days
+}
 
 # IpAddress
 IP_STATUS_DEFAULT_DURATION = 30  # days

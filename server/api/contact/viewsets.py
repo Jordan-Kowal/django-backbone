@@ -1,11 +1,14 @@
 """Viewsets for the 'contact' application"""
 
+# Django
+from rest_framework.permissions import AllowAny
 
 # Personal
-from jklib.django.drf.permissions import IsAdminUser, IsNotAuthenticated
+from jklib.django.drf.permissions import IsAdminUser
 from jklib.django.drf.viewsets import DynamicViewSet
 
 # Local
+from .actions import CreateContactHandler
 from .models import Contact
 
 
@@ -13,7 +16,10 @@ from .models import Contact
 # > ViewSets
 # --------------------------------------------------------------------------------
 class ContactViewset(DynamicViewSet):
-    """WIP"""
+    """
+    Viewset mostly for the Contact model
+    Due to the nature of this model, there is no update API
+    """
 
     queryset = Contact.objects.all()
 
@@ -21,9 +27,9 @@ class ContactViewset(DynamicViewSet):
 
     known_actions = {
         "create": {
-            "description": "Sends a new contact message",
-            "handler": None,
-            "permissions": (IsNotAuthenticated,),
+            "description": "Creates and sends a new contact message",
+            "handler": CreateContactHandler,
+            "permissions": (AllowAny,),
         },
         "list": {
             "description": "List all existing contact messages",
