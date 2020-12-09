@@ -1,54 +1,59 @@
 # TODO
 
 #### JKLIB
-- [ ] Add :raises ErrorType: to functions docstring
+- Add :raises ErrorType: to functions docstring
+- TrimCharField / TrimTextField
+- LengthValidator(min, max, trim)
 
 #### Core API
-- [ ] Add :raises ErrorType: to functions docstring
-- [ ] Remove admins
+- comment to TrimmedCharField + test
+- Add :raises ErrorType: to functions docstring
+- Service: delete several ip
+- Remove admins
  
 #### Users API
-- [ ] Login/Logout
-    - [ ] Setup token auth
-    - [ ] Login service and test
-    - [ ] Include a ban check based on login tries (model already exist?)
-    - [ ] Logout service and test
-- [ ] Remove admins
+- Service: delete several user
+- Fields to TrimmedCharField + test
+- Check email sent to TO addresses
+- Login/Logout
+    - Setup token auth
+    - Login service and test
+    - Include a ban check based on login tries (model already exist?)
+    - Logout service and test
+- Remove admins
 
 #### Contact API
-- [x] Contact Model
-    - [x] Write model
-    - [x] Write tests
-- [ ] Contact API service + test
-    - [ ] Create (with ban check)
-    - [ ] List 
-    - [ ] Retrieve 
-    - [ ] Delete
-- [x] Clean up database
-    - [x] Write the function
-    - [x] Write a test
-- [ ] Remove admins
+- Add trimming to charfields + update test
+- Contact API service + test
+    - List 
+    - Retrieve 
+    - Delete
+    - Delete several user
+- Clean up database
+    - Write the function
+    - Write a test
+- Remove admins
 
 #### Emails
-- [ ] Rework css into SASS with variables for easier setup
-- [ ] Simplify css/design for easier setup
-- [ ] Update the emails
-    - [ ] Users
-        - [ ] Verify
-        - [ ] Welcome
-        - [ ] Password reset
-        - [ ] Password update
-    - [ ] Contact
-        - [ ] Admin alert
-        - [ ] User alert
-        - [ ] Config either in 
+- Rework css into SASS with variables for easier setup
+- Simplify css/design for easier setup
+- Update the emails
+    - Users
+        - Verify
+        - Welcome
+        - Password reset
+        - Password update
+    - Contact
+        - Admin alert
+        - User alert
+        - Config either in 
 
 #### Packages
-- [ ] CRON package
-   - [ ] Setup IpAddress automatic clear cron
-   - [ ] Setup Contact cleanup cron
-- [ ] Test runner
-- [ ] Pretty errors
+- CRON package
+   - Setup IpAddress automatic clear cron
+   - Setup Contact cleanup cron
+- Test runner
+- Pretty errors
 
 #### Others
-- [ ] Update README.md
+- Update README.md

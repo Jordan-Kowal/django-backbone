@@ -131,7 +131,7 @@ class IpAddress(LifeCycleModel):
     def blacklist(self, end_date=None, comment=None, override=False):
         """
         Blacklists an IP address
-        :param Date end_date: The desired expiration date
+        :param date end_date: The desired expiration date
         :param str comment: The comment to add in the instance
         :param bool override: Whether we allow blacklisting a whitelisted entry
         """
@@ -147,7 +147,7 @@ class IpAddress(LifeCycleModel):
     def whitelist(self, end_date=None, comment=None, override=False):
         """
         Whitelists an IP address
-        :param Date end_date: The desired expiration date
+        :param date end_date: The desired expiration date
         :param str comment: The comment to add in the instance
         :param bool override: Whether we allow whitelisting a blacklisted entry
         """
@@ -156,9 +156,9 @@ class IpAddress(LifeCycleModel):
     def _compute_valid_end_date(self, end_date):
         """
         Defaults the expiration date if none is provided
-        :param Date end_date: The desired expiration date
+        :param date end_date: The desired expiration date
         :return: Either the provided date or the default one
-        :rtype: Date
+        :rtype: date
         """
         if end_date is None:
             delta_in_days = timedelta(days=self.get_default_duration())
@@ -169,7 +169,7 @@ class IpAddress(LifeCycleModel):
         """
         Whitelists or blacklists an IP and update all the required fields
         :param str action: Action to perform, used to define the status check
-        :param Date end_date: The desired expiration date
+        :param date end_date: The desired expiration date
         :param str comment: The comment to add in the instance
         :param bool override: Whether we allow whitelisting a blacklisted entry
         """
@@ -197,7 +197,7 @@ class IpAddress(LifeCycleModel):
         """
         Blacklists an IP address using the provided Request object
         :param Request request: Request object used to get the IP address
-        :param Date end_date: The desired expiration date
+        :param date end_date: The desired expiration date
         :param str comment: The comment to add in the instance
         :param bool override: Whether we allow blacklisting a whitelisted entry
         :return: The updated instance
@@ -228,7 +228,7 @@ class IpAddress(LifeCycleModel):
         """
         Whitelists an IP address using the provided Request object
         :param Request request: Request object used to get the IP address
-        :param Date end_date: The desired expiration date
+        :param date end_date: The desired expiration date
         :param str comment: The comment to add in the instance
         :param bool override: Whether we allow blacklisting a whitelisted entry
         :return: The updated instance

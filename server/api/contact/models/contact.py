@@ -191,13 +191,14 @@ class Contact(LifeCycleModel):
     def should_ban_ip(self):
         """
         Checks if an IP should be banned based on the amount of contact requests recently sent
+        If true, it means the ban would happen at the next API call
         :return: Whether it should be banned
         :rtype: bool
         """
         ban_settings = self.get_ban_settings()
         threshold = ban_settings["threshold"]
         # No threshold means no ban
-        if threshold is None or threshold == 0:
+        if not threshold:
             return False
         # Else we check
         creation_date_threshold = timezone.now() - timedelta(
@@ -206,7 +207,7 @@ class Contact(LifeCycleModel):
         count = self.__class__.objects.filter(
             ip=self.ip, created_at__gt=creation_date_threshold
         ).count()
-        return count > threshold
+        return count >= threshold
 
     # ----------------------------------------
     # CRON jobs

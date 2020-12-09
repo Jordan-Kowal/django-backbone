@@ -9,6 +9,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 # Local
+from .contact.viewsets import ContactViewset
 from .core.viewsets import IpViewSet
 from .users.viewsets import AuthViewSet, UserViewSet
 
@@ -19,7 +20,7 @@ router = routers.DefaultRouter()
 router.register("auth", AuthViewSet, "auth")
 router.register("users", UserViewSet, "users")
 router.register("ips", IpViewSet, "ips")
-# router.register("contact", ContactViewSet, "contact")
+router.register("contact", ContactViewset, "contact")
 # router.register("example", ClientViewSet, "example")
 
 

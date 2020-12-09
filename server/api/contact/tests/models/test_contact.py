@@ -187,6 +187,7 @@ class TestContact(ModelTestCase):
         contact = self.model_class.objects.create(**self.payload)
         # No mail
         contact.send_notifications(False, False)
+        sleep(0.2)
         assert len(mail.outbox) == 0
         # Only admin
         contact.send_notifications(True, False)
@@ -212,20 +213,21 @@ class TestContact(ModelTestCase):
 
     def test_should_ban_ip(self):
         """Tests that we correctly check if an IP should be banned based on the settings"""
-        contact = self.model_class.objects.create(**self.payload)
-        ban_settings = contact.get_ban_settings()
+        ban_settings = Contact.get_ban_settings()
         threshold = ban_settings["threshold"]
         # No threshold, no ban
-        if threshold is None or threshold == 0:
-            assert not contact.test_should_ban_ip
+        if not threshold:
+            contact = self.model_class.objects.create(**self.payload)
+            assert not contact.test_should_ban_ip()
         # Reach the threshold and check the ban
         else:
-            for i in range(1, threshold):
+            for i in range(threshold - 1):
                 instance = self.model_class.objects.create(**self.payload)
                 assert not instance.should_ban_ip()
-            self.model_class.objects.create(**self.payload)  # One too many
-            for instance in self.model_class.objects.all():
-                assert instance.should_ban_ip()
+            instance = self.model_class.objects.create(
+                **self.payload
+            )  # Reach the threshold
+            assert instance.should_ban_ip()
 
     # ----------------------------------------
     # Cron tests
@@ -259,9 +261,10 @@ class TestContact(ModelTestCase):
         :param int max_: The maximum length accepted
         """
         empty_value = ""
+        space_value = " " * min_
         short_value = "a" * (min_ - 1)
         long_value = "a" * (max_ + 1)
-        for value in [empty_value, short_value, long_value]:
+        for value in [empty_value, space_value, short_value, long_value]:
             self.payload[field] = value
             with self.assertRaises(self.common_errors):
                 self.model_class(**payload).save()
