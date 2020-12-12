@@ -5,7 +5,6 @@ from datetime import date, timedelta
 
 # Django
 from django.db.models import (
-    CharField,
     DateField,
     GenericIPAddressField,
     IntegerChoices,
@@ -13,7 +12,7 @@ from django.db.models import (
 )
 
 # Personal
-from jklib.django.db.fields import ActiveField, RequiredField
+from jklib.django.db.fields import ActiveField, RequiredField, TrimCharField
 from jklib.django.db.models import LifeCycleModel
 from jklib.django.db.queries import get_object_or_none
 from jklib.django.utils.network import get_client_ip
@@ -69,7 +68,7 @@ class IpAddress(LifeCycleModel):
         help_text="Expires at the end of said date",
     )
     active = ActiveField()
-    comment = CharField(max_length=COMMENT_MAX_LENGTH, blank=True)
+    comment = TrimCharField(max_length=COMMENT_MAX_LENGTH, blank=True)
 
     # ----------------------------------------
     # Behavior (meta, str, save)

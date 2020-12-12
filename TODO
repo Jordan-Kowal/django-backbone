@@ -2,11 +2,8 @@
 
 #### JKLIB
 - Add :raises ErrorType: to functions docstring
-- TrimCharField / TrimTextField
-- LengthValidator(min, max, trim)
 
 #### Core API
-- comment to TrimmedCharField + test
 - Add :raises ErrorType: to functions docstring
 - Service: delete several ip
 - Remove admins
@@ -23,7 +20,6 @@
 - Remove admins
 
 #### Contact API
-- Add trimming to charfields + update test
 - Contact API service + test
     - List 
     - Retrieve 
