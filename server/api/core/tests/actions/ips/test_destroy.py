@@ -20,7 +20,7 @@ from ._shared import (
 # --------------------------------------------------------------------------------
 # > TestCase
 # --------------------------------------------------------------------------------
-class TestDestroyUser(ActionTestCase):
+class TestDestroyIp(ActionTestCase):
     """TestCase for the 'destroy' action"""
 
     service_base_url = f"{SERVICE_URL}/"

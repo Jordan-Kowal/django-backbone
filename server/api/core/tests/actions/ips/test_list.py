@@ -19,7 +19,7 @@ from ._shared import (
 # --------------------------------------------------------------------------------
 # > TestCase
 # --------------------------------------------------------------------------------
-class TestListUsers(ActionTestCase):
+class TestListIps(ActionTestCase):
     """TestCase for the 'list' action"""
 
     service_base_url = f"{SERVICE_URL}/"
