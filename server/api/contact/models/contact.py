@@ -7,20 +7,13 @@ from enum import Enum
 
 # Django
 from django.contrib.auth.models import User
-from django.core.validators import MinLengthValidator
-from django.db.models import (
-    SET_NULL,
-    CharField,
-    EmailField,
-    ForeignKey,
-    GenericIPAddressField,
-    TextField,
-)
+from django.db.models import SET_NULL, EmailField, ForeignKey, GenericIPAddressField
 from django.utils import timezone
 
 # Personal
-from jklib.django.db.fields import RequiredField
+from jklib.django.db.fields import RequiredField, TrimCharField, TrimTextField
 from jklib.django.db.models import LifeCycleModel
+from jklib.django.db.validators import length_validator
 from jklib.django.utils.emails import send_html_email_async
 from jklib.django.utils.settings import get_config
 
@@ -85,19 +78,21 @@ class Contact(LifeCycleModel):
         User, on_delete=SET_NULL, null=True, blank=True, related_name="contacts"
     )
     name = RequiredField(
-        CharField,
+        TrimCharField,
         max_length=NAME_LENGTH[1],
-        validators=[MinLengthValidator(NAME_LENGTH[0])],
+        validators=[length_validator(*NAME_LENGTH)],
         verbose_name="Name",
     )
-    email = EmailField(verbose_name="Email")
+    email = RequiredField(EmailField, verbose_name="Email")
     subject = RequiredField(
-        CharField,
+        TrimCharField,
         max_length=SUBJECT_LENGTH[1],
-        validators=[MinLengthValidator(SUBJECT_LENGTH[0])],
+        validators=[length_validator(*SUBJECT_LENGTH)],
         verbose_name="Subject",
     )
-    body = RequiredField(TextField, verbose_name="Body",)
+    body = RequiredField(
+        TrimTextField, validators=[length_validator(*BODY_LENGTH)], verbose_name="Body",
+    )
 
     # ----------------------------------------
     # Behavior (meta, str, save)
@@ -118,29 +113,6 @@ class Contact(LifeCycleModel):
         :rtype: str
         """
         return self.subject
-
-    # ----------------------------------------
-    # Validation
-    # ----------------------------------------
-    def clean(self):
-        """
-        Overrides the 'clean' method to make sure the 'body' clean happens
-        Because it's a TextField, Django doesn't clean it automatically
-        """
-        self.clean_body()
-
-    def clean_body(self):
-        """Checks if the 'body' has a valid length"""
-        if self.body is None:
-            return ValueError("The 'body' field cannot be empty")
-        length = len(self.body)
-        if length < self.BODY_LENGTH[0] or length > self.BODY_LENGTH[1]:
-            raise ValueError(
-                f"Value for 'body' is too long "
-                f"(min: {self.BODY_LENGTH[0]}, "
-                f"max: {self.BODY_LENGTH[1]}, "
-                f"provided: {length})"
-            )
 
     # ----------------------------------------
     # Properties
