@@ -1,12 +1,15 @@
 # TODO
 
 #### JKLIB
-- Add :raises ErrorType: to functions docstring
+- Add :raise ErrorType: to functions docstring
+
+#### Project wide:
+- Add :raise ErrorType: to functions docstring
+- Remove admins
+- Update README.md
 
 #### Core API
-- Add :raises ErrorType: to functions docstring
 - Service: delete several ip
-- Remove admins
  
 #### Users API
 - Service: delete several user
@@ -17,18 +20,11 @@
     - Login service and test
     - Include a ban check based on login tries (model already exist?)
     - Logout service and test
-- Remove admins
 
 #### Contact API
 - Contact API service + test
     - List 
-    - Retrieve 
-    - Delete
     - Delete several user
-- Clean up database
-    - Write the function
-    - Write a test
-- Remove admins
 
 #### Emails
 - Rework css into SASS with variables for easier setup
@@ -52,4 +48,3 @@
 - Pretty errors
 
 #### Others
-- Update README.md

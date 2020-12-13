@@ -8,7 +8,7 @@ from jklib.django.drf.permissions import IsAdminUser
 from jklib.django.drf.viewsets import DynamicViewSet
 
 # Local
-from .actions import CreateContactHandler, DestroyContactHandler
+from .actions import CreateContactHandler, DestroyContactHandler, RetrieveContactHandler
 from .models import Contact
 
 
@@ -38,7 +38,7 @@ class ContactViewset(DynamicViewSet):
         },
         "retrieve": {
             "description": "Retrieve one specific contact message",
-            "handler": None,
+            "handler": RetrieveContactHandler,
             "permissions": (IsAdminUser,),
         },
         "destroy": {

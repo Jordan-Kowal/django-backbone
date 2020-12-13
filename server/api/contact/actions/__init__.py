@@ -1,4 +1,8 @@
 """Centralizes the ActionHandler classes for easier imports"""
 
 # Local
-from .contacts import CreateContactHandler, DestroyContactHandler
+from .contacts import (
+    CreateContactHandler,
+    DestroyContactHandler,
+    RetrieveContactHandler,
+)
