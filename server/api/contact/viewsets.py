@@ -8,7 +8,12 @@ from jklib.django.drf.permissions import IsAdminUser
 from jklib.django.drf.viewsets import DynamicViewSet
 
 # Local
-from .actions import CreateContactHandler, DestroyContactHandler, RetrieveContactHandler
+from .actions import (
+    CreateContactHandler,
+    DestroyContactHandler,
+    ListContactHandler,
+    RetrieveContactHandler,
+)
 from .models import Contact
 
 
@@ -33,7 +38,7 @@ class ContactViewset(DynamicViewSet):
         },
         "list": {
             "description": "List all existing contact messages",
-            "handler": None,
+            "handler": ListContactHandler,
             "permissions": (IsAdminUser,),
         },
         "retrieve": {
