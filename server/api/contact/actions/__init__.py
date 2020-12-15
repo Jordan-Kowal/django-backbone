@@ -4,6 +4,7 @@
 from .contacts import (
     CreateContactHandler,
     DestroyContactHandler,
+    DestroyManyContactsHandler,
     ListContactHandler,
     RetrieveContactHandler,
 )

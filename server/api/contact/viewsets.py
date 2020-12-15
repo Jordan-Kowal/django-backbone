@@ -11,6 +11,7 @@ from jklib.django.drf.viewsets import DynamicViewSet
 from .actions import (
     CreateContactHandler,
     DestroyContactHandler,
+    DestroyManyContactsHandler,
     ListContactHandler,
     RetrieveContactHandler,
 )
@@ -50,5 +51,16 @@ class ContactViewset(DynamicViewSet):
             "description": "Delete one specific contact message",
             "handler": DestroyContactHandler,
             "permissions": (IsAdminUser,),
+        },
+    }
+
+    extra_actions = {
+        "destroy_many": {
+            "description": "Deletes several Contact instances at once",
+            "handler": DestroyManyContactsHandler,
+            "permissions": (IsAdminUser,),
+            "methods": ["delete"],
+            "url_path": "destroy_many",
+            "detail": False,
         },
     }

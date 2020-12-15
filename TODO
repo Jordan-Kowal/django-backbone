@@ -21,10 +21,6 @@
     - Include a ban check based on login tries (model already exist?)
     - Logout service and test
 
-#### Contact API
-- Contact API service + test
-    - Delete several user
-
 #### Emails
 - Rework css into SASS with variables for easier setup
 - Simplify css/design for easier setup
@@ -45,5 +41,3 @@
    - Setup Contact cleanup cron
 - Test runner
 - Pretty errors
-
-#### Others
