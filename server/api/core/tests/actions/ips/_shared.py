@@ -3,9 +3,6 @@
 # Built-in
 from datetime import date, timedelta
 
-# Django
-from django.conf import settings
-
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 

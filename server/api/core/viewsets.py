@@ -8,6 +8,10 @@ from jklib.django.drf.viewsets import DynamicViewSet
 from api.core.models import IpAddress
 
 # Local
+# --------------------------------------------------------------------------------
+# > ViewSets
+# --------------------------------------------------------------------------------
+from ..contact.actions import BulkDestroyContactsHandler
 from .actions import (
     BlacklistExistingIpHandler,
     BlacklistNewIpHandler,
@@ -23,14 +27,12 @@ from .actions import (
 )
 
 
-# --------------------------------------------------------------------------------
-# > ViewSets
-# --------------------------------------------------------------------------------
 class IpViewSet(DynamicViewSet):
     """
     Viewset for the IpAddress models.
     Services can be split into the following categories:
         Classic model CRUD
+        Additional CRUD
         IP blacklisting
         IP whitelisting
         IP clearing
@@ -69,6 +71,15 @@ class IpViewSet(DynamicViewSet):
     }
 
     extra_actions = {
+        # Additional CRUD
+        "bulk_destroy": {
+            "description": "Deletes several IPs instances at once",
+            "handler": BulkDestroyContactsHandler,
+            "permissions": None,
+            "methods": ["delete"],
+            "url_path": "bulk_destroy",
+            "detail": False,
+        },
         # Blacklist
         "blacklist_new": {
             "description": "Creates and blacklists an IP",

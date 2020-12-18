@@ -1,4 +1,4 @@
-"""Handler for the 'delete_many' action"""
+"""Handler for the 'bulk_destroy' action"""
 
 # Django
 from rest_framework.response import Response
@@ -11,7 +11,7 @@ from jklib.django.drf.serializers import IdListSerializer
 # --------------------------------------------------------------------------------
 # > Handler
 # --------------------------------------------------------------------------------
-class DestroyManyContactsHandler(ModelActionHandler):
+class BulkDestroyContactsHandler(ModelActionHandler):
     """
     Action to delete multiple instances of a model when provided with valid IDs
     It uses the viewset's queryset as a starting point for the search

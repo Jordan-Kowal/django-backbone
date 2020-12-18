@@ -2,9 +2,9 @@
 
 # Local
 from .contacts import (
+    BulkDestroyContactsHandler,
     CreateContactHandler,
     DestroyContactHandler,
-    DestroyManyContactsHandler,
     ListContactHandler,
     RetrieveContactHandler,
 )

@@ -8,9 +8,6 @@
 - Remove admins
 - Update README.md
 
-#### Core API
-- Service: delete several ip
- 
 #### Users API
 - Service: delete several user
 - Fields to TrimmedCharField + test
