@@ -17,6 +17,7 @@ from jklib.django.drf.viewsets import DynamicViewSet
 
 # Local
 from .actions import (
+    BulkDestroyUsersHandler,
     CreateUserHandler,
     DestroyUserHandler,
     ListUserHandler,
@@ -106,6 +107,14 @@ class UserViewSet(DynamicViewSet):
 
     extra_actions = {
         # ---------- Additional crud ----------
+        "bulk_destroy": {
+            "description": "Deletes several Contact instances at once",
+            "handler": BulkDestroyUsersHandler,
+            "permissions": (IsAdminUser,),
+            "methods": ["delete"],
+            "url_path": "bulk_destroy",
+            "detail": False,
+        },
         "update_password": {
             "description": "Update your password by providing the existing one",
             "handler": UpdatePasswordHandler,

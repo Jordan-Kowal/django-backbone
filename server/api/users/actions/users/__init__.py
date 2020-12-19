@@ -1,6 +1,7 @@
 """Users services from the "users" app"""
 
 # Local
+from .bulk_destroy import BulkDestroyUsersHandler
 from .create import CreateUserHandler
 from .destroy import DestroyUserHandler
 from .list import ListUserHandler

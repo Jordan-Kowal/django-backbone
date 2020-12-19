@@ -4,6 +4,7 @@
 # Local
 from .auth import LoginHandler, LogoutHandler
 from .users import (
+    BulkDestroyUsersHandler,
     CreateUserHandler,
     DestroyUserHandler,
     ListUserHandler,

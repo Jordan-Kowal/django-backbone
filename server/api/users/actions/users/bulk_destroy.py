@@ -11,8 +11,8 @@ from jklib.django.drf.serializers import IdListSerializer
 # --------------------------------------------------------------------------------
 # > Handler
 # --------------------------------------------------------------------------------
-class BulkDestroyIpsHandler(ModelActionHandler):
-    """Deletes the IpAddress instances matching the provided IDs"""
+class BulkDestroyUsersHandler(ModelActionHandler):
+    """Deletes the User instances matching the provided IDs"""
 
     serializer_mode = SerializerMode.UNIQUE
     serializer = IdListSerializer

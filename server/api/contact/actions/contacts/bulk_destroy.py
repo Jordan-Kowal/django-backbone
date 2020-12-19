@@ -12,10 +12,7 @@ from jklib.django.drf.serializers import IdListSerializer
 # > Handler
 # --------------------------------------------------------------------------------
 class BulkDestroyContactsHandler(ModelActionHandler):
-    """
-    Action to delete multiple instances of a model when provided with valid IDs
-    It uses the viewset's queryset as a starting point for the search
-    """
+    """Deletes the Contact instances matching the provided IDs"""
 
     serializer_mode = SerializerMode.UNIQUE
     serializer = IdListSerializer

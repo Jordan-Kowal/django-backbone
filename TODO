@@ -9,7 +9,6 @@
 - Update README.md
 
 #### Users API
-- Service: delete several user
 - Fields to TrimmedCharField + test
 - Check email sent to TO addresses
 - Login/Logout
