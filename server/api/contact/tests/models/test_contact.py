@@ -185,6 +185,7 @@ class TestContact(ModelTestCase):
     def test_send_notifications(self):
         """Tests that notification emails are correctly sent"""
         contact = self.model_class.objects.create(**self.payload)
+        admin_email = get_config("EMAIL_HOST_USER")
         # No mail
         contact.send_notifications(False, False)
         sleep(0.2)
@@ -195,12 +196,16 @@ class TestContact(ModelTestCase):
         email = mail.outbox[0]
         assert len(mail.outbox) == 1
         assert email.subject == contact.EmailTemplate.ADMIN_NOTIFICATION.subject
+        assert len(email.to) == 1
+        assert email.to[0] == admin_email
         # Only user
         contact.send_notifications(False, True)
         sleep(0.2)
         email = mail.outbox[1]
         assert len(mail.outbox) == 2
         assert email.subject == contact.EmailTemplate.USER_NOTIFICATION.subject
+        assert len(email.to) == 1
+        assert email.to[0] == contact.email
         # Both
         contact.send_notifications(True, True)
         sleep(0.4)
@@ -210,6 +215,10 @@ class TestContact(ModelTestCase):
         assert len(mail.outbox) == 4
         assert contact.EmailTemplate.ADMIN_NOTIFICATION.subject in subjects
         assert contact.EmailTemplate.USER_NOTIFICATION.subject in subjects
+        recipients = [email_1.to[0], email_2.to[0]]
+        assert len(email_1.to) == len(email_2.to) == 1
+        assert admin_email in recipients
+        assert contact.email in recipients
 
     def test_should_ban_ip(self):
         """Tests that we correctly check if an IP should be banned based on the settings"""

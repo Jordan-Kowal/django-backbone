@@ -6,7 +6,6 @@
 
 #### Users API
 - Fields to TrimmedCharField + test
-- Check email sent to TO addresses
 - Login/Logout
     - Setup token auth
     - Login service and test
