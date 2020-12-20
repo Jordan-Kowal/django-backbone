@@ -1,10 +1,6 @@
 # TODO
 
-#### JKLIB
-- Add :raise ErrorType: to functions docstring
-
 #### Project wide:
-- Add :raise ErrorType: to functions docstring
 - Remove admins
 - Update README.md
 

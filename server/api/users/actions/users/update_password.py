@@ -53,6 +53,7 @@ class UpdatePasswordSerializer(NotEmptySerializer):
         """
         Must provide the right current password for the user, as a security measure
         :param str current_password: Should be the user's current password
+        :raises ValidationError: If the user did not provide his valid current password
         :return: Hash of the current password
         :rtype: str
         """

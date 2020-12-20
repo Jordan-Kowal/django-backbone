@@ -233,6 +233,7 @@ def validate_expires_on(expiration_date):
     """
     Checks that the expiration date is not in the past
     :param date expiration_date: The provided datetime value
+    :raises ValidationError: When the date is in the past
     :return: The untouched expiration date
     :rtype: date
     """
@@ -246,6 +247,7 @@ def validate_status(status):
     Converts the status from int/str to a valid enum
     :param status: The provided status for the IpAddress
     :type status: str or int
+    :raises ValidationError: If the status value is unknown
     :return: The status converted to its enum integer value
     :rtype: int
     """

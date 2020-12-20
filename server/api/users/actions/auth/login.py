@@ -38,7 +38,13 @@ class LoginSerializer(NotEmptyModelSerializer):
     # Validation
     # ----------------------------------------
     def validate(self, validated_data):
-        """Checks the user's credentials without login him"""
+        """
+        Checks the user's credentials without login him
+        :param dict validated_data: The data after the individual validations
+        :raises ValidationError: If the user's credentials are invalid
+        :return: The validated data using the parent method
+        :rtype: dict
+        """
         email = validated_data["email"]
         password = validated_data["password"]
         user = authenticate(username=email, password=password)
@@ -48,16 +54,28 @@ class LoginSerializer(NotEmptyModelSerializer):
 
     @staticmethod
     def validate_email(email):
-        """Makes the 'email' field required"""
-        email = email.trim()
+        """
+        Makes the 'email' field required
+        :param str email: The provided email address
+        :raises ValidationError: If the email is missing or empty
+        :return: The trimmed email address
+        :rtype: str
+        """
+        email = email.strip()
         if email == "":
             raise ValidationError("Email is required")
         return email
 
     @staticmethod
     def validate_password(password):
-        """Makes the 'password' field required"""
-        password = password.trim()
+        """
+        Makes the 'password' field required
+        :param str password: The user's password
+        :raises ValidationError: If the password is empty or missing
+        :return: The trimmed password
+        :rtype: str
+        """
+        password = password.strip()
         if password == "":
             raise ValidationError("Password is required")
         return password

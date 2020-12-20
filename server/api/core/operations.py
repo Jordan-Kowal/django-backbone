@@ -70,7 +70,10 @@ class TaskDeleteSqlite3Database(OperationTask):
     name = "Sqlite3 removal"
 
     def run(self):
-        """Task job"""
+        """
+        Deletes the sqlite3 database file
+        :raises Exception: If we are not using a sqlite3 database
+        """
         db_config = settings.DATABASES["default"]
         db_filepath = db_config["NAME"]
         _, file_ext = os.path.splitext(db_filepath)

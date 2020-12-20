@@ -59,6 +59,7 @@ def validate_email_is_still_unique(current_email, new_email):
     If the email changes, checks that it is still unique
     :param str current_email: The current email of our user
     :param str new_email: The new email provided
+    :raises ValidationError: If another user already uses this email address
     :return: The email initial data
     :rtype: str
     """
@@ -74,6 +75,7 @@ def validate_password_confirmation(password, password_confirmation):
     Checks that the password has been typed correctly twice
     :param str password: The password field
     :param str password_confirmation: The password confirmation field
+    :raises ValidationError: When the password does not match the confirmation
     :return: The unchanged password confirmation
     :rtype: str
     """
@@ -88,6 +90,7 @@ def validate_token(token_value, token_type):
     Returns the Token instance found
     :param str token_value: A long string of character that represents a token
     :param str token_type: Type of our token
+    :raises ValidationError: If the token is expired or invalid
     :return: Token instance that matches the provided token value
     :rtype: Token
     """

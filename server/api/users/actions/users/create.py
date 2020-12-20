@@ -90,6 +90,7 @@ class CreateUserSerializer(NotEmptyModelSerializer):
         """
         Email must be unique
         :param str email: The provided email
+        :raises ValidationError: When another user already uses this email
         :return: The email initial data
         :rtype: str
         """

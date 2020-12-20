@@ -32,6 +32,7 @@ def username_is_email(sender, instance, **kwargs):
     """
     Overrides the username with the email before saving
     The email address cannot be empty
+    :raises IntegrityError: When the user does not have an email address
     """
     if not instance.email:
         raise IntegrityError("User must have a valid email")
