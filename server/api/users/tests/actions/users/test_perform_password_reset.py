@@ -9,6 +9,7 @@ from jklib.django.drf.tests import ActionTestCase
 
 # Local
 from ....models import Profile, Token
+from ...utils import assert_user_email_was_sent
 from ._shared import USER_SERVICE_URL
 
 
@@ -124,7 +125,7 @@ class TestPerformPasswordReset(ActionTestCase):
         assert user.check_password(self.payload["new_password"])
         # Checking that the update email has been sent
         subject = Profile.EmailTemplate.PASSWORD_UPDATED.subject
-        self.assert_email_was_sent(subject)
+        assert_user_email_was_sent(user, subject)
         # Trying again should fail
         response = self.client.post(self.service_base_url, self.payload)
         self.assert_field_has_error(response, "token")

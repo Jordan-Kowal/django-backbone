@@ -8,6 +8,7 @@ from jklib.django.drf.tests import ActionTestCase
 
 # Local
 from ....models import Profile, Token
+from ...utils import assert_user_email_was_sent
 from ._shared import USER_SERVICE_URL
 
 
@@ -81,4 +82,4 @@ class TestSendVerificationEmail(ActionTestCase):
         assert token.can_be_used
         # Email sent
         subject = Profile.EmailTemplate.VERIFY_EMAIL.subject
-        self.assert_email_was_sent(subject, async_=False)
+        assert_user_email_was_sent(self.user, subject)

@@ -1,4 +1,5 @@
-"""Shared constants, functions, and classes for our User tests"""
+"""Shared constants, functions, and classes for ou users API"""
+
 
 # Django
 from django.contrib.auth.models import User

@@ -13,6 +13,7 @@ from jklib.django.drf.tests import ActionTestCase
 
 # Local
 from ....models import Profile, Token
+from ...utils import assert_user_email_was_sent
 from ._shared import USER_SERVICE_URL
 
 
@@ -91,7 +92,7 @@ class TestRequestPasswordReset(ActionTestCase):
         assert token.can_be_used
         # Checks the email was sent (asynchronously)
         subject = Profile.EmailTemplate.REQUEST_PASSWORD_RESET.subject
-        self.assert_email_was_sent(subject)
+        assert_user_email_was_sent(self.user, subject)
 
     def test_success_with_known_email(self):
         """Tests a success without a valid email, meaning no token was created and no email was sent"""

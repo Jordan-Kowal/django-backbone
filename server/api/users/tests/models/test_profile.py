@@ -8,6 +8,7 @@ from jklib.django.db.tests import ModelTestCase
 
 # Local
 from ...models import Profile, Token
+from ._shared import assert_user_email_was_sent
 
 
 # --------------------------------------------------------------------------------
@@ -91,7 +92,7 @@ class TestProfile(ModelTestCase):
         subject = self.model_class.EmailTemplate.PASSWORD_UPDATED.subject
         user = self.create_user()
         user.profile.send_password_updated_email()
-        self.assert_email_was_sent(subject)
+        assert_user_email_was_sent(user, subject)
 
     def test_send_reset_password_email(self):
         """Tests that the reset password email is sent correctly with a valid token"""
@@ -100,7 +101,7 @@ class TestProfile(ModelTestCase):
         user.profile.send_reset_password_email()
         token_type, _ = Profile.RESET_TOKEN
         self._assert_token_has_been_created(user, token_type)
-        self.assert_email_was_sent(subject)
+        assert_user_email_was_sent(user, subject)
 
     def test_send_verification_email(self):
         """Tests that the verification email is sent only to unverified users, and includes a valid token"""
@@ -111,21 +112,21 @@ class TestProfile(ModelTestCase):
         user.profile.save()
         user.profile.send_verification_email()
         with self.assertRaises((AssertionError, IndexError)):
-            self.assert_email_was_sent(subject)
+            assert_user_email_was_sent(user, subject)
         # Not verified
         user.profile.is_verified = False
         user.profile.save()
         user.profile.send_verification_email()
         token_type, _ = Profile.VERIFY_TOKEN
         self._assert_token_has_been_created(user, token_type)
-        self.assert_email_was_sent(subject)
+        assert_user_email_was_sent(user, subject)
 
     def test_send_welcome_email(self):
         """Tests that the welcome email is sent correctly"""
         subject = self.model_class.EmailTemplate.WELCOME.subject
         user = self.create_user()
         user.profile.send_welcome_email()
-        self.assert_email_was_sent(subject)
+        assert_user_email_was_sent(user, subject)
 
     # ----------------------------------------
     # Helpers

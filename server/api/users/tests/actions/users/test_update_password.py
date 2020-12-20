@@ -9,6 +9,7 @@ from jklib.django.drf.tests import ActionTestCase
 
 # Local
 from ....models import Profile
+from ...utils import assert_user_email_was_sent
 from ._shared import USER_SERVICE_URL
 
 
@@ -116,7 +117,7 @@ class TestUpdatePassword(ActionTestCase):
         assert user.check_password(new_password)
         # Checking notification email was sent
         subject = Profile.EmailTemplate.PASSWORD_UPDATED.subject
-        self.assert_email_was_sent(subject)
+        assert_user_email_was_sent(self.user, subject)
 
     # ----------------------------------------
     # Private

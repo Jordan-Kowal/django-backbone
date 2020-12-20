@@ -9,6 +9,7 @@ from jklib.django.drf.tests import ActionTestCase
 
 # Local
 from ....models import Profile
+from ...utils import assert_user_email_was_sent
 from ._shared import USER_SERVICE_URL, assert_user_representation_matches_instance
 
 
@@ -117,8 +118,9 @@ class TestCreateUser(ActionTestCase):
         user = User.objects.first()
         assert_user_representation_matches_instance(response.data, user)
         # Check the email was sent
-        if user.profile.is_verified:
-            subject = Profile.EmailTemplate.WELCOME.subject
-        else:
-            subject = Profile.EmailTemplate.VERIFY_EMAIL.subject
-        self.assert_email_was_sent(subject)
+        subject = (
+            Profile.EmailTemplate.WELCOME.subject
+            if user.profile.is_verified
+            else Profile.EmailTemplate.VERIFY_EMAIL.subject
+        )
+        assert_user_email_was_sent(user, subject)
