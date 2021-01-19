@@ -8,7 +8,7 @@ from jklib.django.db.tests import ModelTestCase
 
 # Local
 from ...models import Profile, Token
-from ._shared import assert_user_email_was_sent
+from ..utils import assert_user_email_was_sent
 
 
 # --------------------------------------------------------------------------------

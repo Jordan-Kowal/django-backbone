@@ -61,6 +61,8 @@ class CreateUserSerializer(NotEmptyModelSerializer):
         :rtype: User
         """
         validated_data.pop("confirm_password", None)
+        validated_data["first_name"] = validated_data.get("first_name", "").strip()
+        validated_data["last_name"] = validated_data.get("last_name", "").strip()
         return super().create(validated_data)
 
     def to_representation(self, user):

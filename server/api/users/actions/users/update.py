@@ -119,9 +119,13 @@ class UpdateUserSerializer(NotEmptyModelSerializer):
         :return: The updated user instance
         :rtype: User
         """
+        # Trimming the name
+        first_name = validated_data.get("first_name", user.first_name).strip()
+        last_name = validated_data.get("last_name", user.last_name).strip()
+        # Updating
         user.email = validated_data.get("email", user.email)
-        user.first_name = validated_data.get("first_name", user.first_name)
-        user.last_name = validated_data.get("last_name", user.last_name)
+        user.first_name = first_name
+        user.last_name = last_name
         user.save()
         return user
 

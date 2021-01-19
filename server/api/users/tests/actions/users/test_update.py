@@ -19,6 +19,7 @@ class TestUpdateUser(ActionTestCase):
 
     service_base_url = f"{USER_SERVICE_URL}/"
     required_fields = ["email"]
+    success_code = 200
 
     # ----------------------------------------
     # Behavior
@@ -57,12 +58,12 @@ class TestUpdateUser(ActionTestCase):
         assert response.status_code == 403
         # 200 Owner
         response = self.client.put(self.user_detail_url, self.payload)
-        assert response.status_code == 200
+        assert response.status_code == self.success_code
         # 200 Admin
         self.client.logout()
         self.client.force_authenticate(self.admin)
         response = self.client.put(self.user_detail_url, self.payload)
-        assert response.status_code == 200
+        assert response.status_code == self.success_code
 
     def test_unknown_user(self):
         """Tests that we cannot update an unknown user"""
@@ -97,6 +98,11 @@ class TestUpdateUser(ActionTestCase):
         self.client.force_authenticate(self.user)
         self._assert_unique_email()
 
+    def test_names_are_trimmed_as_user(self):
+        """As a user, tests that first and last name are trimmed"""
+        self.client.force_authenticate(self.user)
+        self._assert_names_are_trimmed()
+
     def test_update_success_as_user(self):
         """As a user, tests that we successfully updated our user"""
         # Performing the update
@@ -104,7 +110,7 @@ class TestUpdateUser(ActionTestCase):
         response = self.client.put(self.user_detail_url, data=self.payload)
         user = User.objects.get(id=self.user.id)
         data = response.data
-        assert response.status_code == 200
+        assert response.status_code == self.success_code
         # User has been updated
         assert user.email == data["email"] == self.payload["email"]
         assert user.first_name == data["first_name"] == self.payload["first_name"]
@@ -120,7 +126,7 @@ class TestUpdateUser(ActionTestCase):
         # Performing the request
         response = self.client.put(self.user_detail_url, self.payload)
         updated_user = User.objects.get(id=self.user.id)
-        assert response.status_code == 200
+        assert response.status_code == self.success_code
         # Data should not have changed
         assert updated_user.is_active != self.payload["is_active"]
         assert updated_user.is_staff != self.payload["is_staff"]
@@ -146,6 +152,11 @@ class TestUpdateUser(ActionTestCase):
         self.client.force_authenticate(self.admin)
         self._assert_unique_email()
 
+    def test_names_are_trimmed_as_admin(self):
+        """As an admin, tests that first and last name are trimmed"""
+        self.client.force_authenticate(self.admin)
+        self._assert_names_are_trimmed()
+
     def test_update_success_as_admin(self):
         """As an admin, tests that we successfully updated our user"""
         self.client.force_authenticate(self.admin)
@@ -155,7 +166,7 @@ class TestUpdateUser(ActionTestCase):
         response = self.client.put(self.user_detail_url, data=self.payload)
         updated_user = User.objects.get(id=self.user.id)
         data = response.data
-        assert response.status_code == 200
+        assert response.status_code == self.success_code
         # User has been updated
         assert updated_user.email == data["email"] == self.payload["email"]
         assert updated_user.email == updated_user.username
@@ -188,6 +199,15 @@ class TestUpdateUser(ActionTestCase):
         updated_user = User.objects.get(id=self.user.id)
         self.assert_field_has_error(response, "email")
         assert updated_user.email == self.user.email != self.admin.email
+
+    def _assert_names_are_trimmed(self):
+        """Tests that the firstname and lastname are trimmed"""
+        self.payload["first_name"] = " First Name"
+        self.payload["last_name"] = "Last Name "
+        response = self.client.put(self.user_detail_url, data=self.payload)
+        assert response.status_code == self.success_code
+        assert response.data["first_name"] == self.payload["first_name"].strip()
+        assert response.data["last_name"] == self.payload["last_name"].strip()
 
     def _generate_payloads(self):
         """Generates a valid payload for the service with unique data and stores it in self.payload"""

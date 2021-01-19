@@ -21,6 +21,7 @@ class TestCreateUser(ActionTestCase):
 
     required_fields = ["email", "password", "confirm_password"]
     service_base_url = f"{USER_SERVICE_URL}/"
+    success_code = 201
 
     # ----------------------------------------
     # Behavior
@@ -64,7 +65,7 @@ class TestCreateUser(ActionTestCase):
         # Unauthenticated is 201
         self.client.logout()
         response = self.client.post(self.service_base_url, data=self.payload)
-        assert response.status_code == 201
+        assert response.status_code == self.success_code
         assert User.objects.count() == 2
 
     def test_required_fields(self):
@@ -108,11 +109,22 @@ class TestCreateUser(ActionTestCase):
         self.assert_field_has_error(response, "email")
         assert User.objects.count() == 1
 
+    def test_name_trimming(self):
+        """Tests that the firstname and lastname are trimmed"""
+        self.payload["first_name"] = " First Name"
+        self.payload["last_name"] = "Last Name "
+        response = self.client.post(self.service_base_url, data=self.payload)
+        assert response.status_code == self.success_code
+        assert User.objects.count() == 1
+        user = User.objects.first()
+        assert user.first_name == self.payload["first_name"].strip()
+        assert user.last_name == self.payload["last_name"].strip()
+
     def test_create_success(self):
         """Tests that you can successfully create a user"""
         # Successful create
         response = self.client.post(self.service_base_url, data=self.payload)
-        assert response.status_code == 201
+        assert response.status_code == self.success_code
         assert User.objects.count() == 1
         # Check content
         user = User.objects.first()

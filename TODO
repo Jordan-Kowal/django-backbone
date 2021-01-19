@@ -1,11 +1,13 @@
 # TODO
 
+#### JKLIB
+- Add AOC useful functions
+
 #### Project wide:
 - Remove admins
 - Update README.md
 
 #### Users API
-- Fields to TrimmedCharField + test
 - Login/Logout
     - Setup token auth
     - Login service and test
@@ -31,4 +33,3 @@
    - Setup IpAddress automatic clear cron
    - Setup Contact cleanup cron
 - Test runner
-- Pretty errors
