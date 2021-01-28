@@ -3,12 +3,39 @@
 #### Project wide:
 - Update README.md
 
+#### General
+- Normalize app names
+- Review settings structure to better identify app settings
+
+#### Core
+- Healthcheck services:
+    - api
+    - cache
+    - storage
+    - migrations
+    - see https://github.com/KristianOellegaard/django-health-check
+
 #### Users API
-- Login/Logout
-    - Setup token auth
-    - Login service and test
-    - Include a ban check based on login tries (model already exist?)
-    - Logout service and test
+- Add model to log auth attempts (fail, success, IP, datetime, user if known)
+- Login service that returns session cookie
+    - Block consecutive fails
+    - log attempts. if mfa, success is logged after step 2m bu failure can be both steps
+- Add option for no simultaneous connection
+    - Set in django settings
+    - Used during the login to kill other cookies
+- Add MFA option
+    - Setup at the user level
+    - Value stored on the user, encrypted like a password
+    - Email or SMS
+    - If active, login does not login but send MFA
+    - Limit for a user to avoid spams
+        - Limit per days regardless of success
+        - Limit consecutive failures
+- Service to handle MFA tries
+    - Block consecutive fails
+- Add trusted for 30 days on a machine. Check the `Agent` data in the request
+- Logout service that kills current session
+- Status service to know if we are connected and various session info
 
 #### Emails
 - Rework css into SASS with variables for easier setup
@@ -26,6 +53,6 @@
 
 #### Packages
 - CRON package
-   - Setup IpAddress automatic clear cron
+   - Setup NetworkRule automatic clear cron
    - Setup Contact cleanup cron
 - Test runner

@@ -13,7 +13,7 @@ from jklib.django.drf.tests import ActionTestCase
 from jklib.django.utils.settings import get_config
 
 # Application
-from api.core.models import IpAddress
+from api.core.models import NetworkRule
 
 # Local
 from ....models import Contact
@@ -146,12 +146,12 @@ class TestCreateContact(ActionTestCase):
             assert response.status_code == 403
             assert Contact.objects.count() == threshold
             # The IP should now be banned using our settings
-            ip = IpAddress.objects.get(ip=contact.ip)
+            network_rule = NetworkRule.objects.get(ip=contact.ip)
             expected_end_date = date.today() + timedelta(
                 days=ban_settings["duration_in_days"]
             )
-            assert ip.is_blacklisted
-            assert ip.expires_on == expected_end_date
+            assert network_rule.is_blacklisted
+            assert network_rule.expires_on == expected_end_date
             # Any new request should fail due to the ban
             response = self.client.post(self.service_base_url, self.payload)
             assert response.status_code == 403

@@ -13,7 +13,7 @@ from django.utils import timezone
 # Personal
 from jklib.django.db.fields import RequiredField, TrimCharField, TrimTextField
 from jklib.django.db.models import LifeCycleModel
-from jklib.django.db.validators import length_validator
+from jklib.django.db.validators import LengthValidator
 from jklib.django.utils.emails import send_html_email_async
 from jklib.django.utils.settings import get_config
 
@@ -80,18 +80,18 @@ class Contact(LifeCycleModel):
     name = RequiredField(
         TrimCharField,
         max_length=NAME_LENGTH[1],
-        validators=[length_validator(*NAME_LENGTH)],
+        validators=[LengthValidator(*NAME_LENGTH)],
         verbose_name="Name",
     )
     email = RequiredField(EmailField, verbose_name="Email")
     subject = RequiredField(
         TrimCharField,
         max_length=SUBJECT_LENGTH[1],
-        validators=[length_validator(*SUBJECT_LENGTH)],
+        validators=[LengthValidator(*SUBJECT_LENGTH)],
         verbose_name="Subject",
     )
     body = RequiredField(
-        TrimTextField, validators=[length_validator(*BODY_LENGTH)], verbose_name="Body",
+        TrimTextField, validators=[LengthValidator(*BODY_LENGTH)], verbose_name="Body",
     )
 
     # ----------------------------------------

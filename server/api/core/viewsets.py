@@ -5,31 +5,31 @@ from jklib.django.drf.permissions import IsAdminUser
 from jklib.django.drf.viewsets import DynamicViewSet
 
 # Application
-from api.core.models import IpAddress
+from api.core.models import NetworkRule
 
 # Local
 # --------------------------------------------------------------------------------
 # > ViewSets
 # --------------------------------------------------------------------------------
-from ..contact.actions import BulkDestroyContactsHandler
 from .actions import (
-    BlacklistExistingIpHandler,
-    BlacklistNewIpHandler,
-    ClearAllIpsHandler,
-    ClearIpHandler,
-    CreateIpHandler,
-    DestroyIpHandler,
-    ListIpHandler,
-    RetrieveIpHandler,
-    UpdateIpHandler,
-    WhitelistExistingIpHandler,
-    WhitelistNewIpHandler,
+    BlacklistNetworkRuleHandler,
+    BulkDestroyNetworkRulesHandler,
+    ClearAllNetworkRulesHandler,
+    ClearNetworkRuleHandler,
+    CreateNetworkRuleHandler,
+    DestroyNetworkRuleHandler,
+    ListNetworkRulesHandler,
+    NewBlacklistNetworkRuleHandler,
+    NewWhitelistNetworkRuleHandler,
+    RetrieveNetworkRuleHandler,
+    UpdateNetworkRuleHandler,
+    WhitelistNetworkRuleHandler,
 )
 
 
-class IpViewSet(DynamicViewSet):
+class NetworkRuleViewSet(DynamicViewSet):
     """
-    Viewset for the IpAddress models.
+    Viewset for the NetworkRule models.
     Services can be split into the following categories:
         Classic model CRUD
         Additional CRUD
@@ -38,34 +38,34 @@ class IpViewSet(DynamicViewSet):
         IP clearing
     """
 
-    queryset = IpAddress.objects.all()
+    queryset = NetworkRule.objects.all()
 
     viewset_permissions = (IsAdminUser,)
 
     known_actions = {
         "create": {
-            "description": "Registers a new IP",
-            "handler": CreateIpHandler,
+            "description": "Registers a new network rule",
+            "handler": CreateNetworkRuleHandler,
             "permissions": None,
         },
         "list": {
-            "description": "List all existing IPs",
-            "handler": ListIpHandler,
+            "description": "List all existing network rules",
+            "handler": ListNetworkRulesHandler,
             "permissions": None,
         },
         "retrieve": {
-            "description": "Fetches an existing IP",
-            "handler": RetrieveIpHandler,
+            "description": "Fetches an existing network rule",
+            "handler": RetrieveNetworkRuleHandler,
             "permissions": None,
         },
         "update": {
-            "description": "Updates an existing IP",
-            "handler": UpdateIpHandler,
+            "description": "Updates an existing network rule",
+            "handler": UpdateNetworkRuleHandler,
             "permissions": None,
         },
         "destroy": {
-            "description": "Deletes an existing IP",
-            "handler": DestroyIpHandler,
+            "description": "Deletes an existing network rule",
+            "handler": DestroyNetworkRuleHandler,
             "permissions": None,
         },
     }
@@ -73,8 +73,8 @@ class IpViewSet(DynamicViewSet):
     extra_actions = {
         # Additional CRUD
         "bulk_destroy": {
-            "description": "Deletes several IPs instances at once",
-            "handler": BulkDestroyContactsHandler,
+            "description": "Deletes several network rules instances at once",
+            "handler": BulkDestroyNetworkRulesHandler,
             "permissions": None,
             "methods": ["delete"],
             "url_path": "bulk_destroy",
@@ -82,16 +82,16 @@ class IpViewSet(DynamicViewSet):
         },
         # Blacklist
         "blacklist_new": {
-            "description": "Creates and blacklists an IP",
-            "handler": BlacklistNewIpHandler,
+            "description": "Creates a network rule to blacklist an IP",
+            "handler": NewBlacklistNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
             "url_path": "blacklist",
             "detail": False,
         },
         "blacklist_existing": {
-            "description": "Blacklists an existing IP",
-            "handler": BlacklistExistingIpHandler,
+            "description": "Updates a network rule to blacklist an IP",
+            "handler": BlacklistNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
             "url_path": "blacklist",
@@ -99,16 +99,16 @@ class IpViewSet(DynamicViewSet):
         },
         # Whitelist
         "whitelist_new": {
-            "description": "Creates and whitelists an IP",
-            "handler": WhitelistNewIpHandler,
+            "description": "Creates a network rule to whitelist an IP",
+            "handler": NewWhitelistNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
             "url_path": "whitelist",
             "detail": False,
         },
         "whitelist_existing": {
-            "description": "Whitelists an existing IP",
-            "handler": WhitelistExistingIpHandler,
+            "description": "Updates a network rule to whitelist an IP",
+            "handler": WhitelistNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
             "url_path": "whitelist",
@@ -116,16 +116,16 @@ class IpViewSet(DynamicViewSet):
         },
         # Clear
         "clear": {
-            "description": "Clears an existing IP",
-            "handler": ClearIpHandler,
+            "description": "Clears an existing network rule",
+            "handler": ClearNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
             "url_path": "clear",
             "detail": True,
         },
         "clear_all": {
-            "description": "Clears all existing IPs (can be restricted to a specific status)",
-            "handler": ClearAllIpsHandler,
+            "description": "Clears all existing network rules (can be restricted to a specific status)",
+            "handler": ClearAllNetworkRulesHandler,
             "permissions": None,
             "methods": ["post"],
             "url_path": "clear_all",

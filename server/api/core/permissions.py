@@ -4,7 +4,7 @@
 from jklib.django.drf.permissions import ImprovedBasePermission
 
 # Local
-from .models import IpAddress
+from .models import NetworkRule
 
 
 # --------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ class IsBlacklisted(ImprovedBasePermission):
 
     def has_permission(self, request, view):
         """Returns True if IP is blacklisted"""
-        return IpAddress.is_blacklisted_from_request(request)
+        return NetworkRule.is_blacklisted_from_request(request)
 
 
 class IsNotBlacklisted(ImprovedBasePermission):
@@ -23,7 +23,7 @@ class IsNotBlacklisted(ImprovedBasePermission):
 
     def has_permission(self, request, view):
         """Returns True if IP is not blacklisted"""
-        return not IpAddress.is_blacklisted_from_request(request)
+        return not NetworkRule.is_blacklisted_from_request(request)
 
 
 class IsWhitelisted(ImprovedBasePermission):
@@ -31,7 +31,7 @@ class IsWhitelisted(ImprovedBasePermission):
 
     def has_permission(self, request, view):
         """Returns True if IP is whitelisted"""
-        return IpAddress.is_whitelisted_from_request(request)
+        return NetworkRule.is_whitelisted_from_request(request)
 
 
 class IsNotWhitelisted(ImprovedBasePermission):
@@ -39,4 +39,4 @@ class IsNotWhitelisted(ImprovedBasePermission):
 
     def has_permission(self, request, view):
         """Returns True if IP is not whitelisted"""
-        return not IpAddress.is_whitelisted_from_request(request)
+        return not NetworkRule.is_whitelisted_from_request(request)

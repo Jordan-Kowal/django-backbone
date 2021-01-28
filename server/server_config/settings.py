@@ -164,8 +164,8 @@ CONTACT_API_BAN_SETTINGS = {
     "ban_duration": 30,  # days
 }
 
-# IpAddress
-IP_STATUS_DEFAULT_DURATION = 30  # days
+# NetworkRule
+NETWORK_RULE_DEFAULT_DURATION = 30  # days
 
 
 # --------------------------------------------------------------------------------

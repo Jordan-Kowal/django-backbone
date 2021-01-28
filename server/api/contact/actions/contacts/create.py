@@ -14,7 +14,7 @@ from jklib.django.drf.serializers import ImprovedSerializer, required
 from jklib.django.utils.network import get_client_ip
 
 # Application
-from api.core.models import IpAddress
+from api.core.models import NetworkRule
 
 # Local
 from ...models import Contact
@@ -74,7 +74,7 @@ class CreateContactHandler(ActionHandler):
             ban_end_date = date.today() + timedelta(
                 days=ban_settings["duration_in_days"]
             )
-            IpAddress.blacklist_from_request(
+            NetworkRule.blacklist_from_request(
                 request=self.request,
                 end_date=ban_end_date,
                 comment="Too many requests in the Contact API",

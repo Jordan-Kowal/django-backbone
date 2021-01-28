@@ -108,7 +108,7 @@ class UserViewSet(DynamicViewSet):
     extra_actions = {
         # ---------- Additional crud ----------
         "bulk_destroy": {
-            "description": "Deletes several Contact instances at once",
+            "description": "Deletes several User instances at once",
             "handler": BulkDestroyUsersHandler,
             "permissions": (IsAdminUser,),
             "methods": ["delete"],
