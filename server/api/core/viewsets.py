@@ -8,23 +8,67 @@ from jklib.django.drf.viewsets import DynamicViewSet
 from api.core.models import NetworkRule
 
 # Local
-# --------------------------------------------------------------------------------
-# > ViewSets
-# --------------------------------------------------------------------------------
 from .actions import (
+    ApiHealthCheckHandler,
     BlacklistNetworkRuleHandler,
     BulkDestroyNetworkRulesHandler,
+    CacheHealthCheckHandler,
     ClearAllNetworkRulesHandler,
     ClearNetworkRuleHandler,
     CreateNetworkRuleHandler,
+    DatabaseHealthCheckHandler,
     DestroyNetworkRuleHandler,
     ListNetworkRulesHandler,
+    MigrationsHealthCheckHandler,
     NewBlacklistNetworkRuleHandler,
     NewWhitelistNetworkRuleHandler,
     RetrieveNetworkRuleHandler,
     UpdateNetworkRuleHandler,
     WhitelistNetworkRuleHandler,
 )
+
+
+# --------------------------------------------------------------------------------
+# > ViewSets
+# --------------------------------------------------------------------------------
+class HealthCheckViewSet(DynamicViewSet):
+    """
+    Various healthcheck endpoints that can be pinged to make sure services are up and running
+    Every call will be logged into the HealthcheckLog model
+    """
+
+    viewset_permissions = (IsAdminUser,)
+
+    extra_actions = {
+        "api": {
+            "description": "Checks if the API is up and running",
+            "handler": ApiHealthCheckHandler,
+            "permissions": None,
+            "methods": ["get"],
+            "detail": False,
+        },
+        "cache": {
+            "description": "Checks if the cache is working",
+            "handler": CacheHealthCheckHandler,
+            "permissions": None,
+            "methods": ["get"],
+            "detail": False,
+        },
+        "database": {
+            "description": "Checks if the database is up and working",
+            "handler": DatabaseHealthCheckHandler,
+            "permissions": None,
+            "methods": ["get"],
+            "detail": False,
+        },
+        "migrations": {
+            "description": "Checks if all migrations have been run",
+            "handler": MigrationsHealthCheckHandler,
+            "permissions": None,
+            "methods": ["get"],
+            "detail": False,
+        },
+    }
 
 
 class NetworkRuleViewSet(DynamicViewSet):

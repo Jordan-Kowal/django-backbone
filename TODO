@@ -6,14 +6,17 @@
 #### General
 - Normalize app names
 - Review settings structure to better identify app settings
+- Remove url path if not necessary
+- Ajouter verbose name partout sur les champs model
+- add security logger for ip bans and auth fail
 
 #### Core
+- clean up log file too big
 - Healthcheck services:
-    - api
-    - cache
-    - storage
-    - migrations
-    - see https://github.com/KristianOellegaard/django-health-check
+    - api+test
+    - cache+test
+    - storage+test
+    - migrations+test
 
 #### Users API
 - Add model to log auth attempts (fail, success, IP, datetime, user if known)
@@ -55,4 +58,5 @@
 - CRON package
    - Setup NetworkRule automatic clear cron
    - Setup Contact cleanup cron
+   - Setup log file cleanup
 - Test runner

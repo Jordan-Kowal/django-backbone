@@ -1,6 +1,12 @@
 """Centralizes the ActionHandler classes for easier imports"""
 
 # Local
+from .health_checks import (
+    ApiHealthCheckHandler,
+    CacheHealthCheckHandler,
+    DatabaseHealthCheckHandler,
+    MigrationsHealthCheckHandler,
+)
 from .network_rules import (
     BlacklistNetworkRuleHandler,
     BulkDestroyNetworkRulesHandler,

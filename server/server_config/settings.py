@@ -167,6 +167,61 @@ CONTACT_API_BAN_SETTINGS = {
 # NetworkRule
 NETWORK_RULE_DEFAULT_DURATION = 30  # days
 
+LOG_ROOT = os.path.join(BASE_DIR, "logs/")
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "{asctime} {levelname} {message}", "style": "{",},
+        "verbose": {
+            "format": "{asctime} {levelname} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+    },
+    "filters": {},
+    "handlers": {
+        # Outputs everything in the stderr
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        # File to log detailed debug messages
+        "debug_filer": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOG_ROOT, "debug.log"),
+        },
+        # Default file logger for generic information
+        "default_filer": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "simple",
+            "filename": os.path.join(LOG_ROOT, "console.log"),
+        },
+        # File specifically for healthcheck messages
+        "healthcheck_filer": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "simple",
+            "filename": os.path.join(LOG_ROOT, "healthchecks.log"),
+        },
+    },
+    "loggers": {
+        "debugger": {
+            "handlers": ["console", "debug_filer"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "default": {"handlers": ["default_filer"], "level": "INFO", "propagate": True,},
+        "healthcheck": {
+            "handlers": ["healthcheck_filer"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}
 
 # --------------------------------------------------------------------------------
 # > Local settings
