@@ -27,27 +27,6 @@ class TestProfile(ModelTestCase):
     model_class = Profile
 
     # ----------------------------------------
-    # Behavior
-    # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Not implemented"""
-        pass
-
-    def setUp(self):
-        """Not implemented"""
-        pass
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
-
-    # ----------------------------------------
     # Field tests
     # ----------------------------------------
     def test_required_fields(self):

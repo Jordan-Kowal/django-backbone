@@ -2,7 +2,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -26,11 +25,6 @@ class TestCreateUser(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Stores a default user and creates a valid payload"""
         self.default_user = self.generate_random_user_data()
@@ -41,15 +35,6 @@ class TestCreateUser(ActionTestCase):
             "password": self.default_user["password"],
             "confirm_password": self.default_user["password"],
         }
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

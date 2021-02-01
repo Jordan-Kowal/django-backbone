@@ -3,7 +3,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -23,26 +22,12 @@ class TestDestroyUser(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates 2 users (1 admin and 1 normal)"""
         self.admin = self.create_admin_user()
         self.admin_detail_url = self.detail_url(self.admin.id)
         self.user = self.create_user()
         self.user_detail_url = self.detail_url(self.user.id)
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

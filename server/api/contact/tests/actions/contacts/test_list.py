@@ -1,9 +1,5 @@
 """TestCase for the 'list' action"""
 
-
-# Django
-from rest_framework.test import APIClient
-
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
@@ -24,24 +20,10 @@ class TestDestroyContact(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates 1 admin and 1 user"""
         self.user = self.create_user()
         self.admin = self.create_admin_user()
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

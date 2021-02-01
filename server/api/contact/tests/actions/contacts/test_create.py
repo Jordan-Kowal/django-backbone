@@ -6,7 +6,6 @@ from time import sleep
 
 # Django
 from django.core import mail
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -38,11 +37,6 @@ class TestCreateContact(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates a normal and admin user, and prepares a valid payload"""
         self.user = self.create_user()
@@ -54,15 +48,6 @@ class TestCreateContact(ActionTestCase):
             "body": self.generate_random_string(10, " ", 10, " ", 10),
             "notify_user": False,
         }
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

@@ -1,8 +1,5 @@
 """Shared classes, functions, and constants for healthcheck services tests"""
 
-# Django
-from rest_framework.test import APIClient
-
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
@@ -35,12 +32,6 @@ class HealthcheckTestCase(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-        super(HealthcheckTestCase, cls).setUpClass()
-
     def setUp(self):
         """Creates an admin and normal user"""
         self.admin = self.create_admin_user()

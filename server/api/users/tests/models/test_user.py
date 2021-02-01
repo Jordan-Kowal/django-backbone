@@ -25,23 +25,9 @@ class TestUser(ModelTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Not implemented"""
-        pass
-
     def setUp(self):
         """Generates random data that can be used to create a User"""
         self.payload = self.generate_random_user_data()
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

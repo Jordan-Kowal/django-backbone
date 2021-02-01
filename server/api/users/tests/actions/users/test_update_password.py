@@ -2,7 +2,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -26,26 +25,12 @@ class TestUpdatePassword(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Generates 1 user with a predefined password"""
         self.user_password = self.generate_random_string(20)
         self.user = self.create_user(password=self.user_password)
         self.user_url = self.detail_url(self.user.id)
         self._generate_valid_payload()
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

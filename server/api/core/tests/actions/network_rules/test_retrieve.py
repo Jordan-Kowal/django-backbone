@@ -1,9 +1,5 @@
 """TestCase for the 'retrieve' action"""
 
-
-# Django
-from rest_framework.test import APIClient
-
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
@@ -29,11 +25,6 @@ class TestRetrieveNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates and authenticates an Admin user, and creates 2 NetworkRule instances"""
         self.admin = self.create_admin_user(authenticate=True)
@@ -41,15 +32,6 @@ class TestRetrieveNetworkRule(ActionTestCase):
         self.second_rule = create_network_rule(ip="127.0.0.2")
         self.first_rule_url = self.detail_url(self.first_rule.id)
         self.second_rule_url = self.detail_url(self.second_rule.id)
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

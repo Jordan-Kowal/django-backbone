@@ -6,7 +6,6 @@ from time import sleep
 # Django
 from django.contrib.auth.models import User
 from django.core import mail
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -31,23 +30,14 @@ class TestRequestPasswordReset(ActionTestCase):
     # ----------------------------------------
     @classmethod
     def setUpClass(cls):
-        """Sets up the API client and the token type"""
-        cls.client = APIClient()
+        """Sets up the token type"""
         cls.token_type, _ = Profile.RESET_TOKEN
+        super(TestRequestPasswordReset, cls).setUpClass()
 
     def setUp(self):
         """Creates 1 basic user"""
         self.user = self.create_user()
         self.payload = {"email": self.user.email}
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

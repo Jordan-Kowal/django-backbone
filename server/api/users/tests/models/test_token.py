@@ -34,11 +34,6 @@ class TestToken(ModelTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Not implemented"""
-        pass
-
     def setUp(self):
         """Creates a user and a payload that can be used for creating a token"""
         self.user = self.create_user()
@@ -51,15 +46,6 @@ class TestToken(ModelTestCase):
             "used_at": None,
             "is_active_token": True,
         }
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Fields Tests

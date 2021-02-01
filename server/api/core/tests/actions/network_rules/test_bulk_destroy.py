@@ -1,9 +1,5 @@
 """TestCase for the 'bulk_destroy' action"""
 
-
-# Django
-from rest_framework.test import APIClient
-
 # Personal
 from jklib.django.db.queries import get_object_or_none
 from jklib.django.drf.tests import ActionTestCase
@@ -25,26 +21,12 @@ class TestBulkDestroyNetworkRules(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates 1 admin, a valid payload, and 10 NetworkRule instances"""
         self.admin = self.create_admin_user()
         self.payload = {"ids": [1, 2]}
         for i in range(1, 11):
             create_network_rule(ip=f"127.0.0.1{i}")
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

@@ -2,7 +2,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -24,25 +23,11 @@ class TestUpdateUser(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates 2 user (1 admin and 1 normal) and generates a valid payload"""
         self._generate_users()
         self._generate_payloads()
         assert User.objects.count() == 2
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Shared tests

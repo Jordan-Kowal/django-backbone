@@ -3,7 +3,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.db.queries import get_object_or_none
@@ -25,26 +24,12 @@ class TestDestroyManyUsers(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates 1 admin, a valid payload, and 9 other User instances"""
         self.admin = self.create_admin_user()
         self.payload = {"ids": [3, 4]}
         for i in range(9):
             self.create_user()
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

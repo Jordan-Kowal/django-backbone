@@ -2,7 +2,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -18,27 +17,6 @@ class TestListUsers(ActionTestCase):
     """TestCase for the 'list' action"""
 
     service_base_url = f"{USER_SERVICE_URL}/"
-
-    # ----------------------------------------
-    # Behavior
-    # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
-    def setUp(self):
-        """Not implemented"""
-        pass
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

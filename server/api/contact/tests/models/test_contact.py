@@ -43,11 +43,6 @@ class TestContact(ModelTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Not implemented"""
-        pass
-
     def setUp(self):
         """Creates a valid payload for a Contact instance"""
         self.payload = {
@@ -58,15 +53,6 @@ class TestContact(ModelTestCase):
             "subject": "Fake subject",
             "body": "Fake body but long enough",
         }
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Field tests

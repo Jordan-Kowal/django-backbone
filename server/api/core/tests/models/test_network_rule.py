@@ -37,11 +37,6 @@ class TestNetworkRule(ModelTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Not implemented"""
-        pass
-
     def setUp(self):
         """Creates a valid payload for a NetworkRule"""
         self.payload = {
@@ -51,15 +46,6 @@ class TestNetworkRule(ModelTestCase):
             "active": False,
             "comment": "Created on setUp",
         }
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Field tests

@@ -2,7 +2,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -24,11 +23,6 @@ class TestOverridePassword(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Generates 1 user and 1 admin with predefined passwords and 1 valid payload"""
         # Admin
@@ -45,15 +39,6 @@ class TestOverridePassword(ActionTestCase):
             "password": self.password,
             "confirm_password": self.password,
         }
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

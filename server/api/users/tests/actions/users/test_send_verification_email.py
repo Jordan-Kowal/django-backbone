@@ -1,8 +1,5 @@
 """TestCase for the 'send_verification_email' action"""
 
-# Django
-from rest_framework.test import APIClient
-
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
@@ -26,23 +23,14 @@ class TestSendVerificationEmail(ActionTestCase):
     # ----------------------------------------
     @classmethod
     def setUpClass(cls):
-        """Sets up the API client and the token type"""
-        cls.client = APIClient()
+        """Sets up the token type"""
         cls.token_type, _ = Profile.VERIFY_TOKEN
+        super(TestSendVerificationEmail, cls).setUpClass()
 
     def setUp(self):
         """Creates 1 basic user"""
         self.user = self.create_user()
         self.user_url = self.detail_url(self.user.id)
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

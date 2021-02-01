@@ -2,7 +2,6 @@
 
 # Django
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -31,9 +30,9 @@ class TestPerformPasswordReset(ActionTestCase):
     # ----------------------------------------
     @classmethod
     def setUpClass(cls):
-        """Sets up the API client and the token type"""
-        cls.client = APIClient()
+        """Sets up the token type"""
         cls.token_type, _ = Profile.RESET_TOKEN
+        super(TestPerformPasswordReset, cls).setUpClass()
 
     def setUp(self):
         """Creates 1 basic user, 1 reset token for this user, and a valid payload for the service"""
@@ -53,15 +52,6 @@ class TestPerformPasswordReset(ActionTestCase):
             "confirm_new_password": new_password,
             "token": token_value,
         }
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

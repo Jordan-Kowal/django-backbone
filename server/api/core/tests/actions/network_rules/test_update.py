@@ -1,8 +1,5 @@
 """TestCase for the 'update' action"""
 
-# Django
-from rest_framework.test import APIClient
-
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
@@ -33,11 +30,6 @@ class TestUpdateNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """
         Prepares the following elements
@@ -55,15 +47,6 @@ class TestUpdateNetworkRule(ActionTestCase):
             "active": False,
             "comment": "Test comment",
         }
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

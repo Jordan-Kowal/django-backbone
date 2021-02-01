@@ -1,9 +1,7 @@
 """TestCase for the 'verify' action"""
 
 # Django
-from django.conf import settings
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
@@ -26,22 +24,13 @@ class TestVerifyUser(ActionTestCase):
     # ----------------------------------------
     @classmethod
     def setUpClass(cls):
-        """Sets up the API client and the token type"""
-        cls.client = APIClient()
+        """Sets up the token type"""
         cls.token_type, _ = Profile.VERIFY_TOKEN
+        super(TestVerifyUser, cls).setUpClass()
 
     def setUp(self):
         """Creates 1 basic user"""
         self.user = self.create_user()
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

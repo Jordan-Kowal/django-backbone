@@ -3,9 +3,6 @@
 # Built-in
 from datetime import date, timedelta
 
-# Django
-from rest_framework.test import APIClient
-
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
@@ -32,25 +29,11 @@ class TestClearAllNetworkRules(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates and authenticates an Admin user and generates a bunch of NetworkRule instances"""
         self.admin = self.create_admin_user(authenticate=True)
         self.payload = {"status": None}
         self._generate_all_instances()
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests

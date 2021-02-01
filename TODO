@@ -4,17 +4,10 @@
 - Update README.md
 
 #### General
-- Normalize app names
 - Review settings structure to better identify app settings
 - Remove url path if not necessary
 - Ajouter verbose name partout sur les champs model
 - add security logger for ip bans and auth fail
-- Update tests
-    - Do not override or call super() for the main 4 methods
-    - Load data using another method?
-    - update jklib setup/teardown
-    - cleanup setup/teardown of test
-
 
 #### Users API
 - Add model to log auth attempts (fail, success, IP, datetime, user if known)

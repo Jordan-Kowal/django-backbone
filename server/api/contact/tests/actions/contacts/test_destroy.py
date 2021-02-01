@@ -1,9 +1,5 @@
 """TestCase for the 'destroy' action"""
 
-
-# Django
-from rest_framework.test import APIClient
-
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
@@ -24,11 +20,6 @@ class TestDestroyContact(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        """Sets up the API client"""
-        cls.client = APIClient()
-
     def setUp(self):
         """Creates 1 admin, 1 user, and 2 contact instances"""
         self.user = self.create_user()
@@ -37,15 +28,6 @@ class TestDestroyContact(ActionTestCase):
         self.contact_1_url = self.detail_url(self.contact_1.id)
         self.contact_2 = create_contact()
         self.contact_2_url = self.detail_url(self.contact_2.id)
-
-    def tearDown(self):
-        """Not implemented"""
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
-        """Not implemented"""
-        pass
 
     # ----------------------------------------
     # Tests
