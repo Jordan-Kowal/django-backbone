@@ -50,7 +50,6 @@ class AuthViewSet(DynamicViewSet):
             "handler": LoginHandler,
             "permissions": (IsNotAuthenticated,),
             "methods": ["post"],
-            "url_path": "login",
             "detail": False,
         },
         "logout": {
@@ -58,7 +57,6 @@ class AuthViewSet(DynamicViewSet):
             "handler": LogoutHandler,
             "permissions": (IsAuthenticated,),
             "methods": ["post"],
-            "url_path": "logout",
             "detail": False,
         },
     }
@@ -112,7 +110,6 @@ class UserViewSet(DynamicViewSet):
             "handler": BulkDestroyUsersHandler,
             "permissions": (IsAdminUser,),
             "methods": ["delete"],
-            "url_path": "bulk_destroy",
             "detail": False,
         },
         "update_password": {
@@ -120,7 +117,6 @@ class UserViewSet(DynamicViewSet):
             "handler": UpdatePasswordHandler,
             "permissions": (IsObjectOwner,),
             "methods": ["post"],
-            "url_path": "update_password",
             "detail": True,
         },
         "override_password": {
@@ -128,7 +124,6 @@ class UserViewSet(DynamicViewSet):
             "handler": OverridePasswordHandler,
             "permissions": (IsAdminUser,),
             "methods": ["post"],
-            "url_path": "override_password",
             "detail": True,
         },
         # ---------- Verification ----------
@@ -137,7 +132,6 @@ class UserViewSet(DynamicViewSet):
             "handler": SendVerificationEmailHandler,
             "permissions": (IsAdminOrOwner, IsNotVerified),
             "methods": ["post"],
-            "url_path": "send_verification_email",
             "detail": True,
         },
         "verify": {
@@ -145,7 +139,6 @@ class UserViewSet(DynamicViewSet):
             "handler": VerifyHandler,
             "permissions": (AllowAny,),
             "methods": ["post"],
-            "url_path": "verify",
             "detail": False,
         },
         # ---------- Password reset ----------
@@ -154,7 +147,6 @@ class UserViewSet(DynamicViewSet):
             "handler": RequestPasswordResetHandler,
             "permissions": (IsNotAuthenticated,),
             "methods": ["post"],
-            "url_path": "request_password_reset",
             "detail": False,
         },
         "perform_password_reset": {
@@ -162,7 +154,6 @@ class UserViewSet(DynamicViewSet):
             "handler": PerformPasswordResetHandler,
             "permissions": (IsNotAuthenticated,),
             "methods": ["post"],
-            "url_path": "perform_password_reset",
             "detail": False,
         },
     }

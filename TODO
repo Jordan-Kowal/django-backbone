@@ -4,9 +4,8 @@
 - Update README.md
 
 #### General
-- Review settings structure to better identify app settings
-- Remove url path if not necessary
 - Ajouter verbose name partout sur les champs model
+- Review settings structure to better identify app settings
 - add security logger for ip bans and auth fail
 
 #### Users API

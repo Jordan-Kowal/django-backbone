@@ -60,7 +60,6 @@ class ContactViewset(DynamicViewSet):
             "handler": BulkDestroyContactsHandler,
             "permissions": (IsAdminUser,),
             "methods": ["delete"],
-            "url_path": "bulk_destroy",
             "detail": False,
         },
     }

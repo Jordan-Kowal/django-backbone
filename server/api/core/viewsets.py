@@ -121,7 +121,6 @@ class NetworkRuleViewSet(DynamicViewSet):
             "handler": BulkDestroyNetworkRulesHandler,
             "permissions": None,
             "methods": ["delete"],
-            "url_path": "bulk_destroy",
             "detail": False,
         },
         # Blacklist
@@ -130,16 +129,16 @@ class NetworkRuleViewSet(DynamicViewSet):
             "handler": NewBlacklistNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
-            "url_path": "blacklist",
             "detail": False,
+            "url_path": "blacklist",
         },
         "blacklist_existing": {
             "description": "Updates a network rule to blacklist an IP",
             "handler": BlacklistNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
-            "url_path": "blacklist",
             "detail": True,
+            "url_path": "blacklist",
         },
         # Whitelist
         "whitelist_new": {
@@ -147,16 +146,16 @@ class NetworkRuleViewSet(DynamicViewSet):
             "handler": NewWhitelistNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
-            "url_path": "whitelist",
             "detail": False,
+            "url_path": "whitelist",
         },
         "whitelist_existing": {
             "description": "Updates a network rule to whitelist an IP",
             "handler": WhitelistNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
-            "url_path": "whitelist",
             "detail": True,
+            "url_path": "whitelist",
         },
         # Clear
         "clear": {
@@ -164,7 +163,6 @@ class NetworkRuleViewSet(DynamicViewSet):
             "handler": ClearNetworkRuleHandler,
             "permissions": None,
             "methods": ["post"],
-            "url_path": "clear",
             "detail": True,
         },
         "clear_all": {
@@ -172,7 +170,6 @@ class NetworkRuleViewSet(DynamicViewSet):
             "handler": ClearAllNetworkRulesHandler,
             "permissions": None,
             "methods": ["post"],
-            "url_path": "clear_all",
             "detail": False,
         },
     }
