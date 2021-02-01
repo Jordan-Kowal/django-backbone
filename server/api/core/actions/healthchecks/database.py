@@ -7,14 +7,14 @@ from secrets import token_urlsafe
 from django.core.exceptions import FieldError, ObjectDoesNotExist
 
 # Local
-from ...models import HealthCheckDummy
-from ._shared import HealthCheckHandler, Service
+from ...models import HealthcheckDummy
+from ._shared import HealthcheckHandler, Service
 
 
 # --------------------------------------------------------------------------------
 # > Handler
 # --------------------------------------------------------------------------------
-class DatabaseHealthCheckHandler(HealthCheckHandler):
+class DatabaseHealthcheckHandler(HealthcheckHandler):
     """Performs an insert, update, and delete operation to test the database"""
 
     service = Service.DATABASE
@@ -39,39 +39,39 @@ class DatabaseHealthCheckHandler(HealthCheckHandler):
     # ----------------------------------------
     def _create_model(self):
         """
-        Tries to create a HealthCheckDummy instance and stores it in our state
+        Tries to create a HealthcheckDummy instance and stores it in our state
         :raises LookupError: If we failed to create the model
         """
-        self.instance = HealthCheckDummy.objects.create(content=self.content)
+        self.instance = HealthcheckDummy.objects.create(content=self.content)
         if self.instance is None:
-            raise LookupError("Failed to create the HealthCheckDummy instance")
+            raise LookupError("Failed to create the HealthcheckDummy instance")
 
     def _fetch_model(self):
         """
-        Tries to fetch the recently created HealthCheckDummy instance
+        Tries to fetch the recently created HealthcheckDummy instance
         :raises ObjectDoesNotExist: If we failed to fetch the instance
         :raises FieldError: If the instance does not have the right 'content' value
         """
-        fetched_instance = HealthCheckDummy.objects.get(pk=self.instance.id)
+        fetched_instance = HealthcheckDummy.objects.get(pk=self.instance.id)
         if fetched_instance is None:
             raise ObjectDoesNotExist(
-                "Failed to fetch the created HealthCheckDummy instance"
+                "Failed to fetch the created HealthcheckDummy instance"
             )
         if fetched_instance.content != self.content:
             raise FieldError(
-                "Unexpected field value for the fetched HealthCheckDummy instance"
+                "Unexpected field value for the fetched HealthcheckDummy instance"
             )
 
     @staticmethod
     def _delete_models():
         """
-        Tries to delete all existing HealthCheckDummy instances.
+        Tries to delete all existing HealthcheckDummy instances.
         Because the previous healthcheck might have failed before this step
         we delete all instances to avoid having remnants from previous healthchecks
         :raises RuntimeError: If there are still instances after the mass deletion
         """
-        HealthCheckDummy.objects.all().delete()
-        if HealthCheckDummy.objects.count() > 0:
+        HealthcheckDummy.objects.all().delete()
+        if HealthcheckDummy.objects.count() > 0:
             raise RuntimeError(
-                "Failed to properly delete all HealthCheckDummy instances"
+                "Failed to properly delete all HealthcheckDummy instances"
             )

@@ -1,13 +1,13 @@
 """Handler for the api healthcheck"""
 
 # Local
-from ._shared import HealthCheckHandler, Service
+from ._shared import HealthcheckHandler, Service
 
 
 # --------------------------------------------------------------------------------
 # > Handler
 # --------------------------------------------------------------------------------
-class ApiHealthCheckHandler(HealthCheckHandler):
+class ApiHealthcheckHandler(HealthcheckHandler):
     """
     The API health check consists of making sure the API is responding.
     No specific processing is required here since we are already testing it by being here.

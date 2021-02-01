@@ -7,13 +7,13 @@ from secrets import token_urlsafe
 from django.core.cache import cache
 
 # Local
-from ._shared import HealthCheckHandler, Service
+from ._shared import HealthcheckHandler, Service
 
 
 # --------------------------------------------------------------------------------
 # > Handler
 # --------------------------------------------------------------------------------
-class CacheHealthCheckHandler(HealthCheckHandler):
+class CacheHealthcheckHandler(HealthcheckHandler):
     """Checks the cache is working properly by setting, fetching, and removing a key/value pair"""
 
     service = Service.CACHE

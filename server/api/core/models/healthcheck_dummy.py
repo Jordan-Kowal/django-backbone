@@ -1,4 +1,4 @@
-"""HealthCheckDummy"""
+"""HealthcheckDummy"""
 
 # Django
 from django.db.models import CharField, Model
@@ -7,7 +7,7 @@ from django.db.models import CharField, Model
 # --------------------------------------------------------------------------------
 # > Models
 # --------------------------------------------------------------------------------
-class HealthCheckDummy(Model):
+class HealthcheckDummy(Model):
     """
     Dummy model whose sole purpose is to be used during the database healthcheck
     in order to perform write, update, and delete operations
@@ -19,8 +19,8 @@ class HealthCheckDummy(Model):
     class Meta:
         """Meta class to setup our database table"""
 
-        db_table = "core_health_check_dummies"
+        db_table = "core_healthcheck_dummies"
         indexes = []
         ordering = ["-id"]
-        verbose_name = "Health Check Dummy"
-        verbose_name_plural = "Health Check Dummies"
+        verbose_name = "Healthcheck Dummy"
+        verbose_name_plural = "Healthcheck Dummies"

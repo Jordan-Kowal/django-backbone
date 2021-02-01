@@ -1,4 +1,4 @@
-"""Shared utility classes, functions, and constants for the HealthCheck actions"""
+"""Shared utility classes, functions, and constants for the Healthcheck actions"""
 
 # Built-in
 import logging
@@ -29,13 +29,14 @@ class Service(Enum):
 # --------------------------------------------------------------------------------
 # > Actions
 # --------------------------------------------------------------------------------
-class HealthCheckHandler(ActionHandler):
+class HealthcheckHandler(ActionHandler):
     """
     Extends the ActionHandler to add logs after the healthcheck
     Any action inheriting from this class should:
         Set their 'service' attribute correctly
         Their .main() method does not need to return anything
         Their .main() must perform action that would crash IF the service was unhealthy
+    If the service crashes, THIS class will intercept it and return a failed healthcheck
     """
 
     serializer_mode = SerializerMode.NONE

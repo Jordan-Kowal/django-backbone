@@ -168,6 +168,8 @@ CONTACT_API_BAN_SETTINGS = {
 NETWORK_RULE_DEFAULT_DURATION = 30  # days
 
 LOG_ROOT = os.path.join(BASE_DIR, "logs/")
+MAX_SIZE = 2_000_000  # 2Mo
+BACKUP_COUNT = 2
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -189,23 +191,29 @@ LOGGING = {
         # File to log detailed debug messages
         "debug_filer": {
             "level": "DEBUG",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "formatter": "verbose",
             "filename": os.path.join(LOG_ROOT, "debug.log"),
+            "maxBytes": MAX_SIZE,
+            "backupCount": BACKUP_COUNT,
         },
         # Default file logger for generic information
         "default_filer": {
             "level": "INFO",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "formatter": "simple",
             "filename": os.path.join(LOG_ROOT, "console.log"),
+            "maxBytes": MAX_SIZE,
+            "backupCount": BACKUP_COUNT,
         },
         # File specifically for healthcheck messages
         "healthcheck_filer": {
             "level": "INFO",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "formatter": "simple",
             "filename": os.path.join(LOG_ROOT, "healthchecks.log"),
+            "maxBytes": MAX_SIZE,
+            "backupCount": BACKUP_COUNT,
         },
     },
     "loggers": {

@@ -6,13 +6,13 @@ from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
 # Local
-from ._shared import HealthCheckHandler, Service
+from ._shared import HealthcheckHandler, Service
 
 
 # --------------------------------------------------------------------------------
 # > Handler
 # --------------------------------------------------------------------------------
-class MigrationsHealthCheckHandler(HealthCheckHandler):
+class MigrationsHealthcheckHandler(HealthcheckHandler):
     """Checks if all migrations have been applied to our database"""
 
     service = Service.MIGRATIONS

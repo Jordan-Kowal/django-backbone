@@ -9,17 +9,17 @@ from api.core.models import NetworkRule
 
 # Local
 from .actions import (
-    ApiHealthCheckHandler,
+    ApiHealthcheckHandler,
     BlacklistNetworkRuleHandler,
     BulkDestroyNetworkRulesHandler,
-    CacheHealthCheckHandler,
+    CacheHealthcheckHandler,
     ClearAllNetworkRulesHandler,
     ClearNetworkRuleHandler,
     CreateNetworkRuleHandler,
-    DatabaseHealthCheckHandler,
+    DatabaseHealthcheckHandler,
     DestroyNetworkRuleHandler,
     ListNetworkRulesHandler,
-    MigrationsHealthCheckHandler,
+    MigrationsHealthcheckHandler,
     NewBlacklistNetworkRuleHandler,
     NewWhitelistNetworkRuleHandler,
     RetrieveNetworkRuleHandler,
@@ -31,7 +31,7 @@ from .actions import (
 # --------------------------------------------------------------------------------
 # > ViewSets
 # --------------------------------------------------------------------------------
-class HealthCheckViewSet(DynamicViewSet):
+class HealthcheckViewSet(DynamicViewSet):
     """
     Various healthcheck endpoints that can be pinged to make sure services are up and running
     Every call will be logged into the HealthcheckLog model
@@ -42,28 +42,28 @@ class HealthCheckViewSet(DynamicViewSet):
     extra_actions = {
         "api": {
             "description": "Checks if the API is up and running",
-            "handler": ApiHealthCheckHandler,
+            "handler": ApiHealthcheckHandler,
             "permissions": None,
             "methods": ["get"],
             "detail": False,
         },
         "cache": {
             "description": "Checks if the cache is working",
-            "handler": CacheHealthCheckHandler,
+            "handler": CacheHealthcheckHandler,
             "permissions": None,
             "methods": ["get"],
             "detail": False,
         },
         "database": {
             "description": "Checks if the database is up and working",
-            "handler": DatabaseHealthCheckHandler,
+            "handler": DatabaseHealthcheckHandler,
             "permissions": None,
             "methods": ["get"],
             "detail": False,
         },
         "migrations": {
             "description": "Checks if all migrations have been run",
-            "handler": MigrationsHealthCheckHandler,
+            "handler": MigrationsHealthcheckHandler,
             "permissions": None,
             "methods": ["get"],
             "detail": False,

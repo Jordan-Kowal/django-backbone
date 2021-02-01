@@ -10,7 +10,7 @@ from rest_framework import routers
 
 # Local
 from .contact.viewsets import ContactViewset
-from .core.viewsets import HealthCheckViewSet, NetworkRuleViewSet
+from .core.viewsets import HealthcheckViewSet, NetworkRuleViewSet
 from .users.viewsets import AuthViewSet, UserViewSet
 
 # --------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ from .users.viewsets import AuthViewSet, UserViewSet
 router = routers.DefaultRouter()
 
 # Core
-router.register("health_checks", HealthCheckViewSet, "health_checks")
+router.register("healthchecks", HealthcheckViewSet, "healthchecks")
 router.register("network_rules", NetworkRuleViewSet, "network_rules")
 
 # Contact
