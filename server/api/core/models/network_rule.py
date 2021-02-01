@@ -57,17 +57,28 @@ class NetworkRule(LifeCycleModel):
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    ip = RequiredField(GenericIPAddressField, protocol="IPv4", unique=True)
-    status = RequiredField(IntegerField, choices=Status.choices, default=Status.NONE)
+    ip = RequiredField(
+        GenericIPAddressField, protocol="IPv4", unique=True, verbose_name="IP Address",
+    )
+    status = RequiredField(
+        IntegerField,
+        choices=Status.choices,
+        default=Status.NONE,
+        verbose_name="Status",
+        db_index=True,
+    )
     expires_on = DateField(
         blank=True,
         null=True,
         default=None,
         db_index=True,
+        verbose_name="Expires on",
         help_text="Expires at the end of said date",
     )
     active = ActiveField()
-    comment = TrimCharField(max_length=COMMENT_MAX_LENGTH, blank=True)
+    comment = TrimCharField(
+        max_length=COMMENT_MAX_LENGTH, blank=True, verbose_name="Comment"
+    )
 
     # ----------------------------------------
     # Behavior (meta, str, save)

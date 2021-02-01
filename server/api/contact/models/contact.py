@@ -75,7 +75,12 @@ class Contact(LifeCycleModel):
     # ----------------------------------------
     ip = RequiredField(GenericIPAddressField, db_index=True, verbose_name="IP Address",)
     user = ForeignKey(
-        User, on_delete=SET_NULL, null=True, blank=True, related_name="contacts"
+        User,
+        on_delete=SET_NULL,
+        null=True,
+        blank=True,
+        related_name="contacts",
+        verbose_name="User",
     )
     name = RequiredField(
         TrimCharField,

@@ -14,7 +14,7 @@ class HealthcheckDummy(Model):
     and make sure the database is working properly
     """
 
-    content = CharField(max_length=100)
+    content = CharField(max_length=100, verbose_name="Content")
 
     class Meta:
         """Meta class to setup our database table"""

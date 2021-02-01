@@ -65,7 +65,13 @@ class Profile(Model):
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    user = RequiredField(OneToOneField, User, on_delete=CASCADE, related_name="profile")
+    user = RequiredField(
+        OneToOneField,
+        User,
+        on_delete=CASCADE,
+        related_name="profile",
+        verbose_name="User",
+    )
     is_verified = BooleanField(
         blank=True, default=False, null=False, verbose_name="Verified",
     )

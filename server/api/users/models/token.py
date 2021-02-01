@@ -55,11 +55,15 @@ class Token(LifeCycleModel):
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    user = RequiredField(ForeignKeyCascade, User, related_name="tokens")
-    type = RequiredField(CharField, max_length=TYPE_MAX_LENGTH)
-    value = RequiredField(CharField, unique=True, max_length=1000)
-    expired_at = RequiredField(DateTimeField)
-    used_at = DateTimeField(null=True, blank=True)
+    user = RequiredField(
+        ForeignKeyCascade, User, related_name="tokens", verbose_name="User"
+    )
+    type = RequiredField(CharField, max_length=TYPE_MAX_LENGTH, verbose_name="Type")
+    value = RequiredField(
+        CharField, unique=True, max_length=1000, verbose_name="Token value"
+    )
+    expired_at = RequiredField(DateTimeField, verbose_name="Expires at")
+    used_at = DateTimeField(null=True, blank=True, verbose_name="Used at")
     is_active_token = ActiveField()
 
     # ----------------------------------------
