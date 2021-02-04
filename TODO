@@ -4,8 +4,9 @@
 - Update README.md
 
 #### General
-- Review settings structure to better identify app settings
-- add security logger for ip bans and auth fail
+- add security logger for auth fail
+- add security logger for (un)white/blacklisting ip
+- Setup admins
 
 #### Users API
 - Add model to log auth attempts (fail, success, IP, datetime, user if known)

@@ -16,28 +16,14 @@ import os
 import sys
 
 # --------------------------------------------------------------------------------
-# > Directories
+# > Applications
 # --------------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
-
-
-# --------------------------------------------------------------------------------
-# > Applications
-# --------------------------------------------------------------------------------
 # Directories that will be searched for apps
 # sys.path.insert(0, os.path.join(BASE_DIR, "api"))
-
 INSTALLED_APPS = [
-    # --------------------
     # Django
-    # --------------------
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -46,14 +32,10 @@ INSTALLED_APPS = [
     "django.contrib.sitemaps",
     "django.contrib.sites",
     "django.contrib.staticfiles",
-    # --------------------
     # Third-party
-    # --------------------
     "jklib",
     "rest_framework",
-    # --------------------
     # API
-    # --------------------
     "api.core",
     "api.users",
     "api.contact",
@@ -72,26 +54,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "server_config.urls"
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            os.path.join(
-                BASE_DIR, "templates"
-            ),  # The root /template is also searched for templates
-        ],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
 
 WSGI_APPLICATION = "server_config.wsgi.application"
 
@@ -114,11 +76,8 @@ DRF_GLOBAL_PERMISSIONS = None
 
 
 # --------------------------------------------------------------------------------
-# > Password and logins
+# > Passwords and logins
 # --------------------------------------------------------------------------------
-LOGIN_URL = "user_login"
-LOGIN_REDIRECT_URL = "user_account"
-
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -134,42 +93,47 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # --------------------------------------------------------------------------------
-# > Internationalization
+# > Templates and static files
 # --------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
-LANGUAGES = (("en-us", "English"),)
+# https://docs.djangoproject.com/en/2.2/howto/static-files/
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
-# --------------------------------------------------------------------------------
-# > Others
-# --------------------------------------------------------------------------------
-FIRST_DAY_OF_WEEK = 1
-SITE_ID = 1
 EMAIL_CSS = "core/css/emails.css"
 
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            os.path.join(
+                BASE_DIR, "templates"
+            ),  # The root /template is also searched for templates
+        ],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
 
 # --------------------------------------------------------------------------------
-# > Model settings
+# > Logging
 # --------------------------------------------------------------------------------
-# Contact
-CONTACT_RETENTION_DAYS = 30  # days
-CONTACT_API_BAN_SETTINGS = {
-    "max_requests": 3,
-    "day_range": 30,  # days
-    "ban_duration": 30,  # days
-}
-
-# NetworkRule
-NETWORK_RULE_DEFAULT_DURATION = 30  # days
-
+# That folder contains a README.md file, check it out
 LOG_ROOT = os.path.join(BASE_DIR, "logs/")
+
 MAX_SIZE = 2_000_000  # 2Mo
 BACKUP_COUNT = 2
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -188,17 +152,8 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-        # File to log detailed debug messages
-        "debug_filer": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "verbose",
-            "filename": os.path.join(LOG_ROOT, "debug.log"),
-            "maxBytes": MAX_SIZE,
-            "backupCount": BACKUP_COUNT,
-        },
         # Default file logger for generic information
-        "default_filer": {
+        "console.log": {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "simple",
@@ -206,8 +161,17 @@ LOGGING = {
             "maxBytes": MAX_SIZE,
             "backupCount": BACKUP_COUNT,
         },
+        # File to log detailed debug messages
+        "debug.log": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOG_ROOT, "debug.log"),
+            "maxBytes": MAX_SIZE,
+            "backupCount": BACKUP_COUNT,
+        },
         # File specifically for healthcheck messages
-        "healthcheck_filer": {
+        "healthchecks.log": {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "simple",
@@ -215,21 +179,66 @@ LOGGING = {
             "maxBytes": MAX_SIZE,
             "backupCount": BACKUP_COUNT,
         },
+        # File specifically for healthcheck messages
+        "security.log": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "simple",
+            "filename": os.path.join(LOG_ROOT, "security.log"),
+            "maxBytes": MAX_SIZE,
+            "backupCount": BACKUP_COUNT,
+        },
     },
     "loggers": {
         "debugger": {
-            "handlers": ["console", "debug_filer"],
+            "handlers": ["console", "debug.log"],
             "level": "DEBUG",
             "propagate": True,
         },
-        "default": {"handlers": ["default_filer"], "level": "INFO", "propagate": True,},
+        "default": {"handlers": ["console.log"], "level": "INFO", "propagate": True,},
         "healthcheck": {
-            "handlers": ["healthcheck_filer"],
+            "handlers": ["healthchecks.log"],
             "level": "INFO",
             "propagate": True,
         },
+        "security": {"handlers": ["security.log"], "level": "INFO", "propagate": True,},
     },
 }
+
+
+# --------------------------------------------------------------------------------
+# > Internationalization
+# --------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/2.2/topics/i18n/
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+LANGUAGES = (("en-us", "English"),)
+
+
+# --------------------------------------------------------------------------------
+# > Model settings
+# --------------------------------------------------------------------------------
+# Contact
+CONTACT_RETENTION_DAYS = 30  # days
+CONTACT_API_BAN_SETTINGS = {
+    "max_requests": 3,
+    "day_range": 30,  # days
+    "ban_duration": 30,  # days
+}
+
+# NetworkRule
+NETWORK_RULE_DEFAULT_DURATION = 30  # days
+
+
+# --------------------------------------------------------------------------------
+# > Others
+# --------------------------------------------------------------------------------
+FIRST_DAY_OF_WEEK = 1
+SITE_ID = 1
+
 
 # --------------------------------------------------------------------------------
 # > Local settings
