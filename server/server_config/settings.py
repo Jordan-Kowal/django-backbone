@@ -138,9 +138,9 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "simple": {"format": "{asctime} {levelname} {message}", "style": "{",},
+        "simple": {"format": "{asctime} | {levelname} | {message}", "style": "{",},
         "verbose": {
-            "format": "{asctime} {levelname} {module} {process:d} {thread:d} {message}",
+            "format": "{asctime} | {levelname} | {module} | {process:d} | {thread:d} | {message}",
             "style": "{",
         },
     },

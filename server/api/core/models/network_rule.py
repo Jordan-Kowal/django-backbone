@@ -111,16 +111,28 @@ class NetworkRule(LifeCycleModel):
         return get_config("NETWORK_RULE_DEFAULT_DURATION", cls.DEFAULT_DURATION)
 
     @property
+    def computed_status(self):
+        """
+        :return: The current state of the rule based on all its properties
+        :rtype: str
+        """
+        if self.is_blacklisted:
+            return "blacklisted"
+        if self.is_whitelisted:
+            return "whitelisted"
+        return "inactive"
+
+    @property
     def is_blacklisted(self):
         """
         :return: Whether the rule/IP is currently active and blacklisted
         :rtype: bool
         """
-        return (
-            self.active
-            and (self.expires_on >= date.today())
-            and self.status == self.Status.BLACKLISTED
-        )
+        check = self.active and self.status == self.Status.BLACKLISTED
+        if self.expires_on is None:
+            return check
+        else:
+            return check and self.expires_on >= date.today()
 
     @property
     def is_whitelisted(self):
@@ -128,11 +140,11 @@ class NetworkRule(LifeCycleModel):
         :return: Whether the rule/IP is currently active and whitelisted
         :rtype: bool
         """
-        return (
-            self.active
-            and (self.expires_on >= date.today())
-            and self.status == self.Status.WHITELISTED
-        )
+        check = self.active and self.status == self.Status.WHITELISTED
+        if self.expires_on is None:
+            return check
+        else:
+            return check and self.expires_on >= date.today()
 
     # ----------------------------------------
     # API for instance

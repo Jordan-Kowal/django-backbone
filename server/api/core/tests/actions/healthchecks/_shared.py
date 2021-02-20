@@ -47,7 +47,7 @@ class HealthcheckTestCase(ActionTestCase):
         :return: The START of the error message logged in the logfile
         :rtype: str
         """
-        return f"ERROR:healthcheck:Service {self.service} is KO"
+        return f"ERROR:healthcheck:Service {self.service.name} is KO"
 
     @property
     def success_message(self):
@@ -55,7 +55,7 @@ class HealthcheckTestCase(ActionTestCase):
         :return: The COMPLETE success message logged in the logfile
         :rtype: str
         """
-        return f"INFO:healthcheck:Service {self.service} is OK"
+        return f"INFO:healthcheck:Service {self.service.name} is OK"
 
     # ----------------------------------------
     # Tests

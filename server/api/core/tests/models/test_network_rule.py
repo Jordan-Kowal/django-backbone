@@ -109,6 +109,16 @@ class TestNetworkRule(ModelTestCase):
         else:
             assert instance.get_default_duration() == instance.DEFAULT_DURATION
 
+    def test_computed_status(self):
+        """Tests the computed_status works as intended"""
+        instance = self.model_class.objects.create(**self.payload)
+        instance.whitelist(override=True)
+        assert instance.computed_status == "whitelisted"
+        instance.blacklist(override=True)
+        assert instance.computed_status == "blacklisted"
+        instance.clear()
+        assert instance.computed_status == "inactive"
+
     def test_is_blacklisted(self):
         """Tests that a blacklisted rule is correctly flagged as blacklisted"""
         instance = self.model_class.objects.create(**self.payload)

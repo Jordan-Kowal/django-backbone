@@ -4,12 +4,19 @@
 - Update README.md
 
 #### General
-- add security logger for auth fail
-- add security logger for (un)white/blacklisting ip
 - Setup admins
+
+#### Core
+- Update tests so that they check the logger AND stop writing in them for real
+    - network rule actions
+    - network rule methods
+    - contact actions
+- Add tests for logs in network rule models
+- Add test for logs in contact actions
 
 #### Users API
 - Add model to log auth attempts (fail, success, IP, datetime, user if known)
+    - Also write in the logfile
 - Login service that returns session cookie
     - Block consecutive fails
     - log attempts. if mfa, success is logged after step 2m bu failure can be both steps

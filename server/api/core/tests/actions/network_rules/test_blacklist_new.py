@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -40,7 +41,8 @@ class TestNewBlacklistNetworkRule(ActionTestCase):
 
     # ----------------------------------------
     # Tests
-    # ----------------------------------------
+    # ----------------------------------------\
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         user = self.create_user()

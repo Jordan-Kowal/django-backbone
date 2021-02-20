@@ -60,10 +60,10 @@ class HealthcheckHandler(ActionHandler):
         try:
             action_to_run()
         except Exception as error:
-            LOGGER.error(f"Service {self.service} is KO: {error}")
+            LOGGER.error(f"Service {self.service.name} is KO: {error}")
         else:
             code = HTTP_200_OK
-            LOGGER.info(f"Service {self.service} is OK")
+            LOGGER.info(f"Service {self.service.name} is OK")
         finally:
             return Response(None, status=code)
 
