@@ -1,4 +1,5 @@
-"""Actions for the "healthchecks" services"""
+"""Actions for the healthchecks API"""
+
 
 # Local
 from .api import ApiHealthcheckHandler

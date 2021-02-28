@@ -1,4 +1,4 @@
-"""Centralizes the model classes as requested by Django"""
+"""Models for the 'contact' app"""
 
 # Local
 from .contact import Contact

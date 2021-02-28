@@ -1,1 +1,1 @@
-"""Tests for the 'contacts' API services"""
+"""Tests for the contact API"""

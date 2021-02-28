@@ -1,4 +1,4 @@
-"""Config of the app"""
+"""Config for the 'users' app"""
 
 # Django
 from django.apps import AppConfig
@@ -15,4 +15,5 @@ class UsersConfig(AppConfig):
 
     def ready(self):
         """Starts signals at launch"""
+        # Application
         import api.users.signals

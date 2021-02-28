@@ -1,16 +1,11 @@
-"""
-Description:
-    Admin setup for the Contact api and its models
-Admins:
-    ContactAdmin: Custom admin to display the Contact model
-"""
+"""ContactAdmin"""
 
 
 # Django
 from django.contrib import admin
 
-# Local
-from .models import Contact
+# Application
+from api.contact.models import Contact
 
 
 # --------------------------------------------------------------------------------
@@ -80,6 +75,25 @@ class ContactAdmin(admin.ModelAdmin):
     radio_fields = {}
     raw_id_fields = []
     fieldsets = [
-        ["Informations Structurelles", {"fields": ["id", "created_at",],}],
-        ["Contenu", {"fields": ["ip", "name", "email", "subject", "body",],},],
+        [
+            "Informations Structurelles",
+            {
+                "fields": [
+                    "id",
+                    "created_at",
+                ],
+            },
+        ],
+        [
+            "Contenu",
+            {
+                "fields": [
+                    "ip",
+                    "name",
+                    "email",
+                    "subject",
+                    "body",
+                ],
+            },
+        ],
     ]

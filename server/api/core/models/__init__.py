@@ -1,4 +1,4 @@
-"""Centralizes the model classes as requested by Django"""
+"""Models for the 'core' app"""
 
 # Local
 from .healthcheck_dummy import HealthcheckDummy

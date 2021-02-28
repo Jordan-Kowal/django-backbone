@@ -1,20 +1,34 @@
 # TODO
 
-#### Project wide:
+### Project wide:
 - Update README.md
-
-#### General
 - Setup admins
+- Rename server and server_config into django_backbone
 
-#### Core
+### Core
+- Management command to start new app
+- Should only be used to share utilities
+
+### Contact
+- Update tests so that they check the logger AND stop writing in them for real
+- Add test for logs in contact actions
+
+### Healthchecks
+- Create HealthChecks app
+
+### Security
+- Create security app
 - Update tests so that they check the logger AND stop writing in them for real
     - network rule actions
     - network rule methods
-    - contact actions
 - Add tests for logs in network rule models
-- Add test for logs in contact actions
 
-#### Users API
+### Users API
+- Create new User model
+    - Update model and tests
+    - Update actions and tests
+    - Update settings
+    - Update calls throughout the app
 - Add model to log auth attempts (fail, success, IP, datetime, user if known)
     - Also write in the logfile
 - Login service that returns session cookie

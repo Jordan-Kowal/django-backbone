@@ -1,1 +1,1 @@
-"""Tests for the contact models"""
+"""Tests for the 'contact' app models"""

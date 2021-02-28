@@ -1,4 +1,4 @@
-"""Service actions for the 'contacts' API"""
+"""Actions for the contacts API"""
 
 # Local
 from .bulk_destroy import BulkDestroyContactsHandler

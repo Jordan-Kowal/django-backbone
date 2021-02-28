@@ -1,4 +1,4 @@
-"""Centralizes the model classes as requested by Django"""
+"""Models for the 'users' app"""
 
 
 # Local

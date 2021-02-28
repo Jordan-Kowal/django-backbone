@@ -1,4 +1,4 @@
-"""Config of the app"""
+"""Config for the 'contact' app"""
 
 
 # Django

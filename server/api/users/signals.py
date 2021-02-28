@@ -1,10 +1,4 @@
-"""
-Signals for the users API
-We use them to:
-    User: Create a Profile instance linked to our User on creation
-    User: Override the username by the email address on update
-That way, we can use the email address as username and authentication credentials
-"""
+"""Signals for the 'users' app"""
 
 
 # Django

@@ -1,1 +1,1 @@
-"""Tests for the users API 'users' actions"""
+"""Tests for the users API"""

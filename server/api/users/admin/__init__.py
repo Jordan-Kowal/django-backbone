@@ -1,4 +1,4 @@
-"""Centralizes the admin classes as requested by Django"""
+"""Admins for the 'users' app"""
 
 
 # Local

@@ -1,4 +1,4 @@
-"""Users services from the "users" app"""
+"""Actions for the users API"""
 
 # Local
 from .bulk_destroy import BulkDestroyUsersHandler

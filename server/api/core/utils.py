@@ -1,4 +1,4 @@
-"""Utility functions for the core API"""
+"""Utilities for the 'core' app"""
 
 
 # Django

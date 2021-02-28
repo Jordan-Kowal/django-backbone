@@ -1,4 +1,4 @@
-"""Config of the app"""
+"""Config for the 'core' app"""
 
 # Django
 from django.apps import AppConfig
@@ -15,4 +15,5 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         """Starts signals at launch"""
+        # Application
         import api.core.signals

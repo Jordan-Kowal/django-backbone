@@ -1,4 +1,4 @@
-"""Viewsets for the 'users' application"""
+"""Viewsets for the 'users' app"""
 
 # Django
 from django.contrib.auth.models import User

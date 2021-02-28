@@ -1,4 +1,4 @@
-"""Centralizes the ActionHandler classes for easier imports"""
+"""Actions for the 'contact' app"""
 
 # Local
 from .contacts import (

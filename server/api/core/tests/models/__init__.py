@@ -1,1 +1,1 @@
-"""Tests for the core API models"""
+"""Tests for the 'core' app models"""

@@ -1,1 +1,1 @@
-"""Tests for the contact services"""
+"""Tests for the 'contact' app actions"""

@@ -1,4 +1,4 @@
-"""Auth services from the "users" app"""
+"""Actions for the authentication API"""
 
 # Local
 from .login import LoginHandler

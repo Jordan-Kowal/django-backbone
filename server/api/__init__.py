@@ -1,1 +1,1 @@
-"""Django API that uses Django REST framework"""
+"""API through DRF"""

@@ -1,1 +1,1 @@
-"""Tests for the users API models"""
+"""Tests for the 'users' app models"""

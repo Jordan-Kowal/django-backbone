@@ -1,4 +1,4 @@
-"""Viewsets for the 'contact' application"""
+"""Viewsets for the 'contact' app"""
 
 # Django
 from rest_framework.permissions import AllowAny

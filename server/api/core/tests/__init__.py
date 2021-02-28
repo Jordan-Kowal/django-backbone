@@ -1,1 +1,1 @@
-"""Tests for the core API"""
+"""Tests for the 'core' app"""

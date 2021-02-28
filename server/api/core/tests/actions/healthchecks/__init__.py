@@ -1,1 +1,1 @@
-"""Tests for the health check actions"""
+"""Tests for the healthchecks API"""

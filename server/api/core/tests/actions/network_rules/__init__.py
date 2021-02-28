@@ -1,1 +1,1 @@
-"""Tests for the core API 'network_rules' actions"""
+"""Tests for the network_rules API"""

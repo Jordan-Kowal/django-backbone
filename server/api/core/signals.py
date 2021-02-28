@@ -1,4 +1,4 @@
-"""Signals for the 'core' application"""
+"""Signals for the 'core' app"""
 
 # Built-in
 import logging
