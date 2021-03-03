@@ -12,29 +12,36 @@
 - automatic_pre_save_full_clean signals exclude from settings
 - Use settings to disable certain apps
 - Use settings to disable certain services (like users)
+- Rename `api` folder to `apps`
+- Use settings for API routes with defaults
 
 
 ### Core
 - Should only be used to share utilities
 - Add tests for various utilities
 
+
 ### Commands app
 - Make app out of it
 - Command to list all our custom commands
 - Management command to start new app
 
+
 ### Contact
 - Update tests so that they check the logger AND stop writing in them for real
 - Add test for logs in contact actions
 
+
 ### Healthchecks
 - N/A
+
 
 ### Security
 - Update tests so that they check the logger AND stop writing in them for real
     - network rule actions
     - network rule methods
 - Add tests for logs in network rule models
+
 
 ### Users API
 - Create new User model
@@ -64,6 +71,7 @@
 - Logout service that kills current session
 - Status service to know if we are connected and various session info
 
+
 #### Emails
 - Rework css into SASS with variables for easier setup
 - Simplify css/design for easier setup
@@ -77,6 +85,7 @@
         - Admin alert
         - User alert
         - Config either in 
+
 
 #### Packages
 - CRON package
