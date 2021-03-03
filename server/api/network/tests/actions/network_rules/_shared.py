@@ -6,8 +6,8 @@ from datetime import date, timedelta
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
-# Application
-from api.core.models import NetworkRule
+# Local
+from ....models import NetworkRule
 
 # --------------------------------------------------------------------------------
 # > Constants

@@ -1,4 +1,4 @@
-"""Shared classes, functions, and constants for healthcheck services tests"""
+"""Shared classes, functions, and constants for healthchecks services tests"""
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase

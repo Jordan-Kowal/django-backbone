@@ -14,7 +14,7 @@ from jklib.django.drf.serializers import ImprovedSerializer, required
 from jklib.django.utils.network import get_client_ip
 
 # Application
-from api.core.models import NetworkRule
+from api.network.models import NetworkRule
 
 # Local
 from ...models import Contact

@@ -1,12 +1,6 @@
-"""Actions for the 'core' app"""
+"""Actions for the 'network' app"""
 
 # Local
-from .healthchecks import (
-    ApiHealthcheckHandler,
-    CacheHealthcheckHandler,
-    DatabaseHealthcheckHandler,
-    MigrationsHealthcheckHandler,
-)
 from .network_rules import (
     BlacklistNetworkRuleHandler,
     BulkDestroyNetworkRulesHandler,

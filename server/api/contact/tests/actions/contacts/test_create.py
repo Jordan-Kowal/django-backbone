@@ -12,7 +12,7 @@ from jklib.django.drf.tests import ActionTestCase
 from jklib.django.utils.settings import get_config
 
 # Application
-from api.core.models import NetworkRule
+from api.network.models import NetworkRule
 
 # Local
 from ....models import Contact

@@ -23,8 +23,8 @@ from rest_framework.serializers import (
 # Personal
 from jklib.django.drf.serializers import NotEmptyModelSerializer, required
 
-# Application
-from api.core.models import NetworkRule
+# Local
+from ...models import NetworkRule
 
 # --------------------------------------------------------------------------------
 # > Status management

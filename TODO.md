@@ -4,20 +4,34 @@
 - Update README.md
 - Setup admins
 - Rename server and server_config into django_backbone
+- Make it into a django package
+    - Restructure if necessary
+    - Handle loggers automatic import or through settings (maybe rename them to avoid conflicts) 
+    - Variables/template paths for emails
+    - README for settings
+    - github deployment CI/CD
+- automatic_pre_save_full_clean signals exclude from settings
+- Use settings to disable certain apps
+- Use settings to disable certain services (like users)
+
 
 ### Core
-- Management command to start new app
 - Should only be used to share utilities
+- Add tests for various utilities
+
+### Commands app
+- Make app out of it
+- Command to list all our custom commands
+- Management command to start new app
 
 ### Contact
 - Update tests so that they check the logger AND stop writing in them for real
 - Add test for logs in contact actions
 
 ### Healthchecks
-- Create HealthChecks app
+- N/A
 
 ### Security
-- Create security app
 - Update tests so that they check the logger AND stop writing in them for real
     - network rule actions
     - network rule methods

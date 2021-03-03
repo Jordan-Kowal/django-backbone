@@ -1,4 +1,4 @@
-"""Shared utility classes, functions, and constants for the Healthcheck actions"""
+"""Shared utility classes, functions, and constants for the healthchecks actions"""
 
 # Built-in
 import logging
