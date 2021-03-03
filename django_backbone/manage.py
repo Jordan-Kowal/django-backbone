@@ -10,8 +10,9 @@ import sys
 # --------------------------------------------------------------------------------
 def main():
     """Main runner for django"""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server_config.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_backbone.settings")
     try:
+        # Django
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(

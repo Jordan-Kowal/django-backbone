@@ -170,7 +170,22 @@ class TokenAdmin(CannotAddMixin, CannotEditMixin, admin.ModelAdmin):
     radio_fields = {}
     raw_id_fields = []
     fieldsets = [
-        ["CORE", {"fields": ["id", "created_at", "updated_at"],}],
-        ["INFO", {"fields": ["user", "type", "value", "expired_at", "used_at"],},],
-        ["STATUS", {"fields": ["is_active_token", "is_expired", "is_used"],},],
+        [
+            "CORE",
+            {
+                "fields": ["id", "created_at", "updated_at"],
+            },
+        ],
+        [
+            "INFO",
+            {
+                "fields": ["user", "type", "value", "expired_at", "used_at"],
+            },
+        ],
+        [
+            "STATUS",
+            {
+                "fields": ["is_active_token", "is_expired", "is_used"],
+            },
+        ],
     ]

@@ -3,7 +3,6 @@
 ### Project wide:
 - Update README.md
 - Setup admins
-- Rename server and server_config into django_backbone
 - Make it into a django package
     - Restructure if necessary
     - Handle loggers automatic import or through settings (maybe rename them to avoid conflicts) 

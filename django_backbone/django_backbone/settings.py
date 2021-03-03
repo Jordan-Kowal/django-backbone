@@ -55,9 +55,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "server_config.urls"
+ROOT_URLCONF = "django_backbone.urls"
 
-WSGI_APPLICATION = "server_config.wsgi.application"
+WSGI_APPLICATION = "django_backbone.wsgi.application"
 
 
 # --------------------------------------------------------------------------------

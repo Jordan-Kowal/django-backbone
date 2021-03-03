@@ -73,7 +73,10 @@ class Profile(Model):
         verbose_name="User",
     )
     is_verified = BooleanField(
-        blank=True, default=False, null=False, verbose_name="Verified",
+        blank=True,
+        default=False,
+        null=False,
+        verbose_name="Verified",
     )
 
     # ----------------------------------------

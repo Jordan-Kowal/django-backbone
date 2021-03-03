@@ -50,7 +50,9 @@ def user_representation(user):
         "is_active": user.is_active,
         "is_staff": user.is_staff,
         "last_login": user.last_login,
-        "profile": {"is_verified": profile.is_verified,},
+        "profile": {
+            "is_verified": profile.is_verified,
+        },
     }
 
 

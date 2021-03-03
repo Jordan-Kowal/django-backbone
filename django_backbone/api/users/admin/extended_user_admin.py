@@ -30,7 +30,14 @@ class UserProfileInline(admin.StackedInline):
     radio_fields = {}
     raw_id_fields = []
     fieldsets = [
-        ["", {"fields": ["is_verified",],},],
+        [
+            "",
+            {
+                "fields": [
+                    "is_verified",
+                ],
+            },
+        ],
     ]
 
 

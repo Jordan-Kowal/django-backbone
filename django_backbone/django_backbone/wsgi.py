@@ -16,5 +16,5 @@ from django.core.wsgi import get_wsgi_application
 # --------------------------------------------------------------------------------
 # > Main
 # --------------------------------------------------------------------------------
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server_config.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_backbone.settings")
 application = get_wsgi_application()

@@ -73,7 +73,11 @@ class Contact(LifeCycleModel):
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    ip = RequiredField(GenericIPAddressField, db_index=True, verbose_name="IP Address",)
+    ip = RequiredField(
+        GenericIPAddressField,
+        db_index=True,
+        verbose_name="IP Address",
+    )
     user = ForeignKey(
         User,
         on_delete=SET_NULL,
@@ -96,7 +100,9 @@ class Contact(LifeCycleModel):
         verbose_name="Subject",
     )
     body = RequiredField(
-        TrimTextField, validators=[LengthValidator(*BODY_LENGTH)], verbose_name="Body",
+        TrimTextField,
+        validators=[LengthValidator(*BODY_LENGTH)],
+        verbose_name="Body",
     )
 
     # ----------------------------------------
