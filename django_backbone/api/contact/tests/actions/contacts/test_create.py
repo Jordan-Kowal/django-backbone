@@ -127,19 +127,23 @@ class TestCreateContact(ActionTestCase):
             contact = Contact.objects.last()
             assert contact.should_ban_ip()
             # Create one too many. It should fail
-            response = self.client.post(self.service_base_url, self.payload)
-            assert response.status_code == 403
-            assert Contact.objects.count() == threshold
-            # The IP should now be banned using our settings
-            network_rule = NetworkRule.objects.get(ip=contact.ip)
-            expected_end_date = date.today() + timedelta(
-                days=ban_settings["duration_in_days"]
-            )
-            assert network_rule.is_blacklisted
-            assert network_rule.expires_on == expected_end_date
-            # Any new request should fail due to the ban
-            response = self.client.post(self.service_base_url, self.payload)
-            assert response.status_code == 403
+            with self.assertLogs(logger="security", level="INFO") as logger:
+                response = self.client.post(self.service_base_url, self.payload)
+                assert response.status_code == 403
+                assert Contact.objects.count() == threshold
+                # A NetworkRule should have been created
+                network_rule = NetworkRule.objects.get(ip=contact.ip)
+                message = f"INFO:security:NetworkRule created for {network_rule.ip} (Status: {network_rule.computed_status})"
+                assert logger.output[0] == message
+                # Our IP should be blacklisted
+                expected_end_date = date.today() + timedelta(
+                    days=ban_settings["duration_in_days"]
+                )
+                assert network_rule.is_blacklisted
+                assert network_rule.expires_on == expected_end_date
+                # Any new request should fail due to the ban
+                response = self.client.post(self.service_base_url, self.payload)
+                assert response.status_code == 403
 
     def test_success(self):
         """Tests a successful contact without notifying the user"""

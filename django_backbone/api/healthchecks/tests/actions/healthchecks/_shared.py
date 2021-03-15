@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # --------------------------------------------------------------------------------
 # > Constants
@@ -78,6 +79,7 @@ class HealthcheckTestCase(ActionTestCase):
     # ----------------------------------------
     # Assertion helpers
     # ----------------------------------------
+    @assert_logs(logger="healthcheck", level="INFO")
     def assert_must_be_admin(self):
         """Tries to use the service logged out, as a user, and as an admin"""
         self.client.logout()
@@ -89,14 +91,13 @@ class HealthcheckTestCase(ActionTestCase):
         assert response.status_code == 403
         # 200 Admin
         self.client.logout()
-        with self.assertLogs(logger="healthcheck", level="INFO"):
-            self.client.force_authenticate(self.admin)
-            response = self.client.get(self.service_base_url)
-            assert response.status_code == self.success_code
+        self.client.force_authenticate(self.admin)
+        response = self.client.get(self.service_base_url)
+        assert response.status_code == self.success_code
 
+    @assert_logs(logger="healthcheck", level="INFO")
     def assert_healthcheck_success(self):
         """Checks if a successful call correctly logs its results"""
-        with self.assertLogs(logger="healthcheck", level="INFO") as logger:
-            response = self.client.get(self.service_base_url)
-            assert response.status_code == self.success_code
-            assert self.success_message == logger.output[0]
+        response = self.client.get(self.service_base_url)
+        assert response.status_code == self.success_code
+        assert self.success_message == self.logger_context.output[0]

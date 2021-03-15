@@ -28,8 +28,7 @@
 
 
 ### Contact
-- Update tests so that they check the logger AND stop writing in them for real
-- Add test for logs in contact actions
+- N/A
 
 
 ### Healthchecks
@@ -72,7 +71,7 @@
 - Status service to know if we are connected and various session info
 
 
-#### Emails
+### Emails
 - Rework css into SASS with variables for easier setup
 - Simplify css/design for easier setup
 - Update the emails
@@ -87,7 +86,7 @@
         - Config either in 
 
 
-#### Packages
+### Packages
 - CRON package
    - Setup NetworkRule automatic clear cron
    - Setup Contact cleanup cron
