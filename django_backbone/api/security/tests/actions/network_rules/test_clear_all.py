@@ -5,6 +5,7 @@ from datetime import date, timedelta
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -29,6 +30,7 @@ class TestClearAllNetworkRules(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def setUp(self):
         """Creates and authenticates an Admin user and generates a bunch of NetworkRule instances"""
         self.admin = self.create_admin_user(authenticate=True)
@@ -38,6 +40,7 @@ class TestClearAllNetworkRules(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         user = self.create_user()
@@ -51,6 +54,7 @@ class TestClearAllNetworkRules(ActionTestCase):
             user=user,
         )
 
+    @assert_logs("security", "INFO")
     def test_valid_status(self):
         """Tests that you must provide a valid status"""
         assert_valid_status(
@@ -61,6 +65,7 @@ class TestClearAllNetworkRules(ActionTestCase):
             clean_up=False,
         )
 
+    @assert_logs("security", "INFO")
     def test_status_optional(self):
         """Tests that you can omit the status field"""
         # Empty status
@@ -72,6 +77,7 @@ class TestClearAllNetworkRules(ActionTestCase):
         response = self.client.post(self.service_base_url, data=self.payload)
         assert response.status_code == self.valid_status_code
 
+    @assert_logs("security", "INFO")
     def test_success_clear_all(self):
         """Tests that all NetworkRule instances are cleared if no status is provided"""
         response = self.client.post(self.service_base_url, data=self.payload)
@@ -84,6 +90,7 @@ class TestClearAllNetworkRules(ActionTestCase):
         )
         self._assert_rules_are_cleared(ids)
 
+    @assert_logs("security", "INFO")
     def test_success_clear_blacklisted(self):
         """Tests that only our blacklisted rules get cleared"""
         self.payload["status"] = "BLACKLISTED"
@@ -92,6 +99,7 @@ class TestClearAllNetworkRules(ActionTestCase):
         self._assert_rules_are_cleared(self.blacklisted_ids + self.cleared_ids)
         self._assert_rules_are_not_cleared(self.whitelisted_ids + self.neutral_ids)
 
+    @assert_logs("security", "INFO")
     def test_success_clear_whitelisted(self):
         """Tests that only our whitelisted rules get cleared"""
         self.payload["status"] = "WHITELISTED"
@@ -100,6 +108,7 @@ class TestClearAllNetworkRules(ActionTestCase):
         self._assert_rules_are_cleared(self.whitelisted_ids + self.cleared_ids)
         self._assert_rules_are_not_cleared(self.blacklisted_ids + self.neutral_ids)
 
+    @assert_logs("security", "INFO")
     def test_success_clear_neutral(self):
         """Tests that only our 'NONE' rules get cleared"""
         self.payload["status"] = "NONE"
@@ -108,6 +117,7 @@ class TestClearAllNetworkRules(ActionTestCase):
         self._assert_rules_are_cleared(self.neutral_ids + self.cleared_ids)
         self._assert_rules_are_not_cleared(self.blacklisted_ids + self.whitelisted_ids)
 
+    @assert_logs("security", "INFO")
     def test_success_nothing_to_clear(self):
         """Tests that the service returns a 204 even if no rule is found or eligible"""
         # No rule

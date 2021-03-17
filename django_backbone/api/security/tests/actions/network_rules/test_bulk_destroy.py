@@ -3,6 +3,7 @@
 # Personal
 from jklib.django.db.queries import get_object_or_none
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -21,6 +22,7 @@ class TestBulkDestroyNetworkRules(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def setUp(self):
         """Creates 1 admin, a valid payload, and 10 NetworkRule instances"""
         self.admin = self.create_admin_user()
@@ -31,6 +33,7 @@ class TestBulkDestroyNetworkRules(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests only admins can use this service"""
         # 401 Not authenticated
@@ -68,6 +71,7 @@ class TestBulkDestroyNetworkRules(ActionTestCase):
         assert response.status_code == 404
         assert NetworkRule.objects.count() == 10
 
+    @assert_logs("security", "INFO")
     def test_only_valid_ids(self):
         """Tests that valid IDs are successfully deleted"""
         self.client.force_authenticate(self.admin)
@@ -79,6 +83,7 @@ class TestBulkDestroyNetworkRules(ActionTestCase):
         for id_ in ids_to_delete:
             assert get_object_or_none(NetworkRule, pk=id_) is None
 
+    @assert_logs("security", "INFO")
     def test_some_valid_ids(self):
         """Tests that only valid IDs get successfully deleted"""
         self.client.force_authenticate(self.admin)

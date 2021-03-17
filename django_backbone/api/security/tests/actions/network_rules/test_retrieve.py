@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ._shared import (
@@ -25,6 +26,7 @@ class TestRetrieveNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def setUp(self):
         """Creates and authenticates an Admin user, and creates 2 NetworkRule instances"""
         self.admin = self.create_admin_user(authenticate=True)

@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -27,6 +28,7 @@ class TestClearNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def setUp(self):
         """Creates and authenticates an Admin user, and creates 1 NetworkRule instance"""
         self.admin = self.create_admin_user(authenticate=True)
@@ -36,6 +38,7 @@ class TestClearNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         user = self.create_user()
@@ -62,6 +65,7 @@ class TestClearNetworkRule(ActionTestCase):
             user=user,
         )
 
+    @assert_logs("security", "INFO")
     def test_clear_success_with_change(self):
         """Tests that you can clear a blacklisted NetworkRule"""
         # Perform the request on blacklisted rule
@@ -74,6 +78,7 @@ class TestClearNetworkRule(ActionTestCase):
         assert was_updated
         assert_representation_matches_instance(response.data, updated_instance)
 
+    @assert_logs("security", "INFO")
     def test_clear_success_without_change(self):
         """Tests that clearing an already-cleared rule doesn't do anything"""
         # Perform the request on a cleared rule

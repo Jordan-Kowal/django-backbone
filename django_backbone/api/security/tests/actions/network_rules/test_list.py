@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -32,6 +33,7 @@ class TestListNetworkRules(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin can access this service"""
         create_network_rule()
@@ -54,6 +56,7 @@ class TestListNetworkRules(ActionTestCase):
         assert response.status_code == self.valid_status_code
         assert len(response.data) == 0
 
+    @assert_logs("security", "INFO")
     def test_list_one(self):
         """Tests that the service works even if there's only 1 object"""
         first_rule = create_network_rule()
@@ -63,6 +66,7 @@ class TestListNetworkRules(ActionTestCase):
         assert len(response.data) == 1
         assert_representation_matches_instance(response.data[0], first_rule)
 
+    @assert_logs("security", "INFO")
     def test_list_many(self):
         """Tests that the service returns all IPs correctly"""
         # Create the instances

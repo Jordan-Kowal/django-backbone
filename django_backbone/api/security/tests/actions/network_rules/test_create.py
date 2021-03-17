@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -43,6 +44,7 @@ class TestCreateNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         user = self.create_user()
@@ -64,6 +66,7 @@ class TestCreateNetworkRule(ActionTestCase):
         )
         assert NetworkRule.objects.count() == 0
 
+    @assert_logs("security", "INFO")
     def test_valid_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
         assert_valid_expires_on(
@@ -74,6 +77,7 @@ class TestCreateNetworkRule(ActionTestCase):
             clean_up=True,
         )
 
+    @assert_logs("security", "INFO")
     def test_valid_status_code(self):
         """Tests that you must provide a valid status"""
         assert_valid_status(
@@ -84,6 +88,7 @@ class TestCreateNetworkRule(ActionTestCase):
             clean_up=True,
         )
 
+    @assert_logs("security", "INFO")
     def test_comment_length(self):
         """Tests that the comment cannot exceed the max length"""
         assert_comment_length(
@@ -94,6 +99,7 @@ class TestCreateNetworkRule(ActionTestCase):
         )
         assert NetworkRule.objects.count() == 1
 
+    @assert_logs("security", "INFO")
     def test_unique_constraint(self):
         """Tests that you cannot create two NetworkRule instances with the same IP"""
         assert_unique_constraint_on_creation(
@@ -104,6 +110,7 @@ class TestCreateNetworkRule(ActionTestCase):
             count=0,
         )
 
+    @assert_logs("security", "INFO")
     def test_create_success(self):
         """Tests that we created a new NetworkRule successfully"""
         response = self.client.post(self.service_base_url, data=self.payload)

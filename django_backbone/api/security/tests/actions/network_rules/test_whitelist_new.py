@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -41,6 +42,7 @@ class TestNewWhitelistNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         user = self.create_user()
@@ -62,6 +64,7 @@ class TestNewWhitelistNetworkRule(ActionTestCase):
         )
         assert NetworkRule.objects.count() == 0
 
+    @assert_logs("security", "INFO")
     def test_unique_constraint(self):
         """Tests that you cannot two NetworkRule instances with the same IP"""
         assert_unique_constraint_on_creation(
@@ -72,6 +75,7 @@ class TestNewWhitelistNetworkRule(ActionTestCase):
             count=0,
         )
 
+    @assert_logs("security", "INFO")
     def test_comment_length(self):
         """Tests that the comment cannot exceed the max length"""
         assert_comment_length(
@@ -82,6 +86,7 @@ class TestNewWhitelistNetworkRule(ActionTestCase):
         )
         assert NetworkRule.objects.count() == 1
 
+    @assert_logs("security", "INFO")
     def test_expires_on_optional(self):
         """Tests that the 'expires_on' gets defaulted if not provided"""
         assert_expires_on_is_optional(
@@ -93,6 +98,7 @@ class TestNewWhitelistNetworkRule(ActionTestCase):
             creation=True,
         )
 
+    @assert_logs("security", "INFO")
     def test_valid_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
         assert_valid_expires_on(
@@ -103,6 +109,7 @@ class TestNewWhitelistNetworkRule(ActionTestCase):
             clean_up=True,
         )
 
+    @assert_logs("security", "INFO")
     def test_whitelist_success(self):
         """Tests that we can successfully create and whitelist a NetworkRule"""
         response = self.client.post(self.service_base_url, data=self.payload)

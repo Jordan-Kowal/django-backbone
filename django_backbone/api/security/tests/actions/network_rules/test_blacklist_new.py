@@ -64,6 +64,7 @@ class TestNewBlacklistNetworkRule(ActionTestCase):
         )
         assert NetworkRule.objects.count() == 0
 
+    @assert_logs("security", "INFO")
     def test_unique_constraint(self):
         """Tests that you cannot create the same IP twice"""
         assert_unique_constraint_on_creation(
@@ -74,6 +75,7 @@ class TestNewBlacklistNetworkRule(ActionTestCase):
             count=0,
         )
 
+    @assert_logs("security", "INFO")
     def test_comment_length(self):
         """Tests that the comment cannot exceed the max length"""
         assert_comment_length(
@@ -84,6 +86,7 @@ class TestNewBlacklistNetworkRule(ActionTestCase):
         )
         assert NetworkRule.objects.count() == 1
 
+    @assert_logs("security", "INFO")
     def test_expires_on_optional(self):
         """Tests that the 'expires_on' gets defaulted if not provided"""
         assert_expires_on_is_optional(
@@ -95,6 +98,7 @@ class TestNewBlacklistNetworkRule(ActionTestCase):
             creation=True,
         )
 
+    @assert_logs("security", "INFO")
     def test_valid_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
         assert_valid_expires_on(
@@ -105,6 +109,7 @@ class TestNewBlacklistNetworkRule(ActionTestCase):
             clean_up=True,
         )
 
+    @assert_logs("security", "INFO")
     def test_blacklist_success(self):
         """Tests that we can successfully create and blacklist an IP"""
         response = self.client.post(self.service_base_url, data=self.payload)

@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -30,6 +31,7 @@ class TestUpdateNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def setUp(self):
         """
         Prepares the following elements
@@ -51,6 +53,7 @@ class TestUpdateNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         user = self.create_user()
@@ -81,6 +84,7 @@ class TestUpdateNetworkRule(ActionTestCase):
             user=user,
         )
 
+    @assert_logs("security", "INFO")
     def test_valid_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
         assert_valid_expires_on(
@@ -91,6 +95,7 @@ class TestUpdateNetworkRule(ActionTestCase):
             clean_up=False,
         )
 
+    @assert_logs("security", "INFO")
     def test_valid_status(self):
         """Tests that you must provide a valid status"""
         assert_valid_status(
@@ -101,6 +106,7 @@ class TestUpdateNetworkRule(ActionTestCase):
             clean_up=False,
         )
 
+    @assert_logs("security", "INFO")
     def test_comment_length(self):
         """Tests that the comment cannot exceed the max length"""
         assert_comment_length(
@@ -110,6 +116,7 @@ class TestUpdateNetworkRule(ActionTestCase):
             valid_status_code=self.valid_status_code,
         )
 
+    @assert_logs("security", "INFO")
     def test_unique_constraint(self):
         """Tests that you cannot update an instance with an already-used IP address"""
         second_rule = create_network_rule(ip="127.0.0.2")
@@ -118,6 +125,7 @@ class TestUpdateNetworkRule(ActionTestCase):
         response = self.client.put(detail_url, data=self.payload)
         assert response.status_code == 400
 
+    @assert_logs("security", "INFO")
     def test_update_success(self):
         """Tests that we updated a NetworkRule successfully"""
         response = self.client.put(self.rule_url, data=self.payload)

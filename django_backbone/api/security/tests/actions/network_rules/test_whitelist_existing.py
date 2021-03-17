@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -31,6 +32,7 @@ class TestWhitelistNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def setUp(self):
         """Creates and authenticates an Admin user, and creates 1 NetworkRule instance and a payload"""
         self.admin = self.create_admin_user(authenticate=True)
@@ -45,6 +47,7 @@ class TestWhitelistNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin access this service"""
         user = self.create_user()
@@ -71,6 +74,7 @@ class TestWhitelistNetworkRule(ActionTestCase):
             user=user,
         )
 
+    @assert_logs("security", "INFO")
     def test_comment_length(self):
         """Tests that the comment has a length limit"""
         assert_comment_length(
@@ -80,6 +84,7 @@ class TestWhitelistNetworkRule(ActionTestCase):
             valid_status_code=self.valid_status_code,
         )
 
+    @assert_logs("security", "INFO")
     def test_expires_on_optional(self):
         """Tests that the 'expires_on' gets defaulted if not provided"""
         assert_expires_on_is_optional(
@@ -90,6 +95,7 @@ class TestWhitelistNetworkRule(ActionTestCase):
             id_=self.rule.id,
         )
 
+    @assert_logs("security", "INFO")
     def test_valid_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
         assert_valid_expires_on(
@@ -100,6 +106,7 @@ class TestWhitelistNetworkRule(ActionTestCase):
             clean_up=False,
         )
 
+    @assert_logs("security", "INFO")
     def test_override_check(self):
         """Tests that a blacklisted rule can be whitelisted only with 'override=True'"""
         second_rule = create_network_rule(ip="127.0.0.2")
@@ -114,6 +121,7 @@ class TestWhitelistNetworkRule(ActionTestCase):
             status=NetworkRule.Status.WHITELISTED,
         )
 
+    @assert_logs("security", "INFO")
     def test_whitelist_success(self):
         """Tests that we can successfully whitelist an existing rule"""
         assert not self.rule.is_whitelisted

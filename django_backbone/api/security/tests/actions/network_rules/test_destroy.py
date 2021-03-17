@@ -2,6 +2,7 @@
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ....models import NetworkRule
@@ -25,6 +26,7 @@ class TestDestroyNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Behavior
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def setUp(self):
         """Creates and authenticates an admin user and creates 2 NetworkRule instances"""
         self.admin = self.create_admin_user(authenticate=True)
@@ -36,6 +38,7 @@ class TestDestroyNetworkRule(ActionTestCase):
     # ----------------------------------------
     # Tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can use this service"""
         user = self.create_user()
@@ -64,6 +67,7 @@ class TestDestroyNetworkRule(ActionTestCase):
         )
         assert NetworkRule.objects.count() == 2
 
+    @assert_logs("security", "INFO")
     def test_destroy_success(self):
         """Tests that you can successfully delete a NetworkRule instance"""
         assert NetworkRule.objects.count() == 2

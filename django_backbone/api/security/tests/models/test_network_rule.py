@@ -10,6 +10,7 @@ from django.conf import settings
 # Personal
 from jklib.django.db.tests import ModelTestCase
 from jklib.django.utils.network import get_client_ip
+from jklib.django.utils.tests import assert_logs
 
 # Local
 from ...models import NetworkRule
@@ -90,14 +91,16 @@ class TestNetworkRule(ModelTestCase):
             self.model_class(**self.payload).save()
         self.assert_instance_count_equals(0)
 
+    @assert_logs(logger="security", level="INFO")
     def test_successful_creation(self):
         """Tests that the model can be created successfully"""
-        self.model_class(**self.payload).save()
+        self.model_class.objects.create(**self.payload)
         self.assert_instance_count_equals(1)
 
     # ----------------------------------------
     # Instance properties tests
     # ----------------------------------------
+    @assert_logs("security", "INFO")
     def test_get_default_duration(self):
         """Tests the default duration returns the settings duration"""
         instance = self.model_class.objects.create(**self.payload)
@@ -109,6 +112,7 @@ class TestNetworkRule(ModelTestCase):
         else:
             assert instance.get_default_duration() == instance.DEFAULT_DURATION
 
+    @assert_logs(logger="security", level="INFO")
     def test_computed_status(self):
         """Tests the computed_status works as intended"""
         instance = self.model_class.objects.create(**self.payload)
@@ -119,6 +123,7 @@ class TestNetworkRule(ModelTestCase):
         instance.clear()
         assert instance.computed_status == "inactive"
 
+    @assert_logs(logger="security", level="INFO")
     def test_is_blacklisted(self):
         """Tests that a blacklisted rule is correctly flagged as blacklisted"""
         instance = self.model_class.objects.create(**self.payload)
@@ -127,6 +132,7 @@ class TestNetworkRule(ModelTestCase):
         instance.whitelist(override=True)
         assert not instance.is_blacklisted
 
+    @assert_logs(logger="security", level="INFO")
     def test_is_whitelisted(self):
         """Tests that a whitelisted rule is correctly flagged as whitelisted"""
         instance = self.model_class.objects.create(**self.payload)
@@ -138,6 +144,7 @@ class TestNetworkRule(ModelTestCase):
     # ----------------------------------------
     # Instance API tests
     # ----------------------------------------
+    @assert_logs(logger="security", level="INFO")
     def test_blacklist_general_behavior(self):
         """Tests the general behavior of the blacklist method"""
         instance = self.model_class.objects.create(**self.payload)
@@ -149,6 +156,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.expires_on == end_date
         assert instance.comment == new_comment
 
+    @assert_logs(logger="security", level="INFO")
     def test_blacklist_without_end_date(self):
         """Tests that the end_date is defaulted if not provided when blacklisting"""
         instance = self.model_class.objects.create(**self.payload)
@@ -160,6 +168,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.BLACKLISTED
         assert instance.expires_on == default_end_date
 
+    @assert_logs(logger="security", level="INFO")
     def test_blacklist_override(self):
         """Tests that a whitelisted rule can be blacklisted only with the 'override' argument"""
         end_date = date.today() + timedelta(days=3)
@@ -176,6 +185,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.BLACKLISTED
         assert instance.expires_on == end_date
 
+    @assert_logs(logger="security", level="INFO")
     def test_clear(self):
         """Tests 'clear' correctly resets the model fields"""
         self.payload["active"] = True
@@ -187,6 +197,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.NONE
         assert instance.expires_on is None
 
+    @assert_logs(logger="security", level="INFO")
     def test_whitelist_general_behavior(self):
         """Tests the general behavior of the whitelist method"""
         instance = self.model_class.objects.create(**self.payload)
@@ -198,6 +209,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.expires_on == end_date
         assert instance.comment == new_comment
 
+    @assert_logs(logger="security", level="INFO")
     def test_whitelist_without_end_date(self):
         """Tests that the end_date is defaulted if not provided when whitelisting"""
         instance = self.model_class.objects.create(**self.payload)
@@ -209,6 +221,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.WHITELISTED
         assert instance.expires_on == default_end_date
 
+    @assert_logs(logger="security", level="INFO")
     def test_whitelist_override(self):
         """Tests that a blacklisted rule can be whitelisted only with the 'override' argument"""
         end_date = date.today() + timedelta(days=3)
@@ -228,6 +241,7 @@ class TestNetworkRule(ModelTestCase):
     # ----------------------------------------
     # Request API tests
     # ----------------------------------------
+    @assert_logs(logger="security", level="INFO")
     def test_blacklist_from_request_general_behavior(self):
         """Tests the general behavior of the blacklist_from_request method"""
         fake_request = self.build_fake_request()
@@ -241,6 +255,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.expires_on == end_date
         assert instance.comment == new_comment
 
+    @assert_logs(logger="security", level="INFO")
     def test_blacklist_from_request_without_end_date(self):
         """Tests that the end_date is defaulted if not provided when blacklisting from request"""
         fake_request = self.build_fake_request()
@@ -252,6 +267,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.BLACKLISTED
         assert instance.expires_on == default_end_date
 
+    @assert_logs(logger="security", level="INFO")
     def test_blacklist_from_request_override(self):
         """Tests that a whitelisted rule can be blacklisted only with the 'override' argument"""
         fake_request = self.build_fake_request()
@@ -275,6 +291,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.BLACKLISTED
         assert instance.expires_on == end_date
 
+    @assert_logs(logger="security", level="INFO")
     def test_clear_from_request(self):
         """Tests 'clear_from_request' correctly resets the model fields"""
         fake_request = self.build_fake_request()
@@ -289,6 +306,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.NONE
         assert instance.expires_on is None
 
+    @assert_logs(logger="security", level="INFO")
     def test_whitelist_from_request_general_behavior(self):
         """Tests the general behavior of the whitelist_from_request method"""
         fake_request = self.build_fake_request()
@@ -302,6 +320,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.expires_on == end_date
         assert instance.comment == new_comment
 
+    @assert_logs(logger="security", level="INFO")
     def test_whitelist_from_request_without_end_date(self):
         """Tests that the end_date is defaulted if not provided when whitelisting from request"""
         fake_request = self.build_fake_request()
@@ -313,6 +332,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.WHITELISTED
         assert instance.expires_on == default_end_date
 
+    @assert_logs(logger="security", level="INFO")
     def test_whitelist_from_request_override(self):
         """Tests that a blacklisted rule can be whitelisted only with the 'override' argument"""
         fake_request = self.build_fake_request()
@@ -336,6 +356,7 @@ class TestNetworkRule(ModelTestCase):
         assert instance.status == NetworkRule.Status.WHITELISTED
         assert instance.expires_on == end_date
 
+    @assert_logs(logger="security", level="INFO")
     def test_is_blacklisted_from_request(self):
         """Tests that a blacklisted rule is correctly flagged as blacklisted"""
         fake_request = self.build_fake_request()
@@ -345,6 +366,7 @@ class TestNetworkRule(ModelTestCase):
         self.model_class.blacklist_from_request(fake_request)
         assert self.model_class.is_blacklisted_from_request(fake_request)
 
+    @assert_logs(logger="security", level="INFO")
     def test_is_whitelisted_from_request(self):
         """Tests that a whitelisted rule is correctly flagged as whitelisted"""
         fake_request = self.build_fake_request()
@@ -355,8 +377,23 @@ class TestNetworkRule(ModelTestCase):
         assert self.model_class.is_whitelisted_from_request(fake_request)
 
     # ----------------------------------------
+    # Signals
+    # ----------------------------------------
+    @assert_logs(logger="security", level="INFO")
+    def test_log_signals(self):
+        """Tests that logs are generated on creation, update, and deletion"""
+        logs = self.logger_context.output
+        instance = self.model_class.objects.create(**self.payload)
+        assert logs[0] == self._build_log_message(instance, "created")
+        instance.save()
+        assert logs[1] == self._build_log_message(instance, "updated")
+        instance.delete()
+        assert logs[2] == self._build_log_message(instance, "deleted")
+
+    # ----------------------------------------
     # Cron tests
     # ----------------------------------------
+    @assert_logs(logger="security", level="INFO")
     def test_clear_expired_entries(self):
         """Tests that only the eligible entries are correctly cleared"""
         payloads, instances, clear_eligibility = self._create_instances_for_clear_test()
@@ -375,6 +412,17 @@ class TestNetworkRule(ModelTestCase):
     # ----------------------------------------
     # Helpers
     # ----------------------------------------
+    @staticmethod
+    def _build_log_message(instance, type_):
+        """
+        Generate the expected log message for an action on an NetworkRule
+        :param NetworkRule instance: Any NetworkRule instance
+        :param str type_: Should be 'created', 'updated', or 'deleted'
+        :return: The expected log message
+        :rtype: str
+        """
+        return f"INFO:security:NetworkRule {type_} for {instance.ip} (Status: {instance.computed_status})"
+
     def _create_instances_for_clear_test(self):
         """
         Builds various NetworkRule instances to test various scenarios for the clearing cron job later on
