@@ -1,4 +1,4 @@
-"""Viewsets for the 'network' app"""
+"""Viewsets for the 'security' app"""
 
 # Personal
 from jklib.django.drf.permissions import IsAdminUser

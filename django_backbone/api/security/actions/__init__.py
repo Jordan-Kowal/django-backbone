@@ -1,4 +1,4 @@
-"""Actions for the 'network' app"""
+"""Actions for the 'security' app"""
 
 # Local
 from .network_rules import (

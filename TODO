@@ -21,7 +21,7 @@
 - Add tests for various utilities
 
 
-### Commands app
+### Commands
 - Make app out of it
 - Command to list all our custom commands
 - Management command to start new app

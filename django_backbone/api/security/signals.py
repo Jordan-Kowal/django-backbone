@@ -1,4 +1,4 @@
-"""Signals for the 'network' app"""
+"""Signals for the 'security' app"""
 
 # Built-in
 import logging

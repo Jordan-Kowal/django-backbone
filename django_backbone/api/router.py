@@ -11,7 +11,7 @@ from rest_framework import routers
 # Local
 from .contact.viewsets import ContactViewset
 from .healthchecks.viewsets import HealthcheckViewSet
-from .network.viewsets import NetworkRuleViewSet
+from .security.viewsets import NetworkRuleViewSet
 from .users.viewsets import AuthViewSet, UserViewSet
 
 # --------------------------------------------------------------------------------

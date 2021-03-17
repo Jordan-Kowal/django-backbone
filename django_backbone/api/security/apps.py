@@ -1,4 +1,4 @@
-"""Config for the 'network' app"""
+"""Config for the 'security' app"""
 
 # Django
 from django.apps import AppConfig
@@ -7,13 +7,13 @@ from django.apps import AppConfig
 # --------------------------------------------------------------------------------
 # > Apps
 # --------------------------------------------------------------------------------
-class NetworkConfig(AppConfig):
+class SecurityConfig(AppConfig):
     """Base config for the app"""
 
-    name = "api.network"
-    label = "api.network"
+    name = "api.security"
+    label = "api.security"
 
     def ready(self):
         """Imports signals on application start"""
         # Application
-        import api.network.signals
+        import api.security.signals

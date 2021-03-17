@@ -58,10 +58,7 @@ class NetworkRule(LifeCycleModel):
     # Fields
     # ----------------------------------------
     ip = RequiredField(
-        GenericIPAddressField,
-        protocol="IPv4",
-        unique=True,
-        verbose_name="IP Address",
+        GenericIPAddressField, protocol="IPv4", unique=True, verbose_name="IP Address",
     )
     status = RequiredField(
         IntegerField,

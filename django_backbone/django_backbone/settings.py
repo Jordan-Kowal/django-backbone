@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     # API
     "api.core",
     "api.healthchecks",
-    "api.network",
+    "api.security",
     "api.users",
     "api.contact",
 ]
@@ -87,16 +87,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 10,
-        },
+        "OPTIONS": {"min_length": 10,},
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
 
@@ -146,10 +140,7 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "simple": {
-            "format": "{asctime} | {levelname} | {message}",
-            "style": "{",
-        },
+        "simple": {"format": "{asctime} | {levelname} | {message}", "style": "{",},
         "verbose": {
             "format": "{asctime} | {levelname} | {module} | {process:d} | {thread:d} | {message}",
             "style": "{",
@@ -206,21 +197,13 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
-        "default": {
-            "handlers": ["console.log"],
-            "level": "INFO",
-            "propagate": True,
-        },
+        "default": {"handlers": ["console.log"], "level": "INFO", "propagate": True,},
         "healthcheck": {
             "handlers": ["healthchecks.log"],
             "level": "INFO",
             "propagate": True,
         },
-        "security": {
-            "handlers": ["security.log"],
-            "level": "INFO",
-            "propagate": True,
-        },
+        "security": {"handlers": ["security.log"], "level": "INFO", "propagate": True,},
     },
 }
 
