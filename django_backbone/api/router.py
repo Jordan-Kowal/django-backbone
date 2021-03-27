@@ -6,7 +6,9 @@ All the URLs must be defined in this file
 
 # Django
 from django.urls import include, path
-from rest_framework import routers
+
+# Personal
+from jklib.django.drf.routers import ImprovedRouter
 
 # Local
 from .contact.viewsets import ContactViewset
@@ -17,7 +19,7 @@ from .users.viewsets import AuthViewSet, UserViewSet
 # --------------------------------------------------------------------------------
 # > URLs
 # --------------------------------------------------------------------------------
-router = routers.DefaultRouter()
+router = ImprovedRouter()
 
 router.register("auth", AuthViewSet, "auth")
 router.register("contact", ContactViewset, "contact")

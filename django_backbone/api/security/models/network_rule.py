@@ -23,19 +23,7 @@ from jklib.django.utils.settings import get_config
 # > Models
 # --------------------------------------------------------------------------------
 class NetworkRule(LifeCycleModel):
-    """
-    Network rule linked to a IP address
-    Indicates whether the IP is/was/will be blacklisted/whitelisted
-    Only works with IPv4 addresses
-    The model is split in the following sections
-        Constants
-        Fields
-        Behavior
-        Instance Properties
-        Instance API
-        Request API
-        CRON jobs
-    """
+    """Model to blacklist or whitelist IP addresses"""
 
     # ----------------------------------------
     # Constants
@@ -50,9 +38,9 @@ class NetworkRule(LifeCycleModel):
     class Status(IntegerChoices):
         """Possible statuses for a NetworkRule"""
 
-        NONE = 1
-        WHITELISTED = 2
-        BLACKLISTED = 3
+        NONE = 0
+        WHITELISTED = 1
+        BLACKLISTED = 2
 
     # ----------------------------------------
     # Fields
@@ -216,8 +204,7 @@ class NetworkRule(LifeCycleModel):
         cls, request, end_date=None, comment=None, override=False
     ):
         """
-        Blacklists the IP by creating or updating a NetworkRule and activating it
-        Returns the NetworkRule instance
+        Creates or updates a blacklist rule for the request's IP, and returns the instance.
         :param Request request: Request object used to get the IP address
         :param date end_date: The desired expiration date
         :param str comment: The comment to add in the instance
@@ -232,9 +219,7 @@ class NetworkRule(LifeCycleModel):
     @classmethod
     def clear_from_request(cls, request):
         """
-        Clears the instance linked to the Request IP (if it exists)
-        Does not create a new instance if none exists
-        Returns the instance if found
+        If it exists, clears and returns the NetworkRule model
         :param Request request: Request object used to get the IP address
         :return: The updated instance
         :rtype: NetworkRule or None
@@ -249,8 +234,7 @@ class NetworkRule(LifeCycleModel):
         cls, request, end_date=None, comment=None, override=False
     ):
         """
-        Whitelists the IP by creating or updating a NetworkRule and activating it
-        Returns the NetworkRule instance
+        Creates or updates a whitelist rule for the request's IP, and returns the instance.
         :param Request request: Request object used to get the IP address
         :param date end_date: The desired expiration date
         :param str comment: The comment to add in the instance
@@ -319,10 +303,7 @@ class NetworkRule(LifeCycleModel):
     # ----------------------------------------
     @classmethod
     def clear_expired_entries(cls):
-        """
-        Clears all NetworkRule instances whose status has expired
-        Does not delete them, simply reset some of their fields
-        """
+        """Clears all expired rules"""
         today = date.today()
         instances = cls.objects.filter(expires_on__isnull=False).filter(
             expires_on__lt=today

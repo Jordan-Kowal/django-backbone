@@ -105,13 +105,13 @@ class UserViewSet(DynamicViewSet):
 
     extra_actions = {
         # ---------- Additional crud ----------
-        "bulk_destroy": {
-            "description": "Deletes several User instances at once",
-            "handler": BulkDestroyUsersHandler,
-            "permissions": (IsAdminUser,),
-            "methods": ["delete"],
-            "detail": False,
-        },
+        # "bulk_destroy": {
+        #     "description": "Deletes several User instances at once",
+        #     "handler": BulkDestroyUsersHandler,
+        #     "permissions": (IsAdminUser,),
+        #     "methods": ["delete"],
+        #     "detail": False,
+        # },
         "update_password": {
             "description": "Update your password by providing the existing one",
             "handler": UpdatePasswordHandler,

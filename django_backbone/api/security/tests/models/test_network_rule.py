@@ -20,17 +20,7 @@ from ...models import NetworkRule
 # > TestCase
 # --------------------------------------------------------------------------------
 class TestNetworkRule(ModelTestCase):
-    """
-    TestCase for the 'NetworkRule' model
-    Split into the following sections:
-        Behavior
-        Field tests
-        Instance properties tests
-        Instance API tests
-        Request API tests
-        Cron tests
-        Helpers
-    """
+    """TestCase for the 'NetworkRule' model"""
 
     model_class = NetworkRule
     required_fields = ["ip", "status"]
@@ -49,48 +39,8 @@ class TestNetworkRule(ModelTestCase):
         }
 
     # ----------------------------------------
-    # Field tests
+    # Generic tests
     # ----------------------------------------
-    def test_required_fields(self):
-        """Tests that the required fields are truly required"""
-        self.assert_fields_are_required(self.payload)
-        self.assert_instance_count_equals(0)
-
-    def test_ip(self):
-        """Tests that the ip address must be valid"""
-        self.payload["ip"] = "Invalid IP"
-        with self.assertRaises(self.common_errors):
-            self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(0)
-
-    def test_status(self):
-        """Tests that only a valid 'status' can be provided"""
-        self.payload["status"] = "Invalid status"
-        with self.assertRaises(self.common_errors):
-            self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(0)
-
-    def test_expires_on(self):
-        """Tests that the date must be valid"""
-        self.payload["expires_on"] = "Invalid date"
-        with self.assertRaises(self.common_errors):
-            self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(0)
-
-    def test_active(self):
-        """Tests that the active field must be valid"""
-        self.payload["active"] = "Not a boolean"
-        with self.assertRaises(self.common_errors):
-            self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(0)
-
-    def test_comment(self):
-        """Tests that the comment max_length cannot be exceeded"""
-        self.payload["comment"] = "a" * (self.model_class.COMMENT_MAX_LENGTH + 1)
-        with self.assertRaises(self.common_errors):
-            self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(0)
-
     @assert_logs(logger="security", level="INFO")
     def test_successful_creation(self):
         """Tests that the model can be created successfully"""
@@ -98,7 +48,7 @@ class TestNetworkRule(ModelTestCase):
         self.assert_instance_count_equals(1)
 
     # ----------------------------------------
-    # Instance properties tests
+    # Property tests
     # ----------------------------------------
     @assert_logs("security", "INFO")
     def test_get_default_duration(self):
@@ -145,45 +95,9 @@ class TestNetworkRule(ModelTestCase):
     # Instance API tests
     # ----------------------------------------
     @assert_logs(logger="security", level="INFO")
-    def test_blacklist_general_behavior(self):
-        """Tests the general behavior of the blacklist method"""
-        instance = self.model_class.objects.create(**self.payload)
-        new_comment = "Blacklisted"
-        end_date = date.today() + timedelta(days=3)
-        instance.blacklist(end_date=end_date, comment=new_comment)
-        assert instance.status == NetworkRule.Status.BLACKLISTED
-        assert instance.active
-        assert instance.expires_on == end_date
-        assert instance.comment == new_comment
-
-    @assert_logs(logger="security", level="INFO")
-    def test_blacklist_without_end_date(self):
-        """Tests that the end_date is defaulted if not provided when blacklisting"""
-        instance = self.model_class.objects.create(**self.payload)
-        instance.blacklist()
-        default_end_date = date.today() + timedelta(
-            days=instance.get_default_duration()
-        )
-        assert instance.active
-        assert instance.status == NetworkRule.Status.BLACKLISTED
-        assert instance.expires_on == default_end_date
-
-    @assert_logs(logger="security", level="INFO")
-    def test_blacklist_override(self):
-        """Tests that a whitelisted rule can be blacklisted only with the 'override' argument"""
-        end_date = date.today() + timedelta(days=3)
-        self.payload["status"] = NetworkRule.Status.WHITELISTED
-        instance = self.model_class.objects.create(**self.payload)
-        # Without override
-        instance.blacklist(override=False, end_date=end_date)
-        assert not instance.active
-        assert instance.status == NetworkRule.Status.WHITELISTED
-        assert instance.expires_on == self.payload["expires_on"] != end_date
-        # With override
-        instance.blacklist(override=True, end_date=end_date)
-        assert instance.active
-        assert instance.status == NetworkRule.Status.BLACKLISTED
-        assert instance.expires_on == end_date
+    def test_blacklist(self):
+        """Tests the 'blacklist' method"""
+        self._test_activate("blacklist")
 
     @assert_logs(logger="security", level="INFO")
     def test_clear(self):
@@ -198,98 +112,17 @@ class TestNetworkRule(ModelTestCase):
         assert instance.expires_on is None
 
     @assert_logs(logger="security", level="INFO")
-    def test_whitelist_general_behavior(self):
-        """Tests the general behavior of the whitelist method"""
-        instance = self.model_class.objects.create(**self.payload)
-        new_comment = "Whitelisted"
-        end_date = date.today() + timedelta(days=3)
-        instance.whitelist(end_date=end_date, comment=new_comment)
-        assert instance.status == NetworkRule.Status.WHITELISTED
-        assert instance.active
-        assert instance.expires_on == end_date
-        assert instance.comment == new_comment
-
-    @assert_logs(logger="security", level="INFO")
-    def test_whitelist_without_end_date(self):
-        """Tests that the end_date is defaulted if not provided when whitelisting"""
-        instance = self.model_class.objects.create(**self.payload)
-        instance.whitelist()
-        default_end_date = date.today() + timedelta(
-            days=instance.get_default_duration()
-        )
-        assert instance.active
-        assert instance.status == NetworkRule.Status.WHITELISTED
-        assert instance.expires_on == default_end_date
-
-    @assert_logs(logger="security", level="INFO")
-    def test_whitelist_override(self):
-        """Tests that a blacklisted rule can be whitelisted only with the 'override' argument"""
-        end_date = date.today() + timedelta(days=3)
-        self.payload["status"] = NetworkRule.Status.BLACKLISTED
-        instance = self.model_class.objects.create(**self.payload)
-        # Without override
-        instance.whitelist(override=False, end_date=end_date)
-        assert not instance.active
-        assert instance.status == NetworkRule.Status.BLACKLISTED
-        assert instance.expires_on == self.payload["expires_on"] != end_date
-        # With override
-        instance.whitelist(override=True, end_date=end_date)
-        assert instance.active
-        assert instance.status == NetworkRule.Status.WHITELISTED
-        assert instance.expires_on == end_date
+    def test_whitelist(self):
+        """Tests the 'blacklist' method"""
+        self._test_activate("whitelist")
 
     # ----------------------------------------
     # Request API tests
     # ----------------------------------------
     @assert_logs(logger="security", level="INFO")
-    def test_blacklist_from_request_general_behavior(self):
-        """Tests the general behavior of the blacklist_from_request method"""
-        fake_request = self.build_fake_request()
-        new_comment = "Blacklisted"
-        end_date = date.today() + timedelta(days=3)
-        instance = self.model_class.blacklist_from_request(
-            fake_request, end_date=end_date, comment=new_comment
-        )
-        assert instance.status == NetworkRule.Status.BLACKLISTED
-        assert instance.active
-        assert instance.expires_on == end_date
-        assert instance.comment == new_comment
-
-    @assert_logs(logger="security", level="INFO")
-    def test_blacklist_from_request_without_end_date(self):
-        """Tests that the end_date is defaulted if not provided when blacklisting from request"""
-        fake_request = self.build_fake_request()
-        instance = self.model_class.blacklist_from_request(fake_request)
-        default_end_date = date.today() + timedelta(
-            days=instance.get_default_duration()
-        )
-        assert instance.active
-        assert instance.status == NetworkRule.Status.BLACKLISTED
-        assert instance.expires_on == default_end_date
-
-    @assert_logs(logger="security", level="INFO")
-    def test_blacklist_from_request_override(self):
-        """Tests that a whitelisted rule can be blacklisted only with the 'override' argument"""
-        fake_request = self.build_fake_request()
-        fake_ip_address = get_client_ip(fake_request)
-        self.payload["ip"] = fake_ip_address
-        self.payload["status"] = NetworkRule.Status.WHITELISTED
-        self.model_class.objects.create(**self.payload)
-        end_date = date.today() + timedelta(days=3)
-        # Without override
-        instance = self.model_class.blacklist_from_request(
-            fake_request, end_date=end_date, override=False
-        )
-        assert not instance.active
-        assert instance.status == NetworkRule.Status.WHITELISTED
-        assert instance.expires_on == self.payload["expires_on"] != end_date
-        # With override
-        instance = self.model_class.blacklist_from_request(
-            fake_request, end_date=end_date, override=True
-        )
-        assert instance.active
-        assert instance.status == NetworkRule.Status.BLACKLISTED
-        assert instance.expires_on == end_date
+    def test_blacklist_from_request(self):
+        """Tests the 'blacklist_from_request' method"""
+        self._test_activate_from_api("blacklist")
 
     @assert_logs(logger="security", level="INFO")
     def test_clear_from_request(self):
@@ -307,54 +140,9 @@ class TestNetworkRule(ModelTestCase):
         assert instance.expires_on is None
 
     @assert_logs(logger="security", level="INFO")
-    def test_whitelist_from_request_general_behavior(self):
-        """Tests the general behavior of the whitelist_from_request method"""
-        fake_request = self.build_fake_request()
-        new_comment = "Whitelisted"
-        end_date = date.today() + timedelta(days=3)
-        instance = self.model_class.whitelist_from_request(
-            fake_request, end_date=end_date, comment=new_comment
-        )
-        assert instance.status == NetworkRule.Status.WHITELISTED
-        assert instance.active
-        assert instance.expires_on == end_date
-        assert instance.comment == new_comment
-
-    @assert_logs(logger="security", level="INFO")
-    def test_whitelist_from_request_without_end_date(self):
-        """Tests that the end_date is defaulted if not provided when whitelisting from request"""
-        fake_request = self.build_fake_request()
-        instance = self.model_class.whitelist_from_request(fake_request)
-        default_end_date = date.today() + timedelta(
-            days=instance.get_default_duration()
-        )
-        assert instance.active
-        assert instance.status == NetworkRule.Status.WHITELISTED
-        assert instance.expires_on == default_end_date
-
-    @assert_logs(logger="security", level="INFO")
-    def test_whitelist_from_request_override(self):
-        """Tests that a blacklisted rule can be whitelisted only with the 'override' argument"""
-        fake_request = self.build_fake_request()
-        fake_ip_address = get_client_ip(fake_request)
-        self.payload["ip"] = fake_ip_address
-        self.payload["status"] = NetworkRule.Status.BLACKLISTED
-        self.model_class.objects.create(**self.payload)
-        end_date = date.today() + timedelta(days=3)
-        # Without override
-        instance = self.model_class.whitelist_from_request(
-            fake_request, end_date=end_date, override=False
-        )
-        assert not instance.active
-        assert instance.status == NetworkRule.Status.BLACKLISTED
-        assert instance.expires_on == self.payload["expires_on"] != end_date
-        # With override
-        instance = self.model_class.whitelist_from_request(
-            fake_request, end_date=end_date, override=True
-        )
-        assert instance.active
-        assert instance.status == NetworkRule.Status.WHITELISTED
-        assert instance.expires_on == end_date
+    def test_whitelist_from_request(self):
+        """Tests the 'whitelist_from_request' method"""
+        self._test_activate_from_api("whitelist")
 
     @assert_logs(logger="security", level="INFO")
     def test_is_blacklisted_from_request(self):
@@ -412,6 +200,83 @@ class TestNetworkRule(ModelTestCase):
     # ----------------------------------------
     # Helpers
     # ----------------------------------------
+    def _test_activate(self, name):
+        """
+        Utility function to test the 'blacklist' or 'whitelist' methods
+        :param str name: Either blacklist or whitelist
+        """
+        instance = self.model_class.objects.create(**self.payload)
+        opposite_name = "whitelist" if name == "blacklist" else "blacklist"
+        main_method = getattr(instance, name)
+        main_property = lambda: getattr(instance, f"is_{name}ed")
+        opposite_method = getattr(instance, opposite_name)
+        opposite_property = lambda: getattr(instance, f"is_{opposite_name}ed")
+        # Without end_date
+        new_comment = "Comment 1"
+        main_method(comment=new_comment)
+        default_end_date = date.today() + timedelta(
+            days=instance.get_default_duration()
+        )
+        assert main_property()
+        assert instance.expires_on == default_end_date
+        assert instance.comment == new_comment
+        # With end_date
+        instance.clear()
+        end_date = date.today() + timedelta(days=3)
+        main_method(end_date=end_date, comment=new_comment)
+        assert main_property()
+        assert instance.expires_on == end_date
+        # Without override
+        instance.clear()
+        opposite_method()
+        main_method(override=False, end_date=end_date)
+        assert not main_property()
+        assert opposite_property()
+        # With override
+        main_method(override=True, end_date=end_date)
+        assert not opposite_property()
+        assert main_property()
+
+    def _test_activate_from_api(self, name):
+        """
+        Utility function to test the 'blacklist_from_request' or 'whitelist_from_request'
+        :param str name: Either blacklist or whitelist
+        """
+        main_class_method = getattr(self.model_class, f"{name}_from_request")
+        fake_request = self.build_fake_request()
+        new_comment = "Comment 1"
+        instance = main_class_method(fake_request, comment=new_comment)
+        # Setup dynamic instance calls
+        opposite_name = "whitelist" if name == "blacklist" else "blacklist"
+        opposite_method = getattr(instance, f"{opposite_name}")
+        main_property = lambda: getattr(instance, f"is_{name}ed")
+        opposite_property = lambda: getattr(instance, f"is_{opposite_name}ed")
+        # Without end_date
+        default_end_date = date.today() + timedelta(
+            days=instance.get_default_duration()
+        )
+        assert main_property()
+        assert instance.expires_on == default_end_date
+        assert instance.comment == new_comment
+        # With end_date
+        instance.clear()
+        end_date = date.today() + timedelta(days=3)
+        instance = main_class_method(
+            fake_request, end_date=end_date, comment=new_comment
+        )
+        assert main_property()
+        assert instance.expires_on == end_date
+        # Without override
+        instance.clear()
+        opposite_method()
+        instance = main_class_method(fake_request, end_date=end_date, override=False)
+        assert not main_property()
+        assert opposite_property()
+        # With override
+        instance = main_class_method(fake_request, end_date=end_date, override=True)
+        assert not opposite_property()
+        assert main_property()
+
     @staticmethod
     def _build_log_message(instance, type_):
         """
@@ -425,11 +290,8 @@ class TestNetworkRule(ModelTestCase):
 
     def _create_instances_for_clear_test(self):
         """
-        Builds various NetworkRule instances to test various scenarios for the clearing cron job later on
-        Returns 3 lists:
-            The payload used for the instances
-            The instances themselves
-            Whether they will be cleared
+        Builds various NetworkRule instances
+        Returns : the payloads used, the instances, and whether each instance is clearable
         :return: 3 lists of identical sizes
         :rtype: tuple(list, list, list)
         """

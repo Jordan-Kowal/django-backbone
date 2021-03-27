@@ -1,129 +1,132 @@
 """Viewsets for the 'security' app"""
 
+# Django
+from django.db.models import Q
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
+    HTTP_409_CONFLICT,
+)
+
 # Personal
 from jklib.django.drf.permissions import IsAdminUser
-from jklib.django.drf.viewsets import DynamicViewSet
+from jklib.django.drf.serializers import IdListSerializer
+from jklib.django.drf.viewsets import ImprovedModelViewSet
 
 # Local
-from .actions import (
-    BlacklistNetworkRuleHandler,
-    BulkDestroyNetworkRulesHandler,
-    ClearAllNetworkRulesHandler,
-    ClearNetworkRuleHandler,
-    CreateNetworkRuleHandler,
-    DestroyNetworkRuleHandler,
-    ListNetworkRulesHandler,
-    NewBlacklistNetworkRuleHandler,
-    NewWhitelistNetworkRuleHandler,
-    RetrieveNetworkRuleHandler,
-    UpdateNetworkRuleHandler,
-    WhitelistNetworkRuleHandler,
-)
 from .models import NetworkRule
+from .serializers import (
+    ActivateNetworkRuleSerializer,
+    ActivateNewNetworkRuleSerializer,
+    NetworkRuleSerializer,
+    StatusSerializer,
+)
 
 
 # --------------------------------------------------------------------------------
 # > ViewSets
 # --------------------------------------------------------------------------------
-class NetworkRuleViewSet(DynamicViewSet):
-    """
-    Viewset for the NetworkRule models.
-    Services can be split into the following categories:
-        Classic model CRUD
-        Additional CRUD
-        IP blacklisting
-        IP whitelisting
-        IP clearing
-    """
+class NetworkRuleViewSet(ImprovedModelViewSet):
+    """Viewset for the NetworkRule model"""
 
     queryset = NetworkRule.objects.all()
-
-    viewset_permissions = (IsAdminUser,)
-
-    known_actions = {
-        "create": {
-            "description": "Registers a new network rule",
-            "handler": CreateNetworkRuleHandler,
-            "permissions": None,
-        },
-        "list": {
-            "description": "List all existing network rules",
-            "handler": ListNetworkRulesHandler,
-            "permissions": None,
-        },
-        "retrieve": {
-            "description": "Fetches an existing network rule",
-            "handler": RetrieveNetworkRuleHandler,
-            "permissions": None,
-        },
-        "update": {
-            "description": "Updates an existing network rule",
-            "handler": UpdateNetworkRuleHandler,
-            "permissions": None,
-        },
-        "destroy": {
-            "description": "Deletes an existing network rule",
-            "handler": DestroyNetworkRuleHandler,
-            "permissions": None,
-        },
+    viewset_permission_classes = (IsAdminUser,)
+    serializer_classes = {
+        "default": NetworkRuleSerializer,
+        "activate_existing": ActivateNetworkRuleSerializer,
+        "activate_new": ActivateNewNetworkRuleSerializer,
+        "bulk_destroy": IdListSerializer,
+        "bulk_clear": StatusSerializer,
     }
 
-    extra_actions = {
-        # Additional CRUD
-        "bulk_destroy": {
-            "description": "Deletes several network rules instances at once",
-            "handler": BulkDestroyNetworkRulesHandler,
-            "permissions": None,
-            "methods": ["delete"],
-            "detail": False,
-        },
-        # Blacklist
-        "blacklist_new": {
-            "description": "Creates a network rule to blacklist an IP",
-            "handler": NewBlacklistNetworkRuleHandler,
-            "permissions": None,
-            "methods": ["post"],
-            "detail": False,
-            "url_path": "blacklist",
-        },
-        "blacklist_existing": {
-            "description": "Updates a network rule to blacklist an IP",
-            "handler": BlacklistNetworkRuleHandler,
-            "permissions": None,
-            "methods": ["post"],
-            "detail": True,
-            "url_path": "blacklist",
-        },
-        # Whitelist
-        "whitelist_new": {
-            "description": "Creates a network rule to whitelist an IP",
-            "handler": NewWhitelistNetworkRuleHandler,
-            "permissions": None,
-            "methods": ["post"],
-            "detail": False,
-            "url_path": "whitelist",
-        },
-        "whitelist_existing": {
-            "description": "Updates a network rule to whitelist an IP",
-            "handler": WhitelistNetworkRuleHandler,
-            "permissions": None,
-            "methods": ["post"],
-            "detail": True,
-            "url_path": "whitelist",
-        },
-        # Clear
-        "clear": {
-            "description": "Clears an existing network rule",
-            "handler": ClearNetworkRuleHandler,
-            "permissions": None,
-            "methods": ["post"],
-            "detail": True,
-        },
-        "clear_all": {
-            "description": "Clears all existing network rules (can be restricted to a specific status)",
-            "handler": ClearAllNetworkRulesHandler,
-            "permissions": None,
-            "methods": ["post"],
-            "detail": False,
-        },
-    }
+    @action(detail=True, methods=["put"], url_path="activate")
+    def activate_existing(self, request, pk=None):
+        """
+        Blacklists or whitelists an existing rule. Can return 409 if conflict without override
+        :param Request request: The user's HTTP request
+        :return: HTTP 200 with the rule data
+        :rtype: Response
+        """
+        instance = self.get_object()
+        serializer = self.get_valid_serializer(instance, data=request.data)
+        payload = {
+            "end_date": serializer.validated_data.get("expires_on", None),
+            "comment": serializer.validated_data.get("comment", None),
+            "override": serializer.validated_data.get("override", False),
+        }
+        status = serializer.validated_data["status"]
+        if status == NetworkRule.Status.WHITELISTED:
+            if instance.is_blacklisted and not payload["override"]:
+                return Response(None, status=HTTP_409_CONFLICT)
+            instance.whitelist(**payload)
+        else:
+            if instance.is_whitelisted and not payload["override"]:
+                return Response(None, status=HTTP_409_CONFLICT)
+            instance.blacklist(**payload)
+        serializer = self.get_serializer(instance)
+        serializer.data.pop("override", None)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    @action(detail=False, methods=["post"], url_path="activate")
+    def activate_new(self, request):
+        """
+        Creates a new blacklist or whitelist rule
+        :param Request request: The user's HTTP request
+        :return: HTTP 201 with the rule data
+        :rtype: Response
+        """
+        serializer = self.get_valid_serializer(data=request.data)
+        instance = serializer.save()
+        payload = {
+            "end_date": serializer.validated_data.get("expires_on", None),
+            "comment": serializer.validated_data.get("comment", None),
+            "override": True,
+        }
+        status = serializer.validated_data["status"]
+        if status == NetworkRule.Status.WHITELISTED:
+            instance.whitelist(**payload)
+        else:
+            instance.blacklist(**payload)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    @action(detail=False, methods=["post"], url_path="clear")
+    def bulk_clear(self, request):
+        """
+        Clears multiple rules at once
+        :param Request request: The user's HTTP request
+        :return: HTTP 204 with no data
+        :rtype: Response
+        """
+        serializer = self.get_valid_serializer(data=request.data)
+        status = serializer.validated_data.get("status", None)
+        # Build the query
+        if status is None:
+            query = (
+                Q(active=True)
+                | ~Q(expires_on=None)
+                | ~Q(status=NetworkRule.Status.NONE)
+            )
+        else:
+            query = Q(status=status)
+        eligible_instances = NetworkRule.objects.filter(query)
+        # Apply changes
+        for instance in eligible_instances:
+            instance.clear()
+        return Response(None, status=HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["put"])
+    def clear(self, request, pk=None):
+        """
+        Clears an existing rule
+        :param Request request: The user's HTTP request
+        :return: HTTP 200 with the rule data
+        :rtype: Response
+        """
+        instance = self.get_object()
+        instance.clear()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=HTTP_200_OK)

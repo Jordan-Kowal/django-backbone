@@ -55,11 +55,11 @@ class ContactViewset(DynamicViewSet):
     }
 
     extra_actions = {
-        "bulk_destroy": {
-            "description": "Deletes several Contact instances at once",
-            "handler": BulkDestroyContactsHandler,
-            "permissions": (IsAdminUser,),
-            "methods": ["delete"],
-            "detail": False,
-        },
+        # "bulk_destroy": {
+        #     "description": "Deletes several Contact instances at once",
+        #     "handler": BulkDestroyContactsHandler,
+        #     "permissions": (IsAdminUser,),
+        #     "methods": ["delete"],
+        #     "detail": False,
+        # },
     }
