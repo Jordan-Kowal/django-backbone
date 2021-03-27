@@ -2,7 +2,6 @@
 
 ### Project wide:
 - Update README.md
-- Add requirements-dev.txt
 - Use factory boy
 - Setup admins
 - Make it into a django package
@@ -30,14 +29,10 @@
 - Simplify viewsets, serializers, and actions
 - Simplify model and action tests
 - Add Factory in tests
-- Merge blacklist/whitelist into 1 service
 - Make docstrings simpler
 
 ### Healthchecks
-- Simplify viewsets, serializers, and actions
-- Simplify model and action tests
 - Add Factory in tests
-- Make docstrings simpler
 
 ### Security
 - Add Factory in tests

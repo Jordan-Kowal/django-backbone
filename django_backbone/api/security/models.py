@@ -1,4 +1,4 @@
-"""NetworkRule"""
+"""Models for the 'security' app"""
 
 # Built-in
 from datetime import date, timedelta
@@ -72,8 +72,6 @@ class NetworkRule(LifeCycleModel):
     # Behavior (meta, str, save)
     # ----------------------------------------
     class Meta:
-        """Meta class to setup our database table"""
-
         db_table = "core_network_rules"
         indexes = []
         ordering = ["-id"]

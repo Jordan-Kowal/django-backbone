@@ -1,4 +1,5 @@
-"""HealthcheckDummy"""
+"""Models for the 'healthchecks' app"""
+
 
 # Django
 from django.db.models import CharField, Model

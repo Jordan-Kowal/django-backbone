@@ -1,4 +1,4 @@
-"""Tests for the NetworkRuleViewSet"""
+"""Tests for the 'security' app viewsets"""
 
 # Built-in
 from datetime import date, timedelta
@@ -8,7 +8,7 @@ from jklib.django.drf.tests import ActionTestCase
 from jklib.django.utils.tests import assert_logs
 
 # Local
-from ...models import NetworkRule
+from ..models import NetworkRule
 
 # --------------------------------------------------------------------------------
 # > Helpers
@@ -16,7 +16,7 @@ from ...models import NetworkRule
 SERVICE_URL = "/api/network_rules/"
 
 
-class Base(ActionTestCase):
+class BaseTestCase(ActionTestCase):
     """Base class for all the NetworkRule action test cases"""
 
     def setUp(self):
@@ -144,7 +144,7 @@ class Base(ActionTestCase):
 # --------------------------------------------------------------------------------
 # > TestCases
 # --------------------------------------------------------------------------------
-class TestCreateNetworkRule(Base):
+class TestCreateNetworkRule(BaseTestCase):
     """TestCase for the 'create' action"""
 
     url_template = SERVICE_URL
@@ -184,7 +184,7 @@ class TestCreateNetworkRule(Base):
         self.assert_instance_representation(network_rule, response.data)
 
 
-class TestListNetworkRules(Base):
+class TestListNetworkRules(BaseTestCase):
     """TestCase for the 'list' action"""
 
     url_template = SERVICE_URL
@@ -211,7 +211,7 @@ class TestListNetworkRules(Base):
         self.assert_instance_representation(rule_1, response.data[1])
 
 
-class TestRetrieveNetworkRule(Base):
+class TestRetrieveNetworkRule(BaseTestCase):
     """TestCase for the 'retrieve' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/"
@@ -237,7 +237,7 @@ class TestRetrieveNetworkRule(Base):
         self.assert_instance_representation(self.rule, response.data)
 
 
-class TestUpdateNetworkRule(Base):
+class TestUpdateNetworkRule(BaseTestCase):
     """TestCase for the 'update' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/"
@@ -279,7 +279,7 @@ class TestUpdateNetworkRule(Base):
         self.assert_instance_representation(network_rule, response.data)
 
 
-class TestDestroyNetworkRule(Base):
+class TestDestroyNetworkRule(BaseTestCase):
     """TestCase for the 'destroy' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/"
@@ -314,7 +314,7 @@ class TestDestroyNetworkRule(Base):
         assert NetworkRule.objects.count() == 0
 
 
-class TestBulkDestroyNetworkRules(Base):
+class TestBulkDestroyNetworkRules(BaseTestCase):
     """TestCase for the 'bulk_destroy' action"""
 
     url_template = SERVICE_URL
@@ -368,7 +368,7 @@ class TestBulkDestroyNetworkRules(Base):
         assert NetworkRule.objects.first().id == NetworkRule.objects.last().id == 3
 
 
-class TestClearNetworkRule(Base):
+class TestClearNetworkRule(BaseTestCase):
     """TestCase for the 'clear' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/clear/"
@@ -403,7 +403,7 @@ class TestClearNetworkRule(Base):
         self.assert_instance_representation(updated_rule_1, response.data)
 
 
-class TestBulkClearNetworkRule(Base):
+class TestBulkClearNetworkRule(BaseTestCase):
     """TestCase for the 'bulk_clear' action"""
 
     url_template = f"{SERVICE_URL}/clear/"
@@ -492,7 +492,7 @@ class TestBulkClearNetworkRule(Base):
             )
 
 
-class TestActivateNewNetworkRule(Base):
+class TestActivateNewNetworkRule(BaseTestCase):
     """TestCase for the 'activate_new' action"""
 
     url_template = f"{SERVICE_URL}/activate/"
@@ -567,7 +567,7 @@ class TestActivateNewNetworkRule(Base):
         self.assert_instance_representation(rule_2, response.data)
 
 
-class TestActivateExistingNetworkRule(Base):
+class TestActivateExistingNetworkRule(BaseTestCase):
     """TestCase for the 'activate_existing' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/activate/"

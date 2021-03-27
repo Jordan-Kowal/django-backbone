@@ -1,0 +1,8 @@
+# Pre-commit
+pre-commit
+pydocstyle
+isort
+black
+flake8
+
+# Tests

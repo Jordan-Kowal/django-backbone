@@ -1,4 +1,4 @@
-"""Tests for the 'NetworkRule' model"""
+"""Tests for the 'security' app models"""
 
 
 # Built-in
@@ -13,7 +13,7 @@ from jklib.django.utils.network import get_client_ip
 from jklib.django.utils.tests import assert_logs
 
 # Local
-from ...models import NetworkRule
+from ..models import NetworkRule
 
 
 # --------------------------------------------------------------------------------

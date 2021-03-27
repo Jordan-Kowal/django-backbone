@@ -44,12 +44,7 @@ class NetworkRuleViewSet(ImprovedModelViewSet):
 
     @action(detail=True, methods=["put"], url_path="activate")
     def activate_existing(self, request, pk=None):
-        """
-        Blacklists or whitelists an existing rule. Can return 409 if conflict without override
-        :param Request request: The user's HTTP request
-        :return: HTTP 200 with the rule data
-        :rtype: Response
-        """
+        """Blacklists or whitelists an existing rule. Can return 409 if conflict without override"""
         instance = self.get_object()
         serializer = self.get_valid_serializer(instance, data=request.data)
         payload = {
@@ -72,12 +67,7 @@ class NetworkRuleViewSet(ImprovedModelViewSet):
 
     @action(detail=False, methods=["post"], url_path="activate")
     def activate_new(self, request):
-        """
-        Creates a new blacklist or whitelist rule
-        :param Request request: The user's HTTP request
-        :return: HTTP 201 with the rule data
-        :rtype: Response
-        """
+        """Creates a new blacklist or whitelist rule"""
         serializer = self.get_valid_serializer(data=request.data)
         instance = serializer.save()
         payload = {
@@ -95,12 +85,7 @@ class NetworkRuleViewSet(ImprovedModelViewSet):
 
     @action(detail=False, methods=["post"], url_path="clear")
     def bulk_clear(self, request):
-        """
-        Clears multiple rules at once
-        :param Request request: The user's HTTP request
-        :return: HTTP 204 with no data
-        :rtype: Response
-        """
+        """Clears multiple rules at once"""
         serializer = self.get_valid_serializer(data=request.data)
         status = serializer.validated_data.get("status", None)
         # Build the query
@@ -120,12 +105,7 @@ class NetworkRuleViewSet(ImprovedModelViewSet):
 
     @action(detail=True, methods=["put"])
     def clear(self, request, pk=None):
-        """
-        Clears an existing rule
-        :param Request request: The user's HTTP request
-        :return: HTTP 200 with the rule data
-        :rtype: Response
-        """
+        """Clears an existing rule"""
         instance = self.get_object()
         instance.clear()
         serializer = self.get_serializer(instance)
