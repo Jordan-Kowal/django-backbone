@@ -26,10 +26,7 @@
 - Management command to start new app
 
 ### Contact
-- Simplify viewsets, serializers, and actions
-- Simplify model and action tests
 - Add Factory in tests
-- Make docstrings simpler
 
 ### Healthchecks
 - Add Factory in tests

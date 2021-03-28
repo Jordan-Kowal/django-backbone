@@ -70,8 +70,6 @@ class Token(LifeCycleModel):
     # Behavior (meta, str, save)
     # ----------------------------------------
     class Meta:
-        """Meta class to setup our database table"""
-
         db_table = "users_tokens"
         indexes = []
         ordering = ["-id"]

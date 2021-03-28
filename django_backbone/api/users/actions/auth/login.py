@@ -22,8 +22,6 @@ class LoginSerializer(NotEmptyModelSerializer):
     # Behavior
     # ----------------------------------------
     class Meta:
-        """Meta class to setup the serializer"""
-
         model = User
         fields = [
             "email",

@@ -17,8 +17,6 @@ class RetrieveUserSerializer(ModelSerializer):
     """Model serializer to fetch data from the User instance"""
 
     class Meta:
-        """Meta class to setup the serializer"""
-
         model = User
 
     def to_representation(self, user):
@@ -50,9 +48,7 @@ def user_representation(user):
         "is_active": user.is_active,
         "is_staff": user.is_staff,
         "last_login": user.last_login,
-        "profile": {
-            "is_verified": profile.is_verified,
-        },
+        "profile": {"is_verified": profile.is_verified,},
     }
 
 

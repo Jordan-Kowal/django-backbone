@@ -1,4 +1,4 @@
-"""Contact"""
+"""Models for the 'contact' app"""
 
 # Built-in
 from collections import namedtuple
@@ -30,18 +30,7 @@ EmailInfo = namedtuple("EmailInfo", ["template", "subject"])
 # > Models
 # --------------------------------------------------------------------------------
 class Contact(LifeCycleModel):
-    """
-    Contact messages sent by our users through the API
-    Class has been split into the following sub-sections:
-        Constants
-        Fields
-        Behavior
-        Validation
-        Properties
-        Public API
-        CRON jobs
-        Private methods
-    """
+    """Contact messages sent by our users through the API"""
 
     # ----------------------------------------
     # Constants
@@ -73,11 +62,7 @@ class Contact(LifeCycleModel):
     # ----------------------------------------
     # Fields
     # ----------------------------------------
-    ip = RequiredField(
-        GenericIPAddressField,
-        db_index=True,
-        verbose_name="IP Address",
-    )
+    ip = RequiredField(GenericIPAddressField, db_index=True, verbose_name="IP Address",)
     user = ForeignKey(
         User,
         on_delete=SET_NULL,
@@ -100,17 +85,13 @@ class Contact(LifeCycleModel):
         verbose_name="Subject",
     )
     body = RequiredField(
-        TrimTextField,
-        validators=[LengthValidator(*BODY_LENGTH)],
-        verbose_name="Body",
+        TrimTextField, validators=[LengthValidator(*BODY_LENGTH)], verbose_name="Body",
     )
 
     # ----------------------------------------
     # Behavior (meta, str, save)
     # ----------------------------------------
     class Meta:
-        """Meta class to setup the model"""
-
         db_table = "contacts"
         indexes = []
         ordering = ["-id"]
@@ -171,14 +152,15 @@ class Contact(LifeCycleModel):
         if to_user:
             self._send_async_email(self.EmailTemplate.USER_NOTIFICATION, self.email)
 
-    def should_ban_ip(self):
+    @classmethod
+    def should_ban_ip(cls, ip):
         """
         Checks if an IP should be banned based on the amount of contact requests recently sent
-        If true, it means the ban would happen at the next API call
+        :param str ip: The IP address to check
         :return: Whether it should be banned
         :rtype: bool
         """
-        ban_settings = self.get_ban_settings()
+        ban_settings = cls.get_ban_settings()
         threshold = ban_settings["threshold"]
         # No threshold means no ban
         if not threshold:
@@ -187,8 +169,8 @@ class Contact(LifeCycleModel):
         creation_date_threshold = timezone.now() - timedelta(
             days=ban_settings["period_in_days"]
         )
-        count = self.__class__.objects.filter(
-            ip=self.ip, created_at__gt=creation_date_threshold
+        count = cls.objects.filter(
+            ip=ip, created_at__gt=creation_date_threshold
         ).count()
         return count >= threshold
 

@@ -22,7 +22,7 @@ from .users.viewsets import AuthViewSet, UserViewSet
 router = ImprovedRouter()
 
 router.register("auth", AuthViewSet, "auth")
-router.register("contact", ContactViewset, "contact")
+router.register("contacts", ContactViewset, "contacts")
 router.register("healthchecks", HealthcheckViewSet, "healthchecks")
 router.register("network_rules", NetworkRuleViewSet, "network_rules")
 router.register("users", UserViewSet, "users")

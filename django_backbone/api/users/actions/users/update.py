@@ -29,8 +29,6 @@ class UpdateAdminSerializer(NotEmptyModelSerializer):
     # Behavior
     # ----------------------------------------
     class Meta:
-        """Meta class to setup the serializer"""
-
         model = User
         fields = [
             "first_name",
@@ -99,8 +97,6 @@ class UpdateUserSerializer(NotEmptyModelSerializer):
     # Behavior
     # ----------------------------------------
     class Meta:
-        """Meta class to setup the serializer"""
-
         model = User
         fields = [
             "email",

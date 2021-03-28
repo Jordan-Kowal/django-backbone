@@ -18,7 +18,7 @@ class BaseTestCase(ActionTestCase):
 
     # Constant
     url_template = f"{SERVICE_URL}/{{service}}/"
-    http_method_name = "get"
+    http_method_name = "GET"
     success_code = 200
 
     # To override

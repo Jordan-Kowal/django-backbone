@@ -1,4 +1,4 @@
-"""Tests for the 'Contact' model"""
+"""Tests for the 'contact' app models"""
 
 # Built-in
 from datetime import timedelta
@@ -14,31 +14,16 @@ from jklib.django.db.tests import ModelTestCase
 from jklib.django.utils.settings import get_config
 
 # Local
-from ...models import Contact
+from ..models import Contact
 
 
 # --------------------------------------------------------------------------------
 # > TestCase
 # --------------------------------------------------------------------------------
 class TestContact(ModelTestCase):
-    """
-    TestCase for the 'Contact' model
-    Split into the following sections:
-        Behavior
-        Field tests
-        Properties tests
-        Public API
-        Cron tests
-        Helpers
-    """
+    """TestCase for the 'Contact' model"""
 
     model_class = Contact
-    required_fields = [
-        "ip",
-        "email",
-        "subject",
-        "body",
-    ]
 
     # ----------------------------------------
     # Behavior
@@ -53,80 +38,6 @@ class TestContact(ModelTestCase):
             "subject": "Fake subject",
             "body": "Fake body but long enough",
         }
-
-    # ----------------------------------------
-    # Field tests
-    # ----------------------------------------
-    def test_required_fields(self):
-        """Tests that required fields are truly required"""
-        self.assert_fields_are_required(self.payload)
-        self.assert_instance_count_equals(0)
-
-    def test_ip(self):
-        """Tests the IP address must be in a valid format"""
-        self.payload["ip"] = "Invalid IP"
-        with self.assertRaises(self.common_errors):
-            self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(0)
-
-    def test_user(self):
-        """Tests that the user field only accepts user instances"""
-        # Not user
-        self.payload["user"] = "Invalid User"
-        with self.assertRaises(self.common_errors):
-            self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(0)
-        # With user
-        self.payload["user"] = self.create_user()
-        self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(1)
-
-    def test_name(self):
-        """Tests that the 'name' field must be of a certain length"""
-        self._assert_field_length_error(
-            payload=self.payload,
-            field="name",
-            min_=self.model_class.NAME_LENGTH[0],
-            max_=self.model_class.NAME_LENGTH[1],
-        )
-        self.assert_instance_count_equals(0)
-
-    def test_email(self):
-        """Tests that the 'email' must be a valid format"""
-        for invalid_email in ["invalid@email", 33]:
-            self.payload["email"] = invalid_email
-            with self.assertRaises(self.common_errors):
-                self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(0)
-
-    def test_subject(self):
-        """Tests that the 'subject' field must be of a certain length"""
-        self._assert_field_length_error(
-            payload=self.payload,
-            field="subject",
-            min_=self.model_class.SUBJECT_LENGTH[0],
-            max_=self.model_class.SUBJECT_LENGTH[1],
-        )
-        self.assert_instance_count_equals(0)
-
-    def test_body(self):
-        """Tests that the 'body' field must be of a certain length"""
-        self._assert_field_length_error(
-            payload=self.payload,
-            field="body",
-            min_=self.model_class.BODY_LENGTH[0],
-            max_=self.model_class.BODY_LENGTH[1],
-        )
-        self.assert_instance_count_equals(0)
-
-    def test_successful_creation(self):
-        """Tests that we can successfully create a contact instance with and without user"""
-        self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(1)
-        user = self.create_user()
-        self.payload["user"] = user
-        self.model_class(**self.payload).save()
-        self.assert_instance_count_equals(2)
 
     # ----------------------------------------
     # Properties tests
@@ -210,19 +121,18 @@ class TestContact(ModelTestCase):
         """Tests that we correctly check if an IP should be banned based on the settings"""
         ban_settings = Contact.get_ban_settings()
         threshold = ban_settings["threshold"]
+        ip = self.payload["ip"]
         # No threshold, no ban
         if not threshold:
-            contact = self.model_class.objects.create(**self.payload)
-            assert not contact.test_should_ban_ip()
+            self.model_class.objects.create(**self.payload)
+            assert not self.model_class.should_ban_ip(ip)
         # Reach the threshold and check the ban
         else:
             for i in range(threshold - 1):
-                instance = self.model_class.objects.create(**self.payload)
-                assert not instance.should_ban_ip()
-            instance = self.model_class.objects.create(
-                **self.payload
-            )  # Reach the threshold
-            assert instance.should_ban_ip()
+                self.model_class.objects.create(**self.payload)
+                assert not self.model_class.should_ban_ip(ip)
+            self.model_class.objects.create(**self.payload)  # Reach the threshold
+            assert self.model_class.should_ban_ip(ip)
 
     # ----------------------------------------
     # Cron tests
@@ -243,23 +153,3 @@ class TestContact(ModelTestCase):
         # Call the job
         self.model_class.remove_old_entries()
         self.assert_instance_count_equals(6)
-
-    # ----------------------------------------
-    # Helpers
-    # ----------------------------------------
-    def _assert_field_length_error(self, payload, field, min_, max_):
-        """
-        Tests that a specific field with the given min/max lengths generates an error on creation
-        :param dict payload: A valid payload that could be used to create a instance
-        :param str field: The field to override and test
-        :param int min_: The minimal length accepted
-        :param int max_: The maximum length accepted
-        """
-        empty_value = ""
-        space_value = " " * min_
-        short_value = "a" * (min_ - 1)
-        long_value = "a" * (max_ + 1)
-        for value in [empty_value, space_value, short_value, long_value]:
-            self.payload[field] = value
-            with self.assertRaises(self.common_errors):
-                self.model_class(**payload).save()

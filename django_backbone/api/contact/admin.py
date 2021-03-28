@@ -1,4 +1,4 @@
-"""ContactAdmin"""
+"""Admins for the 'contact' app"""
 
 
 # Django
@@ -75,25 +75,6 @@ class ContactAdmin(admin.ModelAdmin):
     radio_fields = {}
     raw_id_fields = []
     fieldsets = [
-        [
-            "Informations Structurelles",
-            {
-                "fields": [
-                    "id",
-                    "created_at",
-                ],
-            },
-        ],
-        [
-            "Contenu",
-            {
-                "fields": [
-                    "ip",
-                    "name",
-                    "email",
-                    "subject",
-                    "body",
-                ],
-            },
-        ],
+        ["Informations Structurelles", {"fields": ["id", "created_at",],},],
+        ["Contenu", {"fields": ["ip", "name", "email", "subject", "body",],},],
     ]

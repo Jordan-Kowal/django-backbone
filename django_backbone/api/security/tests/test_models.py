@@ -39,15 +39,6 @@ class TestNetworkRule(ModelTestCase):
         }
 
     # ----------------------------------------
-    # Generic tests
-    # ----------------------------------------
-    @assert_logs(logger="security", level="INFO")
-    def test_successful_creation(self):
-        """Tests that the model can be created successfully"""
-        self.model_class.objects.create(**self.payload)
-        self.assert_instance_count_equals(1)
-
-    # ----------------------------------------
     # Property tests
     # ----------------------------------------
     @assert_logs("security", "INFO")

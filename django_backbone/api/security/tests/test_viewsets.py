@@ -22,36 +22,16 @@ class BaseTestCase(ActionTestCase):
     def setUp(self):
         """Creates and authenticates an Admin user"""
         self.admin = self.create_admin_user(authenticate=True)
-        self.payload = None
 
-    def assert_admin_permissions(self, url):
-        """
-        Checks that the service is only available to admin users
-        :param str url: The target url
-        """
-        admin = self.create_admin_user()
-        user = self.create_user()
-        # 401 Not authenticated
-        self.api_client.logout()
-        response = self.http_method(url, data=self.payload)
-        assert response.status_code == 401
-        # 403 Not admin
-        self.api_client.force_authenticate(user)
-        response = self.http_method(url, data=self.payload)
-        assert response.status_code == 403
-        # 201 Admin
-        self.api_client.logout()
-        self.api_client.force_authenticate(admin)
-        response = self.http_method(url, data=self.payload)
-        assert response.status_code == self.success_code
-
-    def assert_instance_from_payload(self, instance, mapping=None):
+    @staticmethod
+    def assert_instance_from_payload(instance, payload, mapping=None):
         """
         Compares the payload fields to an instance.
         :param NetworkRule instance: The related instance
+        :param dict payload: The data sent in the request
         :param dict mapping: Used to map payload fieldnames with instance fieldnames
         """
-        for field, value in self.payload.items():
+        for field, value in payload.items():
             if field == "expires_on" and value is None:
                 continue
             instance_field = field if mapping is None else mapping[field]
@@ -64,7 +44,7 @@ class BaseTestCase(ActionTestCase):
     def assert_instance_representation(network_rule, response_data):
         """
         Compares a response payload with a NetworkRule instance
-        :param NetworkRule network_rule: User instance from the database
+        :param NetworkRule network_rule: NetworkRule instance from the database
         :param dict response_data: Response data from the API
         """
         expires_on = None
@@ -77,49 +57,61 @@ class BaseTestCase(ActionTestCase):
         assert network_rule.active == response_data["active"]
         assert network_rule.comment == response_data["comment"]
 
-    def assert_status_field_is_required(self, url):
-        """Checks that the status field is required"""
+    def assert_status_field_is_required(self, url, payload):
+        """
+        Checks that the status field is required
+        :param str url: The target url
+        :param dict payload: The data to pass to the request
+        """
+        temp_payload = payload.copy()
         # None
-        self.payload["status"] = None
-        response = self.http_method(url, data=self.payload)
+        temp_payload["status"] = None
+        response = self.http_method(url, data=temp_payload)
         assert response.status_code == 400
         assert len(response.data["status"]) > 0
         # Empty String
-        self.payload["status"] = ""
-        response = self.http_method(url, data=self.payload)
+        temp_payload["status"] = ""
+        response = self.http_method(url, data=temp_payload)
         assert response.status_code == 400
         assert len(response.data["status"]) > 0
         # Missing
-        del self.payload["status"]
-        response = self.http_method(url, self.payload)
+        del temp_payload["status"]
+        response = self.http_method(url, temp_payload)
         assert response.status_code == 400
         assert len(response.data["status"]) > 0
 
-    def assert_status_field_active_choices(self, url):
-        """Checks that the status can only be WHITELISTED or BLACKLISTED"""
-        self.payload["status"] = 0
-        response = self.http_method(url, data=self.payload)
+    def assert_status_field_active_choices(self, url, payload):
+        """
+        Checks that the status can only be WHITELISTED or BLACKLISTED
+        :param str url: The target url
+        :param dict payload: The data to pass to the request
+        """
+        temp_payload = payload.copy()
+        temp_payload["status"] = 0
+        response = self.http_method(url, data=temp_payload)
         assert response.status_code == 400
         assert len(response.data["status"]) > 0
         for value in [1, 2]:
-            self.payload["ip"] = f"127.0.0.{value}"
-            self.payload["status"] = value
-            response = self.http_method(url, data=self.payload)
+            temp_payload["ip"] = f"127.0.0.{value}"
+            temp_payload["status"] = value
+            response = self.http_method(url, data=temp_payload)
             assert response.status_code == self.success_code
 
-    def assert_valid_expires_on(self, url):
+    def assert_valid_expires_on(self, url, payload):
         """
         Checks that the provided date cannot be in the past
         :param str url: The target url
+        :param dict payload: The data to pass to the request
         """
+        temp_payload = payload.copy()
         # Invalid dates
-        self.payload["expires_on"] = (date.today() - timedelta(days=1)).isoformat()
-        response = self.http_method(url, data=self.payload)
+        temp_payload["expires_on"] = (date.today() - timedelta(days=1)).isoformat()
+        response = self.http_method(url, data=temp_payload)
         assert response.status_code == 400
         assert len(response.data["expires_on"]) > 0
         # Valid date
-        self.payload["expires_on"] = (date.today() + timedelta(days=1)).isoformat()
-        response = self.http_method(url, data=self.payload)
+        temp_payload["expires_on"] = (date.today() + timedelta(days=1)).isoformat()
+        response = self.http_method(url, data=temp_payload)
         assert response.status_code == self.success_code
 
     @staticmethod
@@ -148,7 +140,7 @@ class TestCreateNetworkRule(BaseTestCase):
     """TestCase for the 'create' action"""
 
     url_template = SERVICE_URL
-    http_method_name = "post"
+    http_method_name = "POST"
     success_code = 201
 
     def setUp(self):
@@ -165,13 +157,13 @@ class TestCreateNetworkRule(BaseTestCase):
     @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
-        self.assert_admin_permissions(url=self.url())
+        self.assert_admin_permissions(url=self.url(), payload=self.payload)
         assert NetworkRule.objects.count() == 1
 
     @assert_logs("security", "INFO")
     def test_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
-        self.assert_valid_expires_on(url=self.url())
+        self.assert_valid_expires_on(url=self.url(), payload=self.payload)
 
     @assert_logs("security", "INFO")
     def test_create_success(self):
@@ -180,7 +172,7 @@ class TestCreateNetworkRule(BaseTestCase):
         assert response.status_code == self.success_code
         assert NetworkRule.objects.count() == 1
         network_rule = NetworkRule.objects.get(pk=1)
-        self.assert_instance_from_payload(network_rule)
+        self.assert_instance_from_payload(network_rule, self.payload)
         self.assert_instance_representation(network_rule, response.data)
 
 
@@ -188,7 +180,7 @@ class TestListNetworkRules(BaseTestCase):
     """TestCase for the 'list' action"""
 
     url_template = SERVICE_URL
-    http_method_name = "get"
+    http_method_name = "GET"
     success_code = 200
 
     def test_permissions(self):
@@ -215,7 +207,7 @@ class TestRetrieveNetworkRule(BaseTestCase):
     """TestCase for the 'retrieve' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/"
-    http_method_name = "get"
+    http_method_name = "GET"
     success_code = 200
 
     @assert_logs("security", "INFO")
@@ -241,7 +233,7 @@ class TestUpdateNetworkRule(BaseTestCase):
     """TestCase for the 'update' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/"
-    http_method_name = "put"
+    http_method_name = "PUT"
     success_code = 200
 
     @assert_logs("security", "INFO")
@@ -262,12 +254,12 @@ class TestUpdateNetworkRule(BaseTestCase):
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         assert NetworkRule.objects.count() == 1
-        self.assert_admin_permissions(url=self.detail_url)
+        self.assert_admin_permissions(url=self.detail_url, payload=self.payload)
 
     @assert_logs("security", "INFO")
     def test_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
-        self.assert_valid_expires_on(url=self.detail_url)
+        self.assert_valid_expires_on(url=self.detail_url, payload=self.payload)
 
     @assert_logs("security", "INFO")
     def test_success(self):
@@ -275,7 +267,7 @@ class TestUpdateNetworkRule(BaseTestCase):
         response = self.http_method(self.detail_url, data=self.payload)
         assert response.status_code == self.success_code
         network_rule = NetworkRule.objects.get(pk=1)
-        self.assert_instance_from_payload(network_rule)
+        self.assert_instance_from_payload(network_rule, self.payload)
         self.assert_instance_representation(network_rule, response.data)
 
 
@@ -283,7 +275,7 @@ class TestDestroyNetworkRule(BaseTestCase):
     """TestCase for the 'destroy' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/"
-    http_method_name = "delete"
+    http_method_name = "DELETE"
     success_code = 204
 
     @assert_logs("security", "INFO")
@@ -318,7 +310,7 @@ class TestBulkDestroyNetworkRules(BaseTestCase):
     """TestCase for the 'bulk_destroy' action"""
 
     url_template = SERVICE_URL
-    http_method_name = "delete"
+    http_method_name = "DELETE"
     success_code = 204
 
     @assert_logs("security", "INFO")
@@ -332,25 +324,9 @@ class TestBulkDestroyNetworkRules(BaseTestCase):
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         assert NetworkRule.objects.count() == 4
-        self.payload = {"ids": [1, 3]}
-        self.assert_admin_permissions(url=self.url())
+        payload = {"ids": [1, 3]}
+        self.assert_admin_permissions(url=self.url(), payload=payload)
         assert NetworkRule.objects.count() == 2
-
-    def test_ids_field_is_required(self):
-        """Tests that the 'ids' field is required"""
-        payloads = [None, {}, {"ids": None}, {"ids": []}]
-        for payload in payloads:
-            response = self.http_method(self.url(), data=payload)
-            assert response.status_code == 400
-            assert len(response.data["ids"]) > 0
-            assert NetworkRule.objects.count() == 4
-
-    def test_no_valid_ids(self):
-        """Tests that providing no valid IDs return a 404"""
-        payload = {"ids": [5, 7]}
-        response = self.http_method(self.url(), data=payload)
-        assert response.status_code == 404
-        assert NetworkRule.objects.count() == 4
 
     @assert_logs("security", "INFO")
     def test_success(self):
@@ -372,7 +348,7 @@ class TestClearNetworkRule(BaseTestCase):
     """TestCase for the 'clear' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/clear/"
-    http_method_name = "put"
+    http_method_name = "PUT"
     success_code = 200
 
     @assert_logs("security", "INFO")
@@ -407,7 +383,7 @@ class TestBulkClearNetworkRule(BaseTestCase):
     """TestCase for the 'bulk_clear' action"""
 
     url_template = f"{SERVICE_URL}/clear/"
-    http_method_name = "post"
+    http_method_name = "POST"
     success_code = 204
 
     @assert_logs("security", "INFO")
@@ -496,7 +472,7 @@ class TestActivateNewNetworkRule(BaseTestCase):
     """TestCase for the 'activate_new' action"""
 
     url_template = f"{SERVICE_URL}/activate/"
-    http_method_name = "post"
+    http_method_name = "POST"
     success_code = 201
 
     def setUp(self):
@@ -512,12 +488,12 @@ class TestActivateNewNetworkRule(BaseTestCase):
     @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
-        self.assert_admin_permissions(url=self.url())
+        self.assert_admin_permissions(url=self.url(), payload=self.payload)
 
     @assert_logs("security", "INFO")
     def test_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
-        self.assert_valid_expires_on(url=self.url())
+        self.assert_valid_expires_on(url=self.url(), payload=self.payload)
 
     def test_status_field_is_required(self):
         """Test that the status field is required"""
@@ -538,9 +514,9 @@ class TestActivateNewNetworkRule(BaseTestCase):
     @assert_logs("security", "INFO")
     def test_status_field(self):
         """Tests is required and has limited choices"""
-        self.assert_status_field_is_required(self.url())
+        self.assert_status_field_is_required(self.url(), self.payload)
         assert NetworkRule.objects.count() == 0
-        self.assert_status_field_active_choices(self.url())
+        self.assert_status_field_active_choices(self.url(), self.payload)
         assert NetworkRule.objects.count() == 2
 
     @assert_logs("security", "INFO")
@@ -552,7 +528,7 @@ class TestActivateNewNetworkRule(BaseTestCase):
         assert response.status_code == self.success_code
         assert NetworkRule.objects.count() == 1
         rule_1 = NetworkRule.objects.get(pk=1)
-        self.assert_instance_from_payload(rule_1)
+        self.assert_instance_from_payload(rule_1, self.payload)
         self.assert_instance_representation(rule_1, response.data)
         # Blacklisted
         self.payload["ip"] = "127.0.0.2"
@@ -563,7 +539,7 @@ class TestActivateNewNetworkRule(BaseTestCase):
         assert response.status_code == self.success_code
         assert NetworkRule.objects.count() == 2
         rule_2 = NetworkRule.objects.get(pk=2)
-        self.assert_instance_from_payload(rule_2)
+        self.assert_instance_from_payload(rule_2, self.payload)
         self.assert_instance_representation(rule_2, response.data)
 
 
@@ -571,7 +547,7 @@ class TestActivateExistingNetworkRule(BaseTestCase):
     """TestCase for the 'activate_existing' action"""
 
     url_template = f"{SERVICE_URL}/{{id}}/activate/"
-    http_method_name = "put"
+    http_method_name = "PUT"
     success_code = 200
 
     @assert_logs("security", "INFO")
@@ -590,19 +566,19 @@ class TestActivateExistingNetworkRule(BaseTestCase):
     @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
-        self.assert_admin_permissions(url=self.detail_url)
+        self.assert_admin_permissions(url=self.detail_url, payload=self.payload)
 
     @assert_logs("security", "INFO")
     def test_expires_on(self):
         """Tests that you must provide a valid date in format and value"""
-        self.assert_valid_expires_on(url=self.detail_url)
+        self.assert_valid_expires_on(url=self.detail_url, payload=self.payload)
 
     @assert_logs("security", "INFO")
     def test_status_field(self):
         """Tests is required and has limited choices"""
         self.payload["override"] = True
-        self.assert_status_field_is_required(self.detail_url)
-        self.assert_status_field_active_choices(self.detail_url)
+        self.assert_status_field_is_required(self.detail_url, self.payload)
+        self.assert_status_field_active_choices(self.detail_url, self.payload)
         assert NetworkRule.objects.count() == 1
 
     @assert_logs("security", "INFO")
@@ -623,7 +599,7 @@ class TestActivateExistingNetworkRule(BaseTestCase):
         updated_rule = NetworkRule.objects.get(id=self.rule.id)
         assert updated_rule.is_blacklisted
         del self.payload["override"]
-        self.assert_instance_from_payload(updated_rule)
+        self.assert_instance_from_payload(updated_rule, self.payload)
         self.assert_instance_representation(updated_rule, response.data)
 
     @assert_logs("security", "INFO")
@@ -644,7 +620,7 @@ class TestActivateExistingNetworkRule(BaseTestCase):
         updated_rule = NetworkRule.objects.get(id=self.rule.id)
         assert updated_rule.is_whitelisted
         del self.payload["override"]
-        self.assert_instance_from_payload(updated_rule)
+        self.assert_instance_from_payload(updated_rule, self.payload)
         self.assert_instance_representation(updated_rule, response.data)
 
     @assert_logs("security", "INFO")
@@ -657,7 +633,7 @@ class TestActivateExistingNetworkRule(BaseTestCase):
         assert response.status_code == self.success_code
         updated_rule = NetworkRule.objects.get(id=self.rule.id)
         assert updated_rule.is_whitelisted
-        self.assert_instance_from_payload(updated_rule)
+        self.assert_instance_from_payload(updated_rule, self.payload)
         self.assert_instance_representation(updated_rule, response.data)
         updated_rule.clear()
         # Blacklisting
@@ -666,5 +642,5 @@ class TestActivateExistingNetworkRule(BaseTestCase):
         assert response.status_code == self.success_code
         updated_rule = NetworkRule.objects.get(id=self.rule.id)
         assert updated_rule.is_blacklisted
-        self.assert_instance_from_payload(updated_rule)
+        self.assert_instance_from_payload(updated_rule, self.payload)
         self.assert_instance_representation(updated_rule, response.data)
