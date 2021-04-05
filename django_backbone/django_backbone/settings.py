@@ -41,13 +41,12 @@ THIRD_PARTY_APPS = [
 CUSTOM_APPS = [
     "core",
     "users",
+    "contact",
     "healthchecks",
     "security",
-    "contact",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
-
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

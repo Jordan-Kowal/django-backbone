@@ -1,9 +1,6 @@
 """Tests for the 'users' app models"""
 
 
-# Built-in
-from time import sleep
-
 # Personal
 from jklib.django.db.tests import ModelTestCase
 
@@ -12,7 +9,6 @@ from security.models import SecurityToken
 
 # Local
 from ..models import User, UserEmailTemplate
-from .utils import assert_user_email_was_sent
 
 # --------------------------------------------------------------------------------
 # > Utilities
@@ -85,40 +81,55 @@ class TestUser(ModelTestCase):
         """Tests that the password updated email is sent correctly"""
         subject = UserEmailTemplate.PASSWORD_UPDATED.subject
         self.user.send_password_updated_email()
-        sleep(0.2)
-        assert_user_email_was_sent(self.user, subject, async_=True)
+        self.assert_email_was_sent(subject, to=[self.user.email], async_=True)
 
     def test_send_reset_password_email(self):
         """Tests that the reset password email is sent correctly and includes a token"""
         subject = UserEmailTemplate.REQUEST_PASSWORD_RESET.subject
-        self.user.send_reset_password_email()
-        assert_user_email_was_sent(self.user, subject)
-        token_type, _ = self.model_class.RESET_TOKEN
-        token = SecurityToken.objects.get(user=self.user, type=token_type)
-        assert token.is_active_token
-        assert token.can_be_used
+        token_type, token_duration = self.model_class.RESET_TOKEN
+        token = SecurityToken.create_new_token(self.user, token_type, token_duration)
+        async_ = False
+        self.user.send_reset_password_email(token, async_)
+        self.assert_email_was_sent(subject, to=[self.user.email], async_=async_)
+        with self.assertRaises(ValueError):
+            token.is_active_token = False
+            token.save()
+            self.user.send_reset_password_email(token, async_)
+        with self.assertRaises(TypeError):
+            token_2 = SecurityToken.create_new_token(
+                self.user, "BadType", token_duration
+            )
+            self.user.send_reset_password_email(token_2, async_)
 
     def test_send_verification_email(self):
         """Tests that the verification email is sent (only to non-verified users) and includes a token"""
         subject = UserEmailTemplate.VERIFY_EMAIL.subject
+        token_type, token_duration = self.model_class.VERIFY_TOKEN
+        token = SecurityToken.create_new_token(self.user, token_type, token_duration)
+        async_ = False
         # Verified
         self.user.is_verified = True
         self.user.save()
-        self.user.send_verification_email()
+        self.user.send_verification_email(token, async_)
         with self.assertRaises((AssertionError, IndexError)):
-            assert_user_email_was_sent(self.user, subject)
+            self.assert_email_was_sent(subject, to=[self.user.email], async_=async_)
         # Not verified
         self.user.is_verified = False
         self.user.save()
-        self.user.send_verification_email()
-        assert_user_email_was_sent(self.user, subject)
-        token_type, _ = self.model_class.VERIFY_TOKEN
-        token = SecurityToken.objects.get(user=self.user, type=token_type)
-        assert token.is_active_token
-        assert token.can_be_used
+        self.user.send_verification_email(token, async_)
+        self.assert_email_was_sent(subject, to=[self.user.email], async_=async_)
+        with self.assertRaises(ValueError):
+            token.is_active_token = False
+            token.save()
+            self.user.send_reset_password_email(token, async_)
+        with self.assertRaises(TypeError):
+            token_2 = SecurityToken.create_new_token(
+                self.user, "BadType", token_duration
+            )
+            self.user.send_reset_password_email(token_2, async_)
 
     def test_send_welcome_email(self):
         """Tests that the welcome email is sent correctly"""
         subject = UserEmailTemplate.WELCOME.subject
         self.user.send_welcome_email()
-        assert_user_email_was_sent(self.user, subject)
+        self.assert_email_was_sent(subject, to=[self.user.email], async_=True)

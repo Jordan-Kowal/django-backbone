@@ -186,7 +186,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         :return: The created instance
         :rtype: User
         """
-        return cls.create_superuser(email, password, **extra_fields)
+        return cls.objects.create_superuser(email, password, **extra_fields)
 
     # ----------------------------------------
     # Email API
@@ -295,14 +295,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def _check_token_before_email(self, token, expected_type):
         """
-
-        :param token:
-        :param expected_type:
-        :return:
+        Checks the token can be used in our email
+        :param SecurityToken token: The token used for the email
+        :param str expected_type: The type we need our token to be
+        :raises ValueError: If token is not usable
+        :raises TypeError: If token does not match the expected type
         """
         if not token.can_be_used:
             raise ValueError("Provided SecurityToken is not usable")
-        if token.type != self.VERIFY_TOKEN[0]:
+        if token.type != expected_type:
             raise TypeError(
                 f"Received SecurityToken of type `{token.type}`. Expected `{expected_type}`"
             )

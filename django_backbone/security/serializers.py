@@ -37,7 +37,7 @@ class NetworkRuleSerializer(ModelSerializer):
         """
         If a date is provided, check that it is not in the past
         :param date expiration_date: The provided datetime value
-        :raise ValidationError: If the expiration date is in the past
+        :raises ValidationError: If the expiration date is in the past
         :return: The untouched expiration date
         :rtype: date
         """
@@ -68,7 +68,7 @@ class _ActivateNetworkRuleBaseSerializer(NetworkRuleSerializer):
         """
         Status must be BLACKLISTED or WHITELISTED
         :param int status: Must match the BLACKLISTED or WHITELISTED enum
-        :raise ValidationError: If status is not BLACKLISTED or WHITELISTED
+        :raises ValidationError: If status is not BLACKLISTED or WHITELISTED
         :return: The unchanged expiration date
         :rtype: date
         """
