@@ -20,11 +20,28 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
 
+# Personal
+from jklib.django.drf.routers import ImprovedRouter
+
+# Application
+from contact.viewsets import ContactViewset
+from healthchecks.viewsets import HealthcheckViewSet
+from security.viewsets import NetworkRuleViewSet
+from users.viewsets import UserAdminViewSet, UserViewSet
+
 # --------------------------------------------------------------------------------
-# > Imports
+# > URLs
 # --------------------------------------------------------------------------------
+router = ImprovedRouter()
+router.register("admin/healthchecks", HealthcheckViewSet, "admin_healthchecks")
+router.register("admin/network_rules", NetworkRuleViewSet, "admin_network_rules")
+router.register("admin/users", UserAdminViewSet, "admin_users")
+# router.register("auth", AuthViewSet, "auth")
+router.register("contacts", ContactViewset, "contacts")
+router.register("users", UserViewSet, "users")
+
 urlpatterns = [
-    path("api/", include("api.router"), name="api_root"),
+    path("api/", include(router.urls), name="api"),
 ]
 
 # Media

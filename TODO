@@ -1,8 +1,8 @@
 # TODO
 
 ### Project wide:
+- Verbose name is first arg on model fields, do it
 - Update README.md
-- Use factory boy
 - Setup admins
 - Make it into a django package
     - Restructure if necessary
@@ -16,14 +16,13 @@
 - Rename `api` folder to `apps`
 - Use settings for API routes with defaults
 
+### JKLIB
+- Clean up following revamp
+- Simplify docstrings
+
 ### Core
 - Should only be used to share utilities
 - Add tests for various utilities
-
-### Commands
-- Make app out of it
-- Command to list all our custom commands
-- Management command to start new app
 
 ### Contact
 - Add Factory in tests

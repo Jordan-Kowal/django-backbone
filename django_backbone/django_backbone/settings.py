@@ -22,8 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Directories that will be searched for apps
 # sys.path.insert(0, os.path.join(BASE_DIR, "api"))
-INSTALLED_APPS = [
-    # Django
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -32,16 +31,22 @@ INSTALLED_APPS = [
     "django.contrib.sitemaps",
     "django.contrib.sites",
     "django.contrib.staticfiles",
-    # Third-party
+]
+
+THIRD_PARTY_APPS = [
     "jklib",
     "rest_framework",
-    # API
-    "api.core",
-    "api.healthchecks",
-    "api.security",
-    "api.users",
-    "api.contact",
 ]
+
+CUSTOM_APPS = [
+    "core",
+    "users",
+    "healthchecks",
+    "security",
+    "contact",
+]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
 
 
 MIDDLEWARE = [
@@ -80,6 +85,8 @@ DRF_GLOBAL_PERMISSIONS = None
 # --------------------------------------------------------------------------------
 # > Passwords and logins
 # --------------------------------------------------------------------------------
+AUTH_USER_MODEL = "users.User"
+
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {
