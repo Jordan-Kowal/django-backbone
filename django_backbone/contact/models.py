@@ -7,7 +7,13 @@ from enum import Enum
 
 # Django
 from django.contrib.auth import get_user_model
-from django.db.models import SET_NULL, EmailField, ForeignKey, GenericIPAddressField
+from django.db.models import (
+    SET_NULL,
+    EmailField,
+    ForeignKey,
+    GenericIPAddressField,
+    Index,
+)
 from django.utils import timezone
 
 # Personal
@@ -93,7 +99,7 @@ class Contact(LifeCycleModel):
     # ----------------------------------------
     class Meta:
         db_table = "contacts"
-        indexes = []
+        indexes = [Index(fields=["ip", "created_at"])]
         ordering = ["-id"]
         unique_together = []
         verbose_name = "Contact"

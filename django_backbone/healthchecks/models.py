@@ -14,7 +14,7 @@ class HealthcheckDummy(Model):
     content = CharField(max_length=100, verbose_name="Content")
 
     class Meta:
-        db_table = "core_healthcheck_dummies"
+        db_table = "healthcheck_dummies"
         indexes = []
         ordering = ["-id"]
         verbose_name = "Healthcheck Dummy"

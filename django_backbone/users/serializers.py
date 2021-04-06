@@ -18,18 +18,14 @@ from security.models import SecurityToken
 # Local
 from .models import User
 
-
 # --------------------------------------------------------------------------------
-# > Mixins
+# > Utilities
 # --------------------------------------------------------------------------------
-class WithPasswordMixin:
-    """Provides the 'password' and 'confirm_password' fields with validation"""
+PasswordField = lambda: serializers.CharField(write_only=True, **required())
 
-    password = serializers.CharField(write_only=True, **required())
-    confirm_password = serializers.CharField(write_only=True, **required())
 
-    class Meta:
-        fields = ["password", "confirm_password"]
+class PasswordValidationMixin:
+    """Provides validation for a `password` and `confirm_password` field"""
 
     @staticmethod
     def validate_password(value):
@@ -65,11 +61,14 @@ class BaseUserSerializer(NoCreateMixin, serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class UserCreateSerializer(NoUpdateMixin, WithPasswordMixin, BaseUserSerializer):
+class UserCreateSerializer(NoUpdateMixin, PasswordValidationMixin, BaseUserSerializer):
     """Extends BaseUserSerializer to provide the password fields. Only for creations."""
 
+    password = PasswordField()
+    confirm_password = PasswordField()
+
     class Meta(BaseUserSerializer.Meta):
-        fields = BaseUserSerializer.Meta.fields + WithPasswordMixin.Meta.fields
+        fields = BaseUserSerializer.Meta.fields + ["password", "confirm_password"]
 
     def create(self, validated_data):
         """
@@ -92,15 +91,16 @@ class BaseUserAdminSerializer(BaseUserSerializer):
         ]
 
 
-class UserAdminCreateSerializer(UserCreateSerializer):
+class UserAdminCreateSerializer(
+    NoUpdateMixin, PasswordValidationMixin, BaseUserAdminSerializer
+):
     """Extends BaseUserAdminSerializer to provide the password fields. Only for creations."""
 
+    password = PasswordField()
+    confirm_password = PasswordField()
+
     class Meta(UserCreateSerializer.Meta):
-        fields = UserCreateSerializer.Meta.fields + [
-            "is_active",
-            "is_staff",
-            "is_verified",
-        ]
+        fields = BaseUserAdminSerializer.Meta.fields + ["password", "confirm_password"]
 
     def create(self, validated_data):
         """
@@ -115,8 +115,14 @@ class UserAdminCreateSerializer(UserCreateSerializer):
 # --------------------------------------------------------------------------------
 # > Password serializers
 # --------------------------------------------------------------------------------
-class OverridePasswordSerializer(WithPasswordMixin, ImprovedSerializer):
+class OverridePasswordSerializer(PasswordValidationMixin, ImprovedSerializer):
     """Simple serializer to update a user's password"""
+
+    password = PasswordField()
+    confirm_password = PasswordField()
+
+    class Meta:
+        fields = ["password", "confirm_password"]
 
     def update(self, user, validated_data):
         """
@@ -131,13 +137,15 @@ class OverridePasswordSerializer(WithPasswordMixin, ImprovedSerializer):
         return user
 
 
-class UpdatePasswordSerializer(WithPasswordMixin, ImprovedSerializer):
+class UpdatePasswordSerializer(PasswordValidationMixin, ImprovedSerializer):
     """Similar to 'OverridePasswordSerializer' but asks for the user's current password"""
 
-    current_password = serializers.CharField(write_only=True, **required())
+    current_password = PasswordField()
+    password = PasswordField()
+    confirm_password = PasswordField()
 
     class Meta:
-        fields = WithPasswordMixin.Meta.fields + ["current_password"]
+        fields = ["password", "confirm_password", "current_password"]
 
     def update(self, user, validated_data):
         """
@@ -164,13 +172,15 @@ class UpdatePasswordSerializer(WithPasswordMixin, ImprovedSerializer):
         return current_password
 
 
-class PasswordResetSerializer(WithPasswordMixin, ImprovedSerializer):
+class PasswordResetSerializer(PasswordValidationMixin, ImprovedSerializer):
     """Similar to 'OverridePasswordSerializer' but it uses a token to get the user instance"""
 
     token = serializers.CharField(write_only=True, **required())
+    password = PasswordField()
+    confirm_password = PasswordField()
 
     class Meta:
-        fields = WithPasswordMixin.Meta.fields + ["token"]
+        fields = ["password", "confirm_password", "token"]
 
     def create(self, validated_data):
         """

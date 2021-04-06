@@ -6,7 +6,7 @@ from secrets import token_urlsafe
 
 # Django
 from django.contrib.auth import get_user_model
-from django.db.models import CharField, DateTimeField
+from django.db.models import CharField, DateTimeField, Index
 
 # Personal
 from jklib.django.db.fields import ActiveField, ForeignKeyCascade, RequiredField
@@ -57,8 +57,12 @@ class SecurityToken(LifeCycleModel):
     # Behavior (meta, str, save)
     # ----------------------------------------
     class Meta:
-        db_table = "users_tokens"
-        indexes = []
+        db_table = "security_tokens"
+        indexes = [
+            Index(fields=["user", "type", "is_active_token"]),  # deactivate_user_tokens
+            Index(fields=["type", "value"]),  # fetch_token_instance
+            Index(fields=["used_at", "expired_at"]),  # cleanup_expired_unused_tokens
+        ]
         ordering = ["-id"]
         verbose_name = "Token"
         verbose_name_plural = "Tokens"

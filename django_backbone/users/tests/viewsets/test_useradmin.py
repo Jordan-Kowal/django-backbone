@@ -15,6 +15,10 @@ SERVICE_URL = "/api/admin/users/"
 class Base(ActionTestCase):
     """Base class for testing the UserAdmin API"""
 
+    def setUp(self):
+        """Creates and authenticates an admin user"""
+        self.admin = self.create_admin_user(authenticate=True)
+
     def assert_password_strength(self):
         """Checks the password strength"""
         self.payload["password"] = "test"
@@ -68,10 +72,10 @@ class TestAdminCreateUser(Base):
     success_code = 201
 
     def setUp(self):
-        """Creates a valid user payload"""
-        self.admin = self.create_admin_user(authenticate=True)
+        """Also prepares a valid payload"""
+        super().setUp()
         self.payload = {
-            "email": "fake_email@fake_domain.com",
+            "email": "fakeemail@fakedomain.com",
             "first_name": "FirstName",
             "last_name": "LastName",
             "password": "Str0ngEn0ugh",
@@ -98,21 +102,36 @@ class TestAdminCreateUser(Base):
         response = self.http_method(self.url(), self.payload)
         assert response.status_code == self.success_code
         assert User.objects.count() == 2
-        created_user = User.objects.count(id=2)
+        created_user = User.objects.get(id=2)
         self.assert_response_matches_objects(response.data, created_user, self.payload)
 
 
-#
-# class TestAdminListUsers(Base):
-#     url_template = f"{SERVICE_URL}"
-#     http_method_name = "GET"
-#     success_code = 200
-#
-#     def test_permissions(self):
-#         pass
-#
-#     def test_success(self):
-#         pass
+class TestAdminListUsers(Base):
+    """TestCase for the `list` action"""
+
+    url_template = f"{SERVICE_URL}"
+    http_method_name = "GET"
+    success_code = 200
+
+    def test_permissions(self):
+        """Tests it is only accessible to admin users"""
+        self.assert_admin_permissions(self.url())
+
+    def test_success(self):
+        """Tests we can successfully retrieve our users"""
+        response = self.http_method(self.url())
+        assert response.status_code == self.success_code
+        assert len(response.data) == 1
+        user_2 = self.create_user()
+        user_3 = self.create_user()
+        response = self.http_method(self.url())
+        assert response.status_code == self.success_code
+        assert len(response.data) == 3
+        for i, user in enumerate([self.admin, user_2, user_3]):
+            instance = User.objects.get(id=i + 1)
+            self.assert_response_matches_objects(response.data[2 - i], instance)
+
+
 #
 #
 # class TestAdminRetrieveUser(Base):

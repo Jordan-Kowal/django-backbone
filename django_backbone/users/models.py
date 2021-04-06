@@ -112,11 +112,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField("Email address", blank=False, unique=True)
     first_name = models.CharField("First name", max_length=150, blank=True)
     last_name = models.CharField("Last name", max_length=150, blank=True)
-    is_staff = models.BooleanField("Staff status", default=False)
-    is_active = models.BooleanField("Active", default=True)
+    is_staff = models.BooleanField("Staff status", default=False, db_index=True)
+    is_active = models.BooleanField("Active", default=True, db_index=True)
     date_joined = models.DateTimeField("Date joined", default=timezone.now)
     # Custom Fields
-    is_verified = models.BooleanField("Verified", default=False)
+    is_verified = models.BooleanField("Verified", default=False, db_index=True)
 
     # Base settings
     objects = EmailUserManager()
@@ -128,9 +128,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     VERIFY_TOKEN = ("verify", 172800)  # 7 days
 
     class Meta:
+        db_table = "users"
+        indexes = []
+        ordering = ["-id"]
         verbose_name = "User"
         verbose_name_plural = "Users"
-        abstract = False
 
     def __str__(self):
         """

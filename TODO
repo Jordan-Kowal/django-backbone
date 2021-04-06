@@ -10,6 +10,7 @@
     - Variables/template paths for emails
     - README for settings
     - github deployment CI/CD
+    - Figure out how to run tests
 - automatic_pre_save_full_clean signals exclude from settings
 - Use settings to disable certain apps
 - Use settings to disable certain services (like users)
@@ -34,8 +35,7 @@
 - Add Factory in tests
 
 ### Users API
-- Simplify viewsets, serializers, and actions
-- Simplify model and action tests
+- Write action tests
 - Add Factory in tests
 - Make docstrings simpler
 - Create new User model

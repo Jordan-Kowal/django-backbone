@@ -7,6 +7,7 @@ from datetime import date, timedelta
 from django.db.models import (
     DateField,
     GenericIPAddressField,
+    Index,
     IntegerChoices,
     IntegerField,
 )
@@ -59,7 +60,7 @@ class NetworkRule(LifeCycleModel):
         blank=True,
         null=True,
         default=None,
-        db_index=True,
+        db_index=True,  # clear_expired_entries
         verbose_name="Expires on",
         help_text="Expires at the end of said date",
     )
@@ -72,8 +73,10 @@ class NetworkRule(LifeCycleModel):
     # Behavior (meta, str, save)
     # ----------------------------------------
     class Meta:
-        db_table = "core_network_rules"
-        indexes = []
+        db_table = "security_network_rules"
+        indexes = [
+            Index(fields=["active", "expires_on", "status"])  # For the `bulk_clear` API
+        ]
         ordering = ["-id"]
         verbose_name = "Network Rule"
         verbose_name_plural = "Network Rules"
