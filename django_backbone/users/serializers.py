@@ -115,28 +115,6 @@ class UserAdminCreateSerializer(
 # --------------------------------------------------------------------------------
 # > Password serializers
 # --------------------------------------------------------------------------------
-class OverridePasswordSerializer(PasswordValidationMixin, ImprovedSerializer):
-    """Simple serializer to update a user's password"""
-
-    password = PasswordField()
-    confirm_password = PasswordField()
-
-    class Meta:
-        fields = ["password", "confirm_password"]
-
-    def update(self, user, validated_data):
-        """
-        Updates the user's password and returns the instance
-        :param User user:
-        :param dict validated_data:
-        :return: The updated user
-        :rtype: User
-        """
-        user.set_password(validated_data["password"])
-        user.save()
-        return user
-
-
 class UpdatePasswordSerializer(PasswordValidationMixin, ImprovedSerializer):
     """Similar to 'OverridePasswordSerializer' but asks for the user's current password"""
 

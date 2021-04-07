@@ -7,7 +7,7 @@ from jklib.django.drf.tests import ActionTestCase
 # --------------------------------------------------------------------------------
 # > Helpers
 # --------------------------------------------------------------------------------
-from users.models import User
+from users.models import User, UserEmailTemplate
 
 SERVICE_URL = "/api/admin/users/"
 
@@ -132,84 +132,163 @@ class TestAdminListUsers(Base):
             self.assert_response_matches_objects(response.data[2 - i], instance)
 
 
-#
-#
-# class TestAdminRetrieveUser(Base):
-#     url_template = f"{SERVICE_URL}/{{id}}/"
-#     http_method_name = "GET"
-#     success_code = 200
-#
-#     def test_permissions(self):
-#         pass
-#
-#     def test_success(self):
-#         pass
-#
-#
-# class TestAdminUpdateUser(Base):
-#     url_template = f"{SERVICE_URL}/{{id}}/"
-#     http_method_name = "PUT"
-#     success_code = 200
-#
-#     def test_permissions(self):
-#         pass
-#
-#     def test_success(self):
-#         pass
-#
-#
-# class TestAdminDestroyUser(Base):
-#     url_template = f"{SERVICE_URL}/{{id}}/"
-#     http_method_name = "DELETE"
-#     success_code = 204
-#
-#     def test_permissions(self):
-#         pass
-#
-#     def test_success(self):
-#         pass
-#
-#
-# class TestAdminBulkDestroyUsers(Base):
-#     url_template = f"{SERVICE_URL}"
-#     http_method_name = "DELETE"
-#     success_code = 204
-#
-#     def test_permissions(self):
-#         pass
-#
-#     def test_success(self):
-#         pass
-#
-#
-# class TestAdminRequestVerification(Base):
-#     url_template = f"{SERVICE_URL}"
-#     http_method_name = "DELETE"
-#     success_code = 200
-#
-#     def test_permissions(self):
-#         pass
-#
-#     def test_already_verified(self):
-#         pass
-#
-#     def test_success(self):
-#         pass
-#
-#
-# class TestAdminOverridePassword(Base):
-#     url_template = f"{SERVICE_URL}"
-#     http_method_name = "DELETE"
-#     success_code = 204
-#
-#     def test_permissions(self):
-#         pass
-#
-#     def test_password_field(self):
-#         pass
-#
-#     def test_confirm_password_field(self):
-#         pass
-#
-#     def test_success(self):
-#         pass
+class TestAdminRetrieveUser(Base):
+    """TestCase for the `retrieve` action"""
+
+    url_template = f"{SERVICE_URL}/{{id}}/"
+    http_method_name = "GET"
+    success_code = 200
+
+    def setUp(self):
+        """Also creates an additional user"""
+        super().setUp()
+        self.user = self.create_user()
+        self.detail_url = self.url(context={"id": self.user.id})
+
+    def test_permissions(self):
+        """Tests it is only accessible to admin users"""
+        self.assert_admin_permissions(self.detail_url)
+
+    def test_success(self):
+        """Tests we can successfully retrieve one user"""
+        response = self.http_method(self.detail_url)
+        assert response.status_code == self.success_code
+        self.assert_response_matches_objects(response.data, self.user)
+
+
+class TestAdminUpdateUser(Base):
+    """TestCase for the `update` action"""
+
+    url_template = f"{SERVICE_URL}/{{id}}/"
+    http_method_name = "PUT"
+    success_code = 200
+
+    def setUp(self):
+        """Also creates an additional user and an update payload"""
+        super().setUp()
+        self.user = self.create_user()
+        self.detail_url = self.url(context={"id": self.user.id})
+        self.payload = {
+            "email": "fakeemail@fakedomain.com",
+            "first_name": "FirstName",
+            "last_name": "LastName",
+            "is_active": True,
+            "is_staff": True,
+            "is_verified": False,
+        }
+
+    def test_permissions(self):
+        """Tests it is only accessible to admin users"""
+        self.assert_admin_permissions(self.detail_url, payload=self.payload)
+
+    def test_success(self):
+        """Tests we can successfully update a user"""
+        response = self.http_method(self.detail_url, data=self.payload)
+        assert response.status_code == self.success_code
+        update_user = User.objects.get(id=self.user.id)
+        self.assert_response_matches_objects(response.data, update_user, self.payload)
+
+
+class TestAdminDestroyUser(Base):
+    """TestCase for the `destroy` action"""
+
+    url_template = f"{SERVICE_URL}/{{id}}/"
+    http_method_name = "DELETE"
+    success_code = 204
+
+    def setUp(self):
+        """Also creates an additional user"""
+        super().setUp()
+        self.user = self.create_user()
+        self.detail_url = self.url(context={"id": self.user.id})
+
+    def test_permissions(self):
+        """Tests it is only accessible to admin users"""
+        self.assert_admin_permissions(self.detail_url)
+
+    def test_success(self):
+        """Tests we can successfully delete a user"""
+        assert User.objects.count() == 2
+        response = self.http_method(self.detail_url)
+        assert response.status_code == self.success_code
+        assert response.data is None
+        assert User.objects.count() == 1
+
+
+class TestAdminBulkDestroyUsers(Base):
+    """TestCase for the `bulk_destroy` action"""
+
+    url_template = f"{SERVICE_URL}"
+    http_method_name = "DELETE"
+    success_code = 204
+
+    def setUp(self):
+        """Also creates 5 additional users"""
+        super().setUp()
+        for i in range(5):
+            self.create_user()
+
+    def test_permissions(self):
+        """Tests it is only accessible to admin users"""
+        payload = {"ids": [2, 3, 5]}
+        assert User.objects.count() == 6
+        self.assert_admin_permissions(self.url(), payload=payload)
+        # The function created 2 users and we deleted 3, so total is -1
+        assert User.objects.count() == 5
+
+    def test_success(self):
+        """Tests we can successfully delete multiple users at once"""
+        assert User.objects.count() == 6
+        # Only valid IDs
+        payload = {"ids": [2, 3, 6]}
+        response = self.http_method(self.url(), data=payload)
+        assert response.status_code == self.success_code
+        assert response.data is None
+        assert User.objects.count() == 3
+        # Some valid IDs
+        payload = {"ids": [5, 10]}
+        response = self.http_method(self.url(), data=payload)
+        assert response.status_code == self.success_code
+        assert response.data is None
+        assert User.objects.count() == 2
+        assert User.objects.first().id == 4
+        assert User.objects.last().id == 1
+
+
+class TestAdminRequestVerification(Base):
+    """TestCase for the `request_verification` action"""
+
+    url_template = f"{SERVICE_URL}/{{id}}/request_verification/"
+    http_method_name = "POST"
+    success_code = 204
+
+    def setUp(self):
+        """Also creates 1 additional user"""
+        super().setUp()
+        self.user = self.create_user()
+        self.detail_url = self.url(context={"id": self.user.id})
+
+    def test_permissions(self):
+        """Tests it is only accessible to admin users"""
+        self.assert_admin_permissions(self.detail_url)
+
+    def test_already_verified(self):
+        """Tests no email is sent if the user is already verified"""
+        self.user.is_verified = True
+        self.user.save()
+        response = self.http_method(self.detail_url)
+        assert response.status_code == 422
+        assert response.data is None
+        with self.assertRaises((AssertionError, IndexError)):
+            subject = UserEmailTemplate.VERIFY_EMAIL.subject
+            self.assert_email_was_sent(subject, to=[self.user.email], async_=True)
+
+    def test_success(self):
+        """Tests an unverified user can receive the verification email"""
+        self.user.is_verified = False
+        self.user.save()
+        response = self.http_method(self.detail_url)
+        assert response.status_code == self.success_code
+        assert response.data is None
+        subject = UserEmailTemplate.VERIFY_EMAIL.subject
+        self.assert_email_was_sent(subject, to=[self.user.email], async_=True)
