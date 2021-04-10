@@ -1,14 +1,14 @@
-"""Tests for the User-related viewsets"""
+"""Tests for the UserAdmin viewsets"""
 
 # Personal
 from jklib.django.drf.tests import ActionTestCase
 
 # Application
+from users.models import User, UserEmailTemplate
+
 # --------------------------------------------------------------------------------
 # > Helpers
 # --------------------------------------------------------------------------------
-from users.models import User, UserEmailTemplate
-
 SERVICE_URL = "/api/admin/users/"
 
 
@@ -18,22 +18,6 @@ class Base(ActionTestCase):
     def setUp(self):
         """Creates and authenticates an admin user"""
         self.admin = self.create_admin_user(authenticate=True)
-
-    def assert_password_strength(self):
-        """Checks the password strength"""
-        self.payload["password"] = "test"
-        self.payload["confirm_password"] = "test"
-        response = self.http_method(self.url(), data=self.payload)
-        assert response.status_code == 400
-        assert len(response.data["password"]) > 0
-
-    def assert_matching_password(self):
-        """Checks both passwords must match"""
-        self.payload["password"] = "Str0ngEn0ugh"
-        self.payload["confirm_password"] = "test"
-        response = self.http_method(self.url(), data=self.payload)
-        assert response.status_code == 400
-        assert len(response.data["confirm_password"]) > 0
 
     @staticmethod
     def assert_response_matches_objects(response_data, instance=None, payload=None):
@@ -46,6 +30,7 @@ class Base(ActionTestCase):
         assert "password" not in response_data
         assert "confirm_password" not in response_data
         if instance is not None:
+            assert response_data["id"] == instance.id
             assert response_data["email"] == instance.email
             assert response_data["first_name"] == instance.first_name
             assert response_data["last_name"] == instance.last_name
@@ -90,12 +75,20 @@ class TestAdminCreateUser(Base):
         self.assert_admin_permissions(self.url(), self.payload)
 
     def test_password_field(self):
-        """Test the password strength"""
-        self.assert_password_strength()
+        """Tests the password strength"""
+        self.payload["password"] = "test"
+        self.payload["confirm_password"] = "test"
+        response = self.http_method(self.url(), data=self.payload)
+        assert response.status_code == 400
+        assert len(response.data["password"]) > 0
 
     def test_confirm_password_field(self):
         """Tests both passwords must match"""
-        self.assert_matching_password()
+        self.payload["password"] = "Str0ngEn0ugh"
+        self.payload["confirm_password"] = "test"
+        response = self.http_method(self.url(), data=self.payload)
+        assert response.status_code == 400
+        assert len(response.data["confirm_password"]) > 0
 
     def test_success(self):
         """Tests we can successfully create a user"""

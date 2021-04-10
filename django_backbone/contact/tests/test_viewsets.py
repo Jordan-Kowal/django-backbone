@@ -279,21 +279,6 @@ class TestRetrieveContact(Base):
         self.assert_instance_representation(self.contact, response.data)
 
 
-class TestUpdateContact(Base):
-    """TestCase for the 'update' action"""
-
-    url_template = f"{SERVICE_URL}/{{id}}/"
-    http_method_name = "PUT"
-    success_code = 200
-
-    def test_not_implemented(self):
-        """Tests that this service is not implemented"""
-        contact = self.create_contact()
-        contact_url = self.url(context={"id": contact.id})
-        response = self.http_method(contact_url, data=None)
-        assert response.status_code == 405
-
-
 class TestDestroyContact(Base):
     """TestCase for the 'destroy' action"""
 

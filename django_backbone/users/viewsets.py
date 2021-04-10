@@ -1,4 +1,4 @@
-"""Viewsets for the User model"""
+"""Viewsets for the 'users' app"""
 
 # Django
 from rest_framework import mixins
@@ -36,7 +36,7 @@ from .serializers import (
     UpdatePasswordSerializer,
     UserAdminCreateSerializer,
     UserCreateSerializer,
-    VerifySerializer,
+    UserVerificationSerializer,
 )
 
 
@@ -84,8 +84,8 @@ class UserViewSet(
         "create": (IsNotAuthenticated,),
         "request_password_reset": (IsNotAuthenticated,),
         "perform_password_reset": (IsNotAuthenticated,),
-        "request_verification": (IsObjectOwner & IsNotVerified),
-        "verify": (AllowAny,),
+        "request_verification": (IsObjectOwner, IsNotVerified),
+        "perform_verification": (AllowAny,),
     }
 
     serializer_classes = {
@@ -95,7 +95,7 @@ class UserViewSet(
         "request_password_reset": RequestPasswordResetSerializer,
         "request_verification": None,
         "update_password": UpdatePasswordSerializer,
-        "verify": VerifySerializer,
+        "perform_verification": UserVerificationSerializer,
     }
 
     def create(self, request, *args, **kwargs):
@@ -117,6 +117,15 @@ class UserViewSet(
         serializer = self.get_valid_serializer(data=request.data)
         user = serializer.save()
         user.send_password_updated_email(async_=True)
+        return Response(None, HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=["post"])
+    def perform_verification(self, request):
+        """Flags the user linked to the token as verified"""
+        serializer = self.get_valid_serializer(data=request.data)
+        user, has_changed = serializer.save()
+        if has_changed:
+            user.send_welcome_email(async_=True)
         return Response(None, HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["post"])
@@ -142,20 +151,11 @@ class UserViewSet(
         user.send_verification_email(token, async_=False)
         return Response(None, HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=["put"])
+    @action(detail=True, methods=["post"])
     def update_password(self, request, pk=None):
         """Updates our user's current password"""
         user = self.get_object()
         serializer = self.get_valid_serializer(user, data=request.data)
         user = serializer.save()
         user.send_password_updated_email(async_=True)
-        return Response(None, HTTP_204_NO_CONTENT)
-
-    @action(detail=False, methods=["post"])
-    def verify(self, request):
-        """Flags the user linked to the token as verified"""
-        serializer = self.get_valid_serializer(data=request.data)
-        user, has_changed = serializer.save()
-        if has_changed:
-            user.send_welcome_email(async_=True)
         return Response(None, HTTP_204_NO_CONTENT)

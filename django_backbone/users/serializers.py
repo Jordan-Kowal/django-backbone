@@ -57,8 +57,8 @@ class BaseUserSerializer(NoCreateMixin, serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "first_name", "last_name"]
-        read_only_fields = ["id"]
+        fields = ["id", "email", "first_name", "last_name", "is_verified"]
+        read_only_fields = ["id", "is_verified"]
 
 
 class UserCreateSerializer(NoUpdateMixin, PasswordValidationMixin, BaseUserSerializer):
@@ -87,7 +87,6 @@ class BaseUserAdminSerializer(BaseUserSerializer):
         fields = BaseUserSerializer.Meta.fields + [
             "is_active",
             "is_staff",
-            "is_verified",
         ]
 
 
@@ -201,7 +200,7 @@ class RequestPasswordResetSerializer(ImprovedSerializer):
 # --------------------------------------------------------------------------------
 # > Others
 # --------------------------------------------------------------------------------
-class VerifySerializer(ImprovedSerializer):
+class UserVerificationSerializer(ImprovedSerializer):
     """Serializer that checks for a VERIFY token"""
 
     token = serializers.CharField(write_only=True, **required())

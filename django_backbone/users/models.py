@@ -295,7 +295,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         parts = [root_url, relative_url]
         return build_url(parts, params=params)
 
-    def _check_token_before_email(self, token, expected_type):
+    @staticmethod
+    def _check_token_before_email(token, expected_type):
         """
         Checks the token can be used in our email
         :param SecurityToken token: The token used for the email

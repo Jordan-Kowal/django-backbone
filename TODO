@@ -22,8 +22,7 @@
 - Simplify docstrings
 
 ### Core
-- Should only be used to share utilities
-- Add tests for various utilities
+- N/A
 
 ### Contact
 - Add Factory in tests
@@ -35,14 +34,7 @@
 - Add Factory in tests
 
 ### Users API
-- Write action tests
 - Add Factory in tests
-- Make docstrings simpler
-- Create new User model
-    - Update model and tests
-    - Update actions and tests
-    - Update settings
-    - Update calls throughout the app
 - Add model to log auth attempts (fail, success, IP, datetime, user if known)
     - Also write in the logfile
 - Login service that returns session cookie
