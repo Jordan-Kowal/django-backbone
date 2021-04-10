@@ -301,8 +301,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         Checks the token can be used in our email
         :param SecurityToken token: The token used for the email
         :param str expected_type: The type we need our token to be
-        :raises ValueError: If token is not usable
-        :raises TypeError: If token does not match the expected type
+        :raise ValueError: If token is not usable
+        :raise TypeError: If token does not match the expected type
         """
         if not token.can_be_used:
             raise ValueError("Provided SecurityToken is not usable")

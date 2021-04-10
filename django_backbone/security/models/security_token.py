@@ -215,8 +215,8 @@ class SecurityToken(LifeCycleModel):
         """
         Returns the initial duration is a valid integer, else raises an error
         :param int value: Duration of the token in seconds
-        :raises TypeError: When the provided value is not an integer
-        :raises ValueError: When the provided value is out of bounds
+        :raise TypeError: When the provided value is not an integer
+        :raise ValueError: When the provided value is out of bounds
         :return: The initial value, if valid
         :rtype: int
         """
@@ -233,8 +233,8 @@ class SecurityToken(LifeCycleModel):
         """
         Returns the initial type if it is a non-empty string, else raises an error
         :param str value: Type of the token
-        :raises TypeError: When the provided value is a string
-        :raises ValueError: When the provided value is empty
+        :raise TypeError: When the provided value is a string
+        :raise ValueError: When the provided value is empty
         :return: The trimmed value, if valid
         :rtype: str
         """
