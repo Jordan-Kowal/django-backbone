@@ -1,10 +1,11 @@
 """Tests for the UserAdmin viewsets"""
 
-# Personal
-from jklib.django.drf.tests import ActionTestCase
-
 # Application
-from users.models import User, UserEmailTemplate
+from core.tests import BaseActionTestCase
+
+# Local
+from ...factories import AdminFactory, UserFactory
+from ...models import User, UserEmailTemplate
 
 # --------------------------------------------------------------------------------
 # > Helpers
@@ -12,12 +13,13 @@ from users.models import User, UserEmailTemplate
 SERVICE_URL = "/api/admin/users/"
 
 
-class Base(ActionTestCase):
+class Base(BaseActionTestCase):
     """Base class for testing the UserAdmin API"""
 
     def setUp(self):
         """Creates and authenticates an admin user"""
-        self.admin = self.create_admin_user(authenticate=True)
+        self.admin = AdminFactory()
+        self.api_client.force_authenticate(self.admin)
 
     @staticmethod
     def assert_response_matches_objects(response_data, instance=None, payload=None):
@@ -115,8 +117,8 @@ class TestAdminListUsers(Base):
         response = self.http_method(self.url())
         assert response.status_code == self.success_code
         assert len(response.data) == 1
-        user_2 = self.create_user()
-        user_3 = self.create_user()
+        user_2 = UserFactory()
+        user_3 = UserFactory()
         response = self.http_method(self.url())
         assert response.status_code == self.success_code
         assert len(response.data) == 3
@@ -135,7 +137,7 @@ class TestAdminRetrieveUser(Base):
     def setUp(self):
         """Also creates an additional user"""
         super().setUp()
-        self.user = self.create_user()
+        self.user = UserFactory()
         self.detail_url = self.url(context={"id": self.user.id})
 
     def test_permissions(self):
@@ -159,7 +161,7 @@ class TestAdminUpdateUser(Base):
     def setUp(self):
         """Also creates an additional user and an update payload"""
         super().setUp()
-        self.user = self.create_user()
+        self.user = UserFactory()
         self.detail_url = self.url(context={"id": self.user.id})
         self.payload = {
             "email": "fakeemail@fakedomain.com",
@@ -172,7 +174,7 @@ class TestAdminUpdateUser(Base):
 
     def test_permissions(self):
         """Tests it is only accessible to admin users"""
-        self.assert_admin_permissions(self.detail_url, payload=self.payload)
+        self.assert_admin_permissions(self.detail_url, data=self.payload)
 
     def test_success(self):
         """Tests we can successfully update a user"""
@@ -192,7 +194,7 @@ class TestAdminDestroyUser(Base):
     def setUp(self):
         """Also creates an additional user"""
         super().setUp()
-        self.user = self.create_user()
+        self.user = UserFactory()
         self.detail_url = self.url(context={"id": self.user.id})
 
     def test_permissions(self):
@@ -219,13 +221,13 @@ class TestAdminBulkDestroyUsers(Base):
         """Also creates 5 additional users"""
         super().setUp()
         for i in range(5):
-            self.create_user()
+            UserFactory()
 
     def test_permissions(self):
         """Tests it is only accessible to admin users"""
         payload = {"ids": [2, 3, 5]}
         assert User.objects.count() == 6
-        self.assert_admin_permissions(self.url(), payload=payload)
+        self.assert_admin_permissions(self.url(), data=payload)
         # The function created 2 users and we deleted 3, so total is -1
         assert User.objects.count() == 5
 
@@ -258,7 +260,7 @@ class TestAdminRequestVerification(Base):
     def setUp(self):
         """Also creates 1 additional user"""
         super().setUp()
-        self.user = self.create_user()
+        self.user = UserFactory()
         self.detail_url = self.url(context={"id": self.user.id})
 
     def test_permissions(self):

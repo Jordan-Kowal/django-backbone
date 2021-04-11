@@ -6,35 +6,30 @@
 - Setup admins
 - Make it into a django package
     - Restructure if necessary
-    - Handle loggers automatic import or through settings (maybe rename them to avoid conflicts) 
+    - Use ONE logger for this app
     - Variables/template paths for emails
     - README for settings
     - github deployment CI/CD
     - Figure out how to run tests
 - automatic_pre_save_full_clean signals exclude from settings
-- Use settings to disable certain apps
-- Use settings to disable certain services (like users)
-- Rename `api` folder to `apps`
-- Use settings for API routes with defaults
+- make viewsets available
 
 ### JKLIB
-- Clean up following revamp
-- Simplify docstrings
+- Update README
 
 ### Core
 - N/A
 
 ### Contact
-- Add Factory in tests
+- N/A
 
 ### Healthchecks
-- Add Factory in tests
+- N/A
 
 ### Security
-- Add Factory in tests
+- N/A
 
 ### Users API
-- Add Factory in tests
 - Add model to log auth attempts (fail, success, IP, datetime, user if known)
     - Also write in the logfile
 - Login service that returns session cookie

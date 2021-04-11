@@ -7,12 +7,13 @@ from time import sleep
 # Django
 from django.utils import timezone
 
-# Personal
-from jklib.django.drf.tests import ActionTestCase
-
 # Application
+from core.tests import BaseActionTestCase
 from security.models import SecurityToken
-from users.models import User, UserEmailTemplate
+
+# Local
+from ...factories import AdminFactory, UserFactory
+from ...models import User, UserEmailTemplate
 
 # --------------------------------------------------------------------------------
 # > Helpers
@@ -20,45 +21,8 @@ from users.models import User, UserEmailTemplate
 SERVICE_URL = "/api/users/"
 
 
-class Base(ActionTestCase):
+class Base(BaseActionTestCase):
     """Base class for testing the UserAdmin API"""
-
-    def assert_owner_permissions(self, url, owner, not_owner, data=None):
-        """
-        Checks only the owner can reach the object
-        :param str url: URL of the endpoint
-        :param User owner: The owner of the object
-        :param User not_owner: A user that is not the owner
-        :param dict data: The data for the request
-        """
-        # Logged out
-        self.api_client.logout()
-        response = self.http_method(url, data=data)
-        assert response.status_code == 401
-        # Not owner
-        self.api_client.force_authenticate(not_owner)
-        response = self.http_method(url, data=data)
-        assert response.status_code == 403
-        # Owner
-        self.api_client.force_authenticate(owner)
-        response = self.http_method(url, data=data)
-        assert response.status_code == self.success_code
-
-    def assert_not_authenticated_permissions(self, url, data=None):
-        """
-        Checks permissions are 'Not authenticated' only
-        :param str url: URL of the endpoint
-        :param dict data: The data for the request
-        """
-        user = self.create_user()
-        admin = self.create_admin_user()
-        for user_instance in [user, admin]:
-            self.api_client.force_authenticate(user_instance)
-            response = self.http_method(url, data=data)
-            assert response.status_code == 403
-            self.api_client.logout()
-        response = self.http_method(url, data=data)
-        assert response.status_code == self.success_code
 
     def assert_password_strength(self, url, data):
         """
@@ -167,7 +131,7 @@ class TestCreateUser(Base):
         """Tests only a non-authenticated user can call this service"""
         self.assert_not_authenticated_permissions(self.url(), self.payload)
         assert User.objects.count() == 3
-        sleep(0.2)  # Due to emails being sent asynchronously
+        sleep(0.4)  # Due to emails being sent asynchronously
 
     def test_password_field(self):
         """Tests the password strength"""
@@ -200,12 +164,13 @@ class TestRetrieveUser(Base):
 
     def setUp(self):
         """Creates and authenticates a user, then prepares a URL"""
-        self.user = self.create_user(authenticate=True)
+        self.user = UserFactory()
+        self.api_client.force_authenticate(self.user)
         self.detail_url = self.url(context={"id": self.user.id})
 
     def test_permissions(self):
         """Tests only the user himself can fetch his data"""
-        admin = self.create_admin_user()
+        admin = AdminFactory()
         self.assert_owner_permissions(self.detail_url, owner=self.user, not_owner=admin)
 
     def test_success(self):
@@ -223,7 +188,8 @@ class TestUpdateUser(Base):
 
     def setUp(self):
         """Creates and authenticates a user, then prepares a URL and a payload"""
-        self.user = self.create_user(authenticate=True)
+        self.user = UserFactory()
+        self.api_client.force_authenticate(self.user)
         self.detail_url = self.url(context={"id": self.user.id})
         self.payload = {
             "email": "newfakeemail@thatdomain.com",
@@ -233,7 +199,7 @@ class TestUpdateUser(Base):
 
     def test_permissions(self):
         """Tests only the owner can updates his info"""
-        admin = self.create_admin_user()
+        admin = AdminFactory()
         self.assert_owner_permissions(
             self.detail_url, owner=self.user, not_owner=admin, data=self.payload
         )
@@ -255,12 +221,13 @@ class TestDestroyUser(Base):
 
     def setUp(self):
         """Creates and authenticates a user, then prepares a URL"""
-        self.user = self.create_user(authenticate=True)
+        self.user = UserFactory()
+        self.api_client.force_authenticate(self.user)
         self.detail_url = self.url(context={"id": self.user.id})
 
     def test_permissions(self):
         """Tests only the owner can delete himself"""
-        admin = self.create_admin_user()
+        admin = AdminFactory()
         self.assert_owner_permissions(self.detail_url, owner=self.user, not_owner=admin)
 
     def test_success(self):
@@ -281,7 +248,7 @@ class TestPerformPasswordReset(Base):
     def setUp(self):
         """Creates a user, a token, and a valid payload"""
         self.initial_password = "Str0ngP4ssw0rd"
-        self.user = self.create_user(password=self.initial_password)
+        self.user = UserFactory(password=self.initial_password)
         self.token_type, self.token_duration = User.RESET_TOKEN
         self.token = SecurityToken.create_new_token(
             self.user, self.token_type, self.token_duration
@@ -295,7 +262,7 @@ class TestPerformPasswordReset(Base):
     def test_permissions(self):
         """Tests only logged out users can use this service"""
         self.assert_not_authenticated_permissions(self.url(), data=self.payload)
-        sleep(0.2)  # Waiting for emails to be sent
+        sleep(0.4)  # Waiting for emails to be sent
 
     def test_password(self):
         """Tests the new password must be strong enough"""
@@ -340,14 +307,14 @@ class TestPerformVerification(Base):
 
     def test_permissions(self):
         """Tests the service is accessible by anyone"""
-        user = self.create_user()
-        admin = self.create_admin_user()
+        user = UserFactory()
+        admin = AdminFactory()
         for instance in [None, user, admin]:
             self.api_client.logout()
             if instance is not None:
                 self.api_client.force_authenticate(instance)
             else:
-                instance = self.create_user()
+                instance = UserFactory()
             token = SecurityToken.create_new_token(
                 instance, self.token_type, self.token_duration
             )
@@ -355,11 +322,11 @@ class TestPerformVerification(Base):
             response = self.http_method(self.url(), data=payload)
             assert response.status_code == self.success_code
             assert response.data is None
-        sleep(0.2)
+        sleep(0.4)
 
     def test_token(self):
         """Tests the user must provide a valid and active VERIFY token"""
-        user = self.create_user(is_verified=False)
+        user = UserFactory()
         payload = {}
         self.assert_token_field(
             url=self.url(),
@@ -371,7 +338,7 @@ class TestPerformVerification(Base):
 
     def test_already_verified(self):
         """Tests no email is sent if the user was already verified"""
-        user = self.create_user(is_verified=True)
+        user = UserFactory(is_verified=True)
         token = SecurityToken.create_new_token(
             user, self.token_type, self.token_duration
         )
@@ -385,7 +352,7 @@ class TestPerformVerification(Base):
 
     def test_success(self):
         """Tests the user gets verified, the email is sent, and the token is consumed"""
-        user = self.create_user(is_verified=False)
+        user = UserFactory()
         token = SecurityToken.create_new_token(
             user, self.token_type, self.token_duration
         )
@@ -413,15 +380,14 @@ class TestRequestPasswordReset(Base):
     success_code = 202
 
     def setUp(self):
-        """Creates a user with a specific email address and prepares a payload"""
-        email = "fakeemail@fakedomain.com"
-        self.user = self.create_user(email=email)
-        self.payload = {"email": email}
+        """Creates a user and prepares a payload"""
+        self.user = UserFactory()
+        self.payload = {"email": self.user.email}
 
     def test_permissions(self):
         """Tests only a logged out user can use this service"""
         self.assert_not_authenticated_permissions(self.url(), self.payload)
-        sleep(0.2)
+        sleep(0.4)
 
     def test_unknown_email(self):
         """Tests the service returns OK if unknown user, but sends no email"""
@@ -451,12 +417,13 @@ class TestRequestVerification(Base):
 
     def setUp(self):
         """Creates and authenticates a user, then prepares a URL"""
-        self.user = self.create_user(authenticate=True)
+        self.user = UserFactory()
+        self.api_client.force_authenticate(self.user)
         self.detail_url = self.url(context={"id": self.user.id})
 
     def test_permissions(self):
         """Tests the user must be the owner and not already verified"""
-        admin = self.create_admin_user()
+        admin = AdminFactory()
         self.assert_owner_permissions(self.detail_url, self.user, admin)
         # If verified, should not work
         self.user.is_verified = True
@@ -465,7 +432,7 @@ class TestRequestVerification(Base):
         self.api_client.force_authenticate(self.user)
         response = self.http_method(self.detail_url)
         assert response.status_code == 403
-        sleep(0.2)
+        sleep(0.4)
 
     def test_success(self):
         """Tests an unverified user can receive the verification email"""
@@ -490,16 +457,15 @@ class TestUpdatePassword(Base):
             "password": "Str0ngP4ssw0rD!!!",
             "confirm_password": "Str0ngP4ssw0rD!!!",
         }
-        self.user = self.create_user(
-            authenticate=True, password=self.payload["current_password"]
-        )
+        self.user = UserFactory(password=self.payload["current_password"])
+        self.api_client.force_authenticate(self.user)
         self.detail_url = self.url(context={"id": self.user.id})
 
     def test_permissions(self):
         """Tests only the owner can reset his own password"""
-        admin = self.create_admin_user(password=self.payload["current_password"])
+        admin = AdminFactory(password=self.payload["current_password"])
         self.assert_owner_permissions(self.detail_url, self.user, admin, self.payload)
-        sleep(0.2)  # For the email to be sent
+        sleep(0.4)  # For the email to be sent
 
     def test_current_password(self):
         """Tests the user must provide the correct current password"""

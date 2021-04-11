@@ -4,8 +4,8 @@
 # Django
 from django.contrib import admin
 
-# Application
-from contact.models import Contact
+# Local
+from .models import Contact
 
 
 # --------------------------------------------------------------------------------

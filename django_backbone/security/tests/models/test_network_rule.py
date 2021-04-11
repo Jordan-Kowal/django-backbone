@@ -13,6 +13,7 @@ from jklib.django.utils.network import get_client_ip
 from jklib.django.utils.tests import assert_logs
 
 # Local
+from ...factories import NetworkRuleFactory
 from ...models import NetworkRule
 
 
@@ -24,23 +25,13 @@ class TestNetworkRule(ModelTestCase):
 
     model_class = NetworkRule
 
-    def setUp(self):
-        """Creates a valid payload for a NetworkRule"""
-        self.payload = {
-            "ip": "127.0.0.1",
-            "status": NetworkRule.Status.NONE,
-            "expires_on": None,
-            "active": False,
-            "comment": "Created on setUp",
-        }
-
     # ----------------------------------------
     # Property tests
     # ----------------------------------------
     @assert_logs("security", "INFO")
     def test_get_default_duration(self):
         """Tests the default duration returns the settings duration"""
-        instance = self.model_class.objects.create(**self.payload)
+        instance = NetworkRuleFactory()
         if hasattr(settings, "NETWORK_RULE_DEFAULT_DURATION"):
             assert (
                 instance.get_default_duration()
@@ -52,7 +43,7 @@ class TestNetworkRule(ModelTestCase):
     @assert_logs(logger="security", level="INFO")
     def test_computed_status(self):
         """Tests the computed_status works as intended"""
-        instance = self.model_class.objects.create(**self.payload)
+        instance = NetworkRuleFactory()
         instance.whitelist(override=True)
         assert instance.computed_status == "whitelisted"
         instance.blacklist(override=True)
@@ -63,7 +54,7 @@ class TestNetworkRule(ModelTestCase):
     @assert_logs(logger="security", level="INFO")
     def test_is_blacklisted(self):
         """Tests that a blacklisted rule is correctly flagged as blacklisted"""
-        instance = self.model_class.objects.create(**self.payload)
+        instance = NetworkRuleFactory()
         instance.blacklist()
         assert instance.is_blacklisted
         instance.whitelist(override=True)
@@ -72,7 +63,7 @@ class TestNetworkRule(ModelTestCase):
     @assert_logs(logger="security", level="INFO")
     def test_is_whitelisted(self):
         """Tests that a whitelisted rule is correctly flagged as whitelisted"""
-        instance = self.model_class.objects.create(**self.payload)
+        instance = NetworkRuleFactory()
         instance.whitelist()
         assert instance.is_whitelisted
         instance.blacklist(override=True)
@@ -89,10 +80,7 @@ class TestNetworkRule(ModelTestCase):
     @assert_logs(logger="security", level="INFO")
     def test_clear(self):
         """Tests 'clear' correctly resets the model fields"""
-        self.payload["active"] = True
-        self.payload["status"] = NetworkRule.Status.BLACKLISTED
-        self.payload["expires_on"] = date.today()
-        instance = self.model_class.objects.create(**self.payload)
+        instance = NetworkRuleFactory(do_blacklist=True)
         instance.clear()
         assert not instance.active
         assert instance.status == NetworkRule.Status.NONE
@@ -116,11 +104,7 @@ class TestNetworkRule(ModelTestCase):
         """Tests 'clear_from_request' correctly resets the model fields"""
         fake_request = self.build_fake_request()
         fake_ip_address = get_client_ip(fake_request)
-        self.payload["ip"] = fake_ip_address
-        self.payload["active"] = True
-        self.payload["status"] = NetworkRule.Status.BLACKLISTED
-        self.payload["expires_on"] = date.today()
-        self.model_class.objects.create(**self.payload)
+        NetworkRuleFactory(ip=fake_ip_address, do_blacklist=True)
         instance = self.model_class.clear_from_request(fake_request)
         assert not instance.active
         assert instance.status == NetworkRule.Status.NONE
@@ -136,8 +120,7 @@ class TestNetworkRule(ModelTestCase):
         """Tests that a blacklisted rule is correctly flagged as blacklisted"""
         fake_request = self.build_fake_request()
         fake_ip_address = get_client_ip(fake_request)
-        self.payload["ip"] = fake_ip_address
-        self.model_class.objects.create(**self.payload)
+        NetworkRuleFactory(ip=fake_ip_address)
         self.model_class.blacklist_from_request(fake_request)
         assert self.model_class.is_blacklisted_from_request(fake_request)
 
@@ -146,8 +129,7 @@ class TestNetworkRule(ModelTestCase):
         """Tests that a whitelisted rule is correctly flagged as whitelisted"""
         fake_request = self.build_fake_request()
         fake_ip_address = get_client_ip(fake_request)
-        self.payload["ip"] = fake_ip_address
-        self.model_class.objects.create(**self.payload)
+        NetworkRuleFactory(ip=fake_ip_address)
         self.model_class.whitelist_from_request(fake_request)
         assert self.model_class.is_whitelisted_from_request(fake_request)
 
@@ -158,12 +140,13 @@ class TestNetworkRule(ModelTestCase):
     def test_log_signals(self):
         """Tests that logs are generated on creation, update, and deletion"""
         logs = self.logger_context.output
-        instance = self.model_class.objects.create(**self.payload)
+        instance = NetworkRuleFactory()  # Factory creates and updates, so 2 logs
         assert logs[0] == self._build_log_message(instance, "created")
-        instance.save()
         assert logs[1] == self._build_log_message(instance, "updated")
+        instance.save()
+        assert logs[2] == self._build_log_message(instance, "updated")
         instance.delete()
-        assert logs[2] == self._build_log_message(instance, "deleted")
+        assert logs[3] == self._build_log_message(instance, "deleted")
 
     # ----------------------------------------
     # Cron tests
@@ -192,7 +175,7 @@ class TestNetworkRule(ModelTestCase):
         Utility function to test the 'blacklist' or 'whitelist' methods
         :param str name: Either blacklist or whitelist
         """
-        instance = self.model_class.objects.create(**self.payload)
+        instance = NetworkRuleFactory()
         opposite_name = "whitelist" if name == "blacklist" else "blacklist"
         main_method = getattr(instance, name)
         main_property = lambda: getattr(instance, f"is_{name}ed")
@@ -287,11 +270,11 @@ class TestNetworkRule(ModelTestCase):
         valid_date = date.today() + timedelta(days=3)
         data = [
             # IP, Status, Expires on, Active, Whether it should be cleared
-            ("127.0.0.1", NetworkRule.Status.NONE, None, False, False),
-            ("127.0.0.2", NetworkRule.Status.BLACKLISTED, expired_date, True, True),
-            ("127.0.0.3", NetworkRule.Status.WHITELISTED, None, False, False),
-            ("127.0.0.4", NetworkRule.Status.BLACKLISTED, valid_date, True, False),
-            ("127.0.0.5", NetworkRule.Status.WHITELISTED, expired_date, True, True),
+            (NetworkRule.Status.NONE, None, False, False),
+            (NetworkRule.Status.BLACKLISTED, expired_date, True, True),
+            (NetworkRule.Status.WHITELISTED, None, False, False),
+            (NetworkRule.Status.BLACKLISTED, valid_date, True, False),
+            (NetworkRule.Status.WHITELISTED, expired_date, True, True),
         ]
         instances = []
         clear_eligibility = []
@@ -299,13 +282,12 @@ class TestNetworkRule(ModelTestCase):
         # Create instances and store data in lists
         for row in data:
             payload = {
-                "ip": row[0],
-                "status": row[1],
-                "expires_on": row[2],
-                "active": row[3],
+                "status": row[0],
+                "expires_on": row[1],
+                "active": row[2],
             }
-            to_be_cleared = row[4]
-            instance = self.model_class.objects.create(**payload)
+            to_be_cleared = row[3]
+            instance = NetworkRuleFactory(**payload)
             payloads.append(payload)
             instances.append(instance)
             clear_eligibility.append(to_be_cleared)

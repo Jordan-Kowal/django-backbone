@@ -14,6 +14,7 @@ from jklib.django.db.tests import ModelTestCase
 from jklib.django.utils.settings import get_config
 
 # Local
+from ..factories import ContactFactory
 from ..models import Contact
 
 
@@ -25,23 +26,12 @@ class TestContact(ModelTestCase):
 
     model_class = Contact
 
-    def setUp(self):
-        """Creates a valid payload for a Contact instance"""
-        self.payload = {
-            "ip": "128.0.0.1",
-            "user": None,
-            "name": "Jordan Kowal",
-            "email": "fakeemail@fakedomain.fakecom",
-            "subject": "Fake subject",
-            "body": "Fake body but long enough",
-        }
-
     # ----------------------------------------
     # Properties tests
     # ----------------------------------------
     def test_get_ban_settings(self):
         """Tests the ban_settings returns the correct value based on the config"""
-        contact = self.model_class.objects.create(**self.payload)
+        contact = ContactFactory()
         ban_settings = contact.get_ban_settings()
         default_settings = contact.DEFAULT_API_BAN_SETTINGS
         overridden_settings = get_config("CONTACT_API_BAN_SETTINGS", {})
@@ -51,7 +41,7 @@ class TestContact(ModelTestCase):
 
     def test_has_expired(self):
         """Tests that the expiration check is correctly computed"""
-        contact = self.model_class.objects.create(**self.payload)
+        contact = ContactFactory()
         retention_days = contact.get_retention_days()
         # Expired
         expired_date = timezone.now() - timedelta(days=retention_days + 1)
@@ -66,7 +56,7 @@ class TestContact(ModelTestCase):
 
     def test_get_retention_days(self):
         """Tests the retention_days returns the correct value based on the config"""
-        contact = self.model_class.objects.create(**self.payload)
+        contact = ContactFactory()
         retention_days = contact.get_retention_days()
         if hasattr(settings, "CONTACT_RETENTION_DAYS"):
             assert retention_days == settings.CONTACT_RETENTION_DAYS
@@ -78,15 +68,15 @@ class TestContact(ModelTestCase):
     # ----------------------------------------
     def test_send_notifications(self):
         """Tests that notification emails are correctly sent"""
-        contact = self.model_class.objects.create(**self.payload)
+        contact = ContactFactory()
         admin_email = get_config("EMAIL_HOST_USER")
         # No mail
         contact.send_notifications(False, False)
-        sleep(0.2)
+        sleep(0.4)
         assert len(mail.outbox) == 0
         # Only admin
         contact.send_notifications(True, False)
-        sleep(0.2)
+        sleep(0.4)
         email = mail.outbox[0]
         assert len(mail.outbox) == 1
         assert email.subject == contact.EmailTemplate.ADMIN_NOTIFICATION.subject
@@ -94,7 +84,7 @@ class TestContact(ModelTestCase):
         assert email.to[0] == admin_email
         # Only user
         contact.send_notifications(False, True)
-        sleep(0.2)
+        sleep(0.4)
         email = mail.outbox[1]
         assert len(mail.outbox) == 2
         assert email.subject == contact.EmailTemplate.USER_NOTIFICATION.subject
@@ -118,17 +108,17 @@ class TestContact(ModelTestCase):
         """Tests that we correctly check if an IP should be banned based on the settings"""
         ban_settings = Contact.get_ban_settings()
         threshold = ban_settings["threshold"]
-        ip = self.payload["ip"]
+        ip = "102.102.102.102"
         # No threshold, no ban
         if not threshold:
-            self.model_class.objects.create(**self.payload)
+            ContactFactory(ip=ip)
             assert not self.model_class.should_ban_ip(ip)
         # Reach the threshold and check the ban
         else:
             for i in range(threshold - 1):
-                self.model_class.objects.create(**self.payload)
+                ContactFactory(ip=ip)
                 assert not self.model_class.should_ban_ip(ip)
-            self.model_class.objects.create(**self.payload)  # Reach the threshold
+            ContactFactory(ip=ip)  # Reach the threshold
             assert self.model_class.should_ban_ip(ip)
 
     # ----------------------------------------
@@ -137,7 +127,7 @@ class TestContact(ModelTestCase):
     def test_remove_old_entries(self):
         """Tests that only expired entries are removed by the CRON job"""
         # Prepare the data
-        instances = [self.model_class.objects.create(**self.payload) for i in range(10)]
+        instances = [ContactFactory() for _ in range(10)]
         retention_days = instances[0].get_retention_days()
         self.assert_instance_count_equals(10)
         # Update dates for our instances

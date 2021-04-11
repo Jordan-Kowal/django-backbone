@@ -8,13 +8,15 @@ from time import sleep
 from django.core import mail
 
 # Personal
-from jklib.django.drf.tests import ActionTestCase
 from jklib.django.utils.settings import get_config
 
 # Application
+from core.tests import BaseActionTestCase
 from security.models import NetworkRule
+from users.factories import AdminFactory, UserFactory
 
 # Local
+from ..factories import ContactFactory
 from ..models import Contact
 
 # --------------------------------------------------------------------------------
@@ -23,12 +25,13 @@ from ..models import Contact
 SERVICE_URL = "/api/contacts/"
 
 
-class Base(ActionTestCase):
+class Base(BaseActionTestCase):
     """Base class for all the Contact action test cases"""
 
     def setUp(self):
         """Creates and authenticates an Admin user"""
-        self.admin = self.create_admin_user(authenticate=True)
+        self.admin = AdminFactory()
+        self.api_client.force_authenticate(self.admin)
 
     @staticmethod
     def assert_instance_representation(instance, response_data):
@@ -68,25 +71,6 @@ class Base(ActionTestCase):
         assert payload["subject"] == instance.subject
         assert payload["body"] == instance.body
 
-    @staticmethod
-    def create_contact(**kwargs):
-        """
-        Creates and returns a contact instance
-        :param kwargs: Parameters to override the default values
-        :return: The created Contact instance
-        :rtype: Contact
-        """
-        default_values = {
-            "ip": "127.0.0.1",
-            "user": None,
-            "name": "Name",
-            "email": "fake-email@fake-domain.com",
-            "subject": "Subject",
-            "body": "Sufficiently long body",
-        }
-        data = {**default_values, **kwargs}
-        return Contact.objects.create(**data)
-
 
 # --------------------------------------------------------------------------------
 # > TestCases
@@ -110,9 +94,9 @@ class TestCreateContact(Base):
         }
 
     def test_permissions(self):
-        """Tests anybody can access this service"""
-        user = self.create_user()
-        admin = self.create_user()
+        """Tests anybody can access this service. (We use 3 different IPs to avoid ban)"""
+        user = UserFactory()
+        admin = AdminFactory()
         # Logged out
         self.api_client.logout()
         response = self.http_method(self.url(), data=self.payload)
@@ -163,9 +147,9 @@ class TestCreateContact(Base):
             )
             assert rule.is_blacklisted
             assert rule.expires_on == expected_end_date
-        # Any subsequent request should fail
-        response = self.http_method(self.url(), self.payload, REMOTE_ADDR=ip)
-        assert response.status_code == 403
+            # Any subsequent request should fail
+            response = self.http_method(self.url(), self.payload, REMOTE_ADDR=ip)
+            assert response.status_code == 403
         # Other IPs can pass through
         response = self.http_method(self.url(), self.payload)
         assert response.status_code == self.success_code
@@ -175,7 +159,7 @@ class TestCreateContact(Base):
         # Without notification
         self._assert_creation_success_base(self.payload, 1)
         assert Contact.objects.count() == 1
-        sleep(0.2)
+        sleep(0.4)
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
         assert email.subject == Contact.EmailTemplate.ADMIN_NOTIFICATION.subject
@@ -246,8 +230,8 @@ class TestListContacts(Base):
         response = self.http_method(self.url())
         assert response.status_code == self.success_code
         assert Contact.objects.count() == len(response.data) == 0
-        contact_1 = self.create_contact()
-        contact_2 = self.create_contact(name="Name 2")
+        contact_1 = ContactFactory()
+        contact_2 = ContactFactory()
         response = self.http_method(self.url())
         assert response.status_code == self.success_code
         assert Contact.objects.count() == len(response.data) == 2
@@ -265,7 +249,7 @@ class TestRetrieveContact(Base):
     def setUp(self):
         """Also creates a Contact instance"""
         super().setUp()
-        self.contact = self.create_contact()
+        self.contact = ContactFactory()
         self.detail_url = self.url(context={"id": self.contact.id})
 
     def test_permissions(self):
@@ -289,8 +273,8 @@ class TestDestroyContact(Base):
     def setUp(self):
         """Also creates 2 Contact instances"""
         super().setUp()
-        self.contact_1 = self.create_contact()
-        self.contact_2 = self.create_contact(name="Name 2")
+        self.contact_1 = ContactFactory()
+        self.contact_2 = ContactFactory()
         self.url_1 = self.url(context={"id": self.contact_1.id})
         self.url_2 = self.url(context={"id": self.contact_2.id})
 
@@ -321,13 +305,13 @@ class TestBulkDestroyContacts(Base):
     def setUp(self):
         """Also creates 4 Contact instances"""
         super().setUp()
-        [setattr(self, f"contact_{i}", self.create_contact()) for i in range(1, 5)]
+        [ContactFactory() for _ in range(4)]
         self.payload = {"ids": [1, 4]}
 
     def test_permissions(self):
         """Tests only admins can access this service"""
         assert Contact.objects.count() == 4
-        self.assert_admin_permissions(url=self.url(), payload=self.payload)
+        self.assert_admin_permissions(url=self.url(), data=self.payload)
         assert Contact.objects.count() == 2
 
     def test_success(self):

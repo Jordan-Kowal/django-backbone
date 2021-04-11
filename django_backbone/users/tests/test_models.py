@@ -8,6 +8,7 @@ from jklib.django.db.tests import ModelTestCase
 from security.models import SecurityToken
 
 # Local
+from ..factories import UserFactory
 from ..models import User, UserEmailTemplate
 
 # --------------------------------------------------------------------------------
@@ -27,7 +28,7 @@ class TestUser(ModelTestCase):
 
     def setUp(self):
         """Creates a user"""
-        self.user = self.create_user()
+        self.user = UserFactory()
 
     # ----------------------------------------
     # Properties tests
@@ -42,15 +43,15 @@ class TestUser(ModelTestCase):
         assert self.user.full_name == full_name
 
     # ----------------------------------------
-    # Creation API tests
+    # Manager tests
     # ----------------------------------------
-    def test_create_user(self):
+    def test_manager_create_user(self):
         """Tests we can create a user"""
         user = self.model_class.create_user(FAKE_EMAIL, FAKE_PASSWORD)
         assert not user.is_staff
         assert not user.is_superuser
 
-    def test_create_admin(self):
+    def test_manager_create_admin(self):
         """Tests we can create an admin"""
         user = self.model_class.create_admin(FAKE_EMAIL, FAKE_PASSWORD)
         assert user.is_staff
@@ -60,7 +61,7 @@ class TestUser(ModelTestCase):
                 "fake_email_2@fake_domain.com", FAKE_PASSWORD, is_staff=False
             )
 
-    def test_create_superuser(self):
+    def test_manager_create_superuser(self):
         """Tests we can create a superuser"""
         user = self.model_class.create_superuser(FAKE_EMAIL, FAKE_PASSWORD)
         assert user.is_staff

@@ -6,3 +6,4 @@ black
 flake8
 
 # Tests
+factory_boy

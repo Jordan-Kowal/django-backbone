@@ -4,10 +4,14 @@
 from datetime import date, timedelta
 
 # Personal
-from jklib.django.drf.tests import ActionTestCase
 from jklib.django.utils.tests import assert_logs
 
+# Application
+from core.tests import BaseActionTestCase
+from users.factories import AdminFactory
+
 # Local
+from ..factories import NetworkRuleFactory
 from ..models import NetworkRule
 
 # --------------------------------------------------------------------------------
@@ -16,12 +20,13 @@ from ..models import NetworkRule
 SERVICE_URL = "/api/admin/network_rules/"
 
 
-class BaseTestCase(ActionTestCase):
+class BaseTestCase(BaseActionTestCase):
     """Base class for all the NetworkRule action test cases"""
 
     def setUp(self):
         """Creates and authenticates an Admin user"""
-        self.admin = self.create_admin_user(authenticate=True)
+        self.admin = AdminFactory()
+        self.api_client.force_authenticate(self.admin)
 
     @staticmethod
     def assert_instance_from_payload(instance, payload, mapping=None):
@@ -114,24 +119,6 @@ class BaseTestCase(ActionTestCase):
         response = self.http_method(url, data=temp_payload)
         assert response.status_code == self.success_code
 
-    @staticmethod
-    def create_network_rule(**kwargs):
-        """
-        Creates a NetworkRule instance using default parameters and the one provided
-        :param kwargs: Parameters to override the default values
-        :return: The created NetworkRule instance
-        :rtype: NetworkRule
-        """
-        default_values = {
-            "ip": "127.0.0.10",
-            "status": NetworkRule.Status.NONE,
-            "expires_on": date.today() + timedelta(days=60),
-            "active": False,
-            "comment": "Test",
-        }
-        data = {**default_values, **kwargs}
-        return NetworkRule.objects.create(**data)
-
 
 # --------------------------------------------------------------------------------
 # > TestCases
@@ -157,7 +144,7 @@ class TestCreateNetworkRule(BaseTestCase):
     @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
-        self.assert_admin_permissions(url=self.url(), payload=self.payload)
+        self.assert_admin_permissions(url=self.url(), data=self.payload)
         assert NetworkRule.objects.count() == 1
 
     @assert_logs("security", "INFO")
@@ -194,8 +181,8 @@ class TestListNetworkRules(BaseTestCase):
         response = self.http_method(self.url())
         assert response.status_code == self.success_code
         assert NetworkRule.objects.count() == len(response.data) == 0
-        rule_1 = self.create_network_rule()
-        rule_2 = self.create_network_rule(ip="127.0.0.2")
+        rule_1 = NetworkRuleFactory()
+        rule_2 = NetworkRuleFactory()
         response = self.http_method(self.url())
         assert response.status_code == self.success_code
         assert NetworkRule.objects.count() == len(response.data) == 2
@@ -214,7 +201,7 @@ class TestRetrieveNetworkRule(BaseTestCase):
     def setUp(self):
         """Also creates a NetworkRule and builds its detail URL"""
         super().setUp()
-        self.rule = self.create_network_rule()
+        self.rule = NetworkRuleFactory()
         self.detail_url = self.url(context={"id": self.rule.id})
 
     def test_permissions(self):
@@ -240,7 +227,7 @@ class TestUpdateNetworkRule(BaseTestCase):
     def setUp(self):
         """Creates 1 admin, 1 rule, and a valid payload"""
         super().setUp()
-        self.rule = self.create_network_rule()
+        self.rule = NetworkRuleFactory()
         self.detail_url = self.url(context={"id": self.rule.id})
         self.payload = {
             "ip": "128.0.0.1",
@@ -254,7 +241,7 @@ class TestUpdateNetworkRule(BaseTestCase):
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         assert NetworkRule.objects.count() == 1
-        self.assert_admin_permissions(url=self.detail_url, payload=self.payload)
+        self.assert_admin_permissions(url=self.detail_url, data=self.payload)
 
     @assert_logs("security", "INFO")
     def test_expires_on(self):
@@ -282,8 +269,8 @@ class TestDestroyNetworkRule(BaseTestCase):
     def setUp(self):
         """Also creates 2 NetworkRules"""
         super().setUp()
-        self.rule_1 = self.create_network_rule()
-        self.rule_2 = self.create_network_rule(ip="127.0.0.2")
+        self.rule_1 = NetworkRuleFactory()
+        self.rule_2 = NetworkRuleFactory()
         self.detail_url_1 = self.url(context={"id": self.rule_1.id})
         self.detail_url_2 = self.url(context={"id": self.rule_2.id})
 
@@ -318,14 +305,14 @@ class TestBulkDestroyNetworkRules(BaseTestCase):
         """Also creates 4 NetworkRules"""
         super().setUp()
         for i in range(1, 5):
-            self.create_network_rule(ip=f"127.0.0.1{i}")
+            NetworkRuleFactory()
 
     @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
         assert NetworkRule.objects.count() == 4
         payload = {"ids": [1, 3]}
-        self.assert_admin_permissions(url=self.url(), payload=payload)
+        self.assert_admin_permissions(url=self.url(), data=payload)
         assert NetworkRule.objects.count() == 2
 
     @assert_logs("security", "INFO")
@@ -355,7 +342,7 @@ class TestClearNetworkRule(BaseTestCase):
     def setUp(self):
         """Also creates 1 NetworkRule"""
         super().setUp()
-        self.rule = self.create_network_rule()
+        self.rule = NetworkRuleFactory()
         self.rule_url = self.url(context={"id": self.rule.id})
 
     @assert_logs("security", "INFO")
@@ -460,8 +447,7 @@ class TestBulkClearNetworkRule(BaseTestCase):
         """Creates 6 clearable NetworkRule instances"""
         end_date = date.today() + timedelta(days=60)
         for i in range(6):
-            self.create_network_rule(
-                ip=f"{i+1}.0.0.{i+1}",
+            NetworkRuleFactory(
                 active=True,
                 expires_on=end_date,
                 status=NetworkRule.Status.values[i // 2],
@@ -488,7 +474,7 @@ class TestActivateNewNetworkRule(BaseTestCase):
     @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
-        self.assert_admin_permissions(url=self.url(), payload=self.payload)
+        self.assert_admin_permissions(url=self.url(), data=self.payload)
 
     @assert_logs("security", "INFO")
     def test_expires_on(self):
@@ -554,7 +540,7 @@ class TestActivateExistingNetworkRule(BaseTestCase):
     def setUp(self):
         """Also creates a NetworkRule and a payload to activate it"""
         super().setUp()
-        self.rule = self.create_network_rule()
+        self.rule = NetworkRuleFactory()
         self.detail_url = self.url(context={"id": self.rule.id})
         self.payload = {
             "override": False,
@@ -566,7 +552,7 @@ class TestActivateExistingNetworkRule(BaseTestCase):
     @assert_logs("security", "INFO")
     def test_permissions(self):
         """Tests that only admin users can access this service"""
-        self.assert_admin_permissions(url=self.detail_url, payload=self.payload)
+        self.assert_admin_permissions(url=self.detail_url, data=self.payload)
 
     @assert_logs("security", "INFO")
     def test_expires_on(self):

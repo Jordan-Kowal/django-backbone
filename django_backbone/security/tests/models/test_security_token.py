@@ -2,7 +2,6 @@
 
 # Built-in
 from datetime import timedelta
-from secrets import token_urlsafe
 
 # Django
 from django.utils import timezone
@@ -10,7 +9,11 @@ from django.utils import timezone
 # Personal
 from jklib.django.db.tests import ModelTestCase
 
+# Application
+from users.factories import UserFactory
+
 # Local
+from ...factories import SecurityTokenFactory
 from ...models import SecurityToken
 
 
@@ -25,14 +28,11 @@ class TestToken(ModelTestCase):
 
     def setUp(self):
         """Creates a user and a payload that can be used for creating a token"""
-        self.user = self.create_user()
+        self.user = UserFactory()
         expiration_date = timezone.now() + timedelta(days=1)
         self.payload = {
             "user": self.user,
-            "type": "random",
-            "value": token_urlsafe(50),
             "expired_at": expiration_date,
-            "used_at": None,
             "is_active_token": True,
         }
 
@@ -41,7 +41,7 @@ class TestToken(ModelTestCase):
     # ----------------------------------------
     def test_can_be_used(self):
         """Tests the 'can_be_used' property"""
-        token = self.model_class.objects.create(**self.payload)
+        token = SecurityTokenFactory(**self.payload)
         assert token.can_be_used
         token.is_active_token = False
         assert not token.can_be_used
@@ -56,14 +56,14 @@ class TestToken(ModelTestCase):
 
     def test_is_expired(self):
         """Tests the 'is_expired' property"""
-        token = self.model_class.objects.create(**self.payload)
+        token = SecurityTokenFactory(**self.payload)
         assert not token.is_expired
         token.expired_at = timezone.now() - timedelta(days=1)
         assert token.is_expired
 
     def test_is_used(self):
         """Tests the 'is_used' property"""
-        token = self.model_class.objects.create(**self.payload)
+        token = SecurityTokenFactory(**self.payload)
         assert not token.is_used
         token.used_at = timezone.now() - timedelta(days=1)
         assert token.is_used
@@ -95,7 +95,7 @@ class TestToken(ModelTestCase):
         assert token_2.can_be_used
         assert token_3.can_be_used
         # Create token for a different user, does not impact the other users' tokens
-        new_user = self.create_user()
+        new_user = UserFactory()
         token_4 = self.model_class.create_new_token(new_user, "other", 600)
         token_3 = self.model_class.objects.get(pk=3)  # Refresh
         assert token_3.can_be_used
@@ -103,7 +103,7 @@ class TestToken(ModelTestCase):
 
     def test_deactivate_token(self):
         """Tests that deactivating a token makes it unusable"""
-        token = self.model_class.objects.create(**self.payload)
+        token = SecurityTokenFactory(**self.payload)
         assert token.can_be_used
         token.deactivate_token()
         assert not token.can_be_used
@@ -111,7 +111,7 @@ class TestToken(ModelTestCase):
     def test_deactivate_user_tokens(self):
         """Tests we can deactivate all tokens of a user"""
         shared_type = "type 3"
-        other_user = self.create_user()
+        other_user = UserFactory()
         self.model_class.create_new_token(self.user, "type 1", 600)
         self.model_class.create_new_token(self.user, "type 2", 600)
         self.model_class.create_new_token(self.user, shared_type, 600)

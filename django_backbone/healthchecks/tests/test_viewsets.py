@@ -1,11 +1,14 @@
 """Tests for the 'healthchecks' viewsets"""
 
 # Personal
-from jklib.django.drf.tests import ActionTestCase
 from jklib.django.utils.tests import assert_logs
 
 # Application
-from healthchecks.viewsets import Service
+from core.tests import BaseActionTestCase
+from users.factories import AdminFactory
+
+# Local
+from ..viewsets import Service
 
 # --------------------------------------------------------------------------------
 # > Helpers
@@ -13,7 +16,7 @@ from healthchecks.viewsets import Service
 SERVICE_URL = "/api/admin/healthchecks/"
 
 
-class BaseTestCase(ActionTestCase):
+class BaseTestCase(BaseActionTestCase):
     """Base class for healthcheck tests that provides utilities"""
 
     # Constant
@@ -26,7 +29,8 @@ class BaseTestCase(ActionTestCase):
 
     def setUp(self):
         """Creates and logs an admin, then stores the service endpoint"""
-        self.admin = self.create_admin_user(authenticate=True)
+        self.admin = AdminFactory()
+        self.api_client.force_authenticate(self.admin)
         self.endpoint_url = self.url(context={"service": self.service.name.lower()})
 
     @property
@@ -52,21 +56,7 @@ class SharedMixin:
     @assert_logs(logger="healthcheck", level="INFO")
     def test_permissions(self):
         """Tests that only an admin can access this service"""
-        admin = self.create_admin_user()
-        user = self.create_user()
-        # 401 Not authenticated
-        self.api_client.logout()
-        response = self.http_method(self.endpoint_url)
-        assert response.status_code == 401
-        # 403 Not admin
-        self.api_client.force_authenticate(user)
-        response = self.http_method(self.endpoint_url)
-        assert response.status_code == 403
-        # 201 Admin
-        self.api_client.logout()
-        self.api_client.force_authenticate(admin)
-        response = self.http_method(self.endpoint_url)
-        assert response.status_code == self.success_code
+        self.assert_admin_permissions(self.endpoint_url)
 
     def test_healthcheck_failure(self):
         """Cannot be tested"""
